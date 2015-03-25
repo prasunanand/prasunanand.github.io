@@ -1,3 +1,16 @@
+*{
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	-ms-box-sizing: border-box;
+}
+*{
+	transition: 0.5s all ease-in;
+	-webkit-transition: 0.5s all ease-in;
+	-moz-transition: 0.5s all ease-in;
+	-ms-transition: 0.5s all ease-in;
+}
+
 .container{
 	width:100%;
 }
