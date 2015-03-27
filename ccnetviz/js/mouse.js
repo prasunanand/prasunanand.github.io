@@ -1,17 +1,26 @@
-function relMouseCoords(e){var x;
-var y;
-if (e.pageX || e.pageY) { 
-  x = e.pageX;
-  y = e.pageY;
-}
-else { 
-  x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
-  y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
-} 
-x -= gCanvasElement.offsetLeft;
-y -= gCanvasElement.offsetTop;
+var Y=X=pageX=pageY=difY=difX=0;
 
-console.log(x + " " + y) ;
-}
+function getCoordinates(event) {
 
-relMouseCoords();
+	var canvas = document.getElementById('br');
+	var width = canvas.width;
+	var height = canvas.height;
+
+	if (event.pageX) {
+
+		pageX = event.pageX;
+		pageY = event.pageY;
+
+		difX=pageX-X;
+		difY=pageY-Y;
+
+
+		x=difX/width;
+		y=1-difY/height;
+
+		console.log(x+" "+y);
+
+		a=ccNetViz.quadtree(graphs[0].nodes,graphs[0].edges);
+		console.log(a.find(x,y));
+	}
+}
