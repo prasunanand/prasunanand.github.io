@@ -1,0 +1,43 @@
+<html>
+	<head>
+		<title>Edge</title>
+		<link rel="stylesheet" type="text/css" href="css/normalize.css">
+		<link rel="stylesheet" type="text/css" href="css/home.css">
+	</head>
+	<body>
+		<div class="container">
+			<div class="row">
+				<h1>Pseudo Code</h1>
+				<div class="code">
+					<pre>
+					<code>
+function is_edge_in_quad(quad, edge){
+	// edge is connecting node a and b with coordinates (a1, a2) and (b1, b2)
+	// We have quad_range as a 4-tuple.
+	quad_range = (quad.xmin, quad.ymin, quad.xmax, quad.ymax)
+	// We also have edge_range as a 4-tuple.
+	edge_range = (edge.xmin, edge.ymin, edge.xmax, edge.ymax)
+	// If both ranges are mutually exclusive, then the egde will not be in the quad, otherwise yes.
+	return is_mutually_exclusive(quad_range, edge_range)
+}
+
+
+function is_mutually_exclusive(range1, range2){	
+	// range1 = (x1, y1, x2, y2) , x1 <= x2 , y1 <= y2
+	// range2 = (a1, b1, a2, b2) , a1 <= a2 , b1 <= b2	
+	if ((x2 < a1) | (a1 < x2)){
+		if ((y2 < b1) | (y1 < b2)) {
+			return True
+		}
+	} 
+	else {
+		return False
+	}
+}
+			</code>
+					</pre>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

@@ -15,6 +15,14 @@
 	width:100%;
 }
 
+code{
+	font-size: 12px;
+	line-height: 20px;
+}
+.code{
+	background-color: #f5f5f5;
+	padding:0px 25px;
+}
 .row{
 	width: 85%;
 	margin: auto;
