@@ -1,0 +1,109 @@
+
+/******
+  Carousel
+*******/
+.carouselBox{
+    width: 100%;
+    height: 100px;
+    background-color: #106470;
+    text-align: left;
+    padding: 25px 10%;
+}
+
+.heading{
+    font-size: 36px;
+    color: #eaeaea;
+    font-weight: normal;
+}
+/******
+  Carousel
+*******/
+/******
+  members
+*******/
+.members{
+  height: 400px;
+  padding: 25px 10%;
+}
+
+.member{
+    width: 28%;
+    float: left;
+    padding: 20px 10px;
+    margin-bottom: 30px;
+    border: 1px solid #eee;
+    background-color: #f5f5f5;
+    margin: 20px 2% ;
+    text-align: center;
+    color: #353535;
+}
+.members img{
+  display: block;
+  width: 90%;
+  height: 100px;
+  margin: 5px auto;
+}
+/******
+  members
+*******/
+
+/******
+  projects
+*******/
+
+.projects{
+    width: 100%;
+    height: 940px;
+    padding:10px 10%;
+    padding-top: 60px;
+}
+
+.headingProject{
+    font-size: 40px;
+    display: block;
+    height: 90px;
+    font-weight: lighter;
+    color: #106470;
+    margin-bottom: -40px;
+}
+/******
+  projects
+*******/
+/******
+  footer
+*******/
+.cdtFooter{
+    width: 100%;
+    height: 240px;
+    background-color: #106470;
+}
+.bitsFooter{
+    width: 100%;
+    height: 280px;
+    background-color: #000;
+}
+
+
+/******
+buttons
+*****/
+.read{
+    display: block;
+    border:1px solid #3687C7;
+    height: 30px;
+    width: 100px;
+    padding: 4px;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    margin: 18px auto 10px;
+    font-size: 14px;
+    background-color: #fff;
+    color: #3687C7;
+}
+
+.read:hover{
+    color: #fff;
+    border-color: none;
+    background-color: #3687C7;
+}
