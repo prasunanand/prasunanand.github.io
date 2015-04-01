@@ -34,7 +34,7 @@ li{
 	margin-bottom: 0px;
 }
 
-		a{
+		li a{
 			display: block;
 			border:2px solid #fff;
 			width: 100%;
@@ -50,7 +50,7 @@ li{
 
 		}
 
-		a:hover{
+		li a:hover{
 			color: #3687C7;
 			border-color: #3687C7;
 			background-color: #fff;
