@@ -47,6 +47,7 @@
     line-height: 32px;
     height: 161px;
     border-radius: 17px;
+    color: #106470;
 }
 .row{
     width: 100%;
@@ -63,8 +64,27 @@
     margin: 20px 2% ;
     text-align: center;
     color: #353535;
+    height: 200px;
 }
-
+.colImage{
+  width: 40%;
+  height: 120px;
+  float: left;
+  padding: 5px;
+}
+.colContents{
+  width: 60%;
+  height: 120px;
+  float: left;
+  font-size: 14px;
+  text-align: left;
+  padding-top: 20px;
+}
+.colImage img{
+  display: block;
+  width: 90%;
+  height: auto;
+}
 /******
   intro
 *******/
@@ -339,11 +359,12 @@
 buttons
 *****/
 .read{
+  clear: both;
     display: block;
     border:1px solid #3687C7;
     height: 30px;
     width: 100px;
-    padding: 4px;
+    padding: 6px;
     text-align: center;
     text-decoration: none;
     font-weight: bold;

@@ -323,3 +323,14 @@ textarea {
 /******
   navbar
 *******/
+
+.cdtFooter{
+    width: 100%;
+    height: 240px;
+    background-color: #106470;
+}
+.bitsFooter{
+    width: 100%;
+    height: 280px;
+    background-color: #000;
+}
