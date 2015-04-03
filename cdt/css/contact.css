@@ -5,15 +5,14 @@
 .carouselBox{
     width: 100%;
     height: 130px;
-    background-color: #106470;
+    background-color: rgba(42, 39, 94, 0.89);
     text-align: left;
-    padding: 40px 10%;
+    padding: 30px 10%;
 }
 
 .heading{
-    font-size: 36px;
-    color: #eaeaea;
-    font-weight: normal;
+    font-size: 56px;
+    color: #fff;
 }
 /******
   Carousel
@@ -69,19 +68,7 @@
 /******
   projects
 *******/
-/******
-  footer
-*******/
-.cdtFooter{
-    width: 100%;
-    height: 240px;
-    background-color: #106470;
-}
-.bitsFooter{
-    width: 100%;
-    height: 280px;
-    background-color: #000;
-}
+
 
 
 /******

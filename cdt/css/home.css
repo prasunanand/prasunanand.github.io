@@ -12,7 +12,7 @@
 
 .heading{
     font-size: 44px;
-    color: #eaeaea;
+    color: #fff;
     font-weight: bold;
 }
 .carousl{
@@ -55,16 +55,16 @@
     margin-top:20px; 
 }
 .col{
-    width: 45%;
+    width: 41%;
     float: left;
     padding: 20px 10px;
     margin-bottom: 30px;
-    border: 1px solid #eee;
+    border: 1px solid #211D70;
     background-color: #f5f5f5;
-    margin: 20px 2% ;
+    margin: 25px 4%;
     text-align: center;
-    color: #353535;
-    height: 200px;
+    height: 214px;
+    color: #333333;
 }
 .colImage{
   width: 40%;
@@ -347,21 +347,19 @@ buttons
 .read{
   clear: both;
     display: block;
-    border:1px solid  #211D70;
-    height: 30px;
-    width: 100px;
-    padding: 6px;
+    border:1px solid #211D70;
+    height: 35px;
+    width: 120px;
+    padding: 8px;
     text-align: center;
     text-decoration: none;
-    font-weight: bold;
     margin: 18px auto 10px;
     font-size: 14px;
-    background-color: #fff;
-    color:  #211D70;
+    color: #fff;
+    background-color: rgba(42, 39, 94, 0.68);
 }
-
 .read:hover{
     color: #fff;
     border-color: none;
-    background-color:  #211D70;
+    background-color: #211D70;
 }
