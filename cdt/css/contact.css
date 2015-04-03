@@ -21,7 +21,7 @@
   members
 *******/
 .members{
-  height: 400px;
+  height: 520px;
   padding: 25px 10%;
 }
 
@@ -38,8 +38,8 @@
 }
 .members img{
   display: block;
-  width: 90%;
-  height: 100px;
+  width: 150px;
+  height: 180px;
   margin: 5px auto;
 }
 /******

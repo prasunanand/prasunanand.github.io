@@ -299,9 +299,9 @@ textarea {
     .logo{
         float: left;
         height: 60px;
-        margin-right: 10%;
+        margin-left: 8%;
         font-weight:bold; 
-        padding: 4px 90px;
+        padding-top: 4px;
 
     }
     .logo img{
@@ -318,14 +318,10 @@ textarea {
         padding: 18px 10px;
         float: left;
         width: 140px;
-        border-right: 1px solid rgba(255, 255, 255, 0.37);
-
         height: 59px;
         text-align: center;
     }
-    .a{
-        border-left: 1px solid rgba(255, 255, 255, 0.37);
-    }
+    
 
     .right li a{
         text-decoration: none;
@@ -346,6 +342,9 @@ textarea {
     height: 280px;
     
     height: 0px;
+}
+a{
+    text-decoration: none;
 }
 #activePage{
   text-decoration: underline;
