@@ -94,3 +94,8 @@ buttons
     border-color: none;
     background-color: #3687C7;
 }
+
+.info{
+  font-size: 14px;
+  line-height: 22px;
+}
