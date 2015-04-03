@@ -293,16 +293,28 @@ textarea {
 .navbar{
     width: 100%;
     height: 60px;
-    background-color: #000;
+    border-bottom: 4px solid #211D70;
 }
-    .navbar div{
+
+    .logo{
+        float: left;
+        height: 60px;
+        margin-right: 10%;
+        font-weight:bold; 
+        padding: 4px 90px;
+
+    }
+    .logo img{
+        height: 50px;
+        width: auto;
+    }
+    .right{
         height: 60px;
         float: right;
         margin-right: 10%;
     }
-    .navbar div li{
+    .right li{
         display: block;
-        color: #fff;
         padding: 18px 10px;
         float: left;
         width: 140px;
@@ -311,11 +323,11 @@ textarea {
         height: 59px;
         text-align: center;
     }
-    .navbar div:first-child{
+    .a{
         border-left: 1px solid rgba(255, 255, 255, 0.37);
     }
 
-    .navbar div li a{
+    .right li a{
         text-decoration: none;
         color: inherit;
         font-weight: bold;
