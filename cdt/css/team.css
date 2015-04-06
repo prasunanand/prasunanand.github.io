@@ -20,8 +20,12 @@
 /******
   members
 *******/
-.members{
-  height: 1480px;
+.members1{
+  height: 520px;
+  padding: 0px 10%;
+}
+.members2{
+  height: 1040px;
   padding: 25px 10%;
 }
 
@@ -37,7 +41,7 @@
     text-align: center;
     color: #353535;
 }
-.members img{
+.member img{
   display: block;
   width: 150px;
   height: 180px;
@@ -46,7 +50,12 @@
 /******
   members
 *******/
-
+.type{
+  margin: 20px 10% 0px;
+  font-weight: bold;
+  font-size: 18px;
+  color: #211D70;
+}
 /******
   projects
 *******/
