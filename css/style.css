@@ -61,11 +61,9 @@ body{
 
 .row{
 	width: 100%;
-	padding: 0.5rem 1rem;
 	clear: both;
 }
 .heading{
-	width: 100%;
 	font-size: 32px;
 	text-align: left;
 	color: #7E6E57;
@@ -120,7 +118,7 @@ body{
 			border:2px solid #fff;
 			width: 120px;
 			height: 40px;
-			padding-top: 7px;
+			padding-top: 10px;
 			text-align: center;
 			text-decoration: none;
 			color: #fff;
@@ -208,5 +206,15 @@ body{
 		font-weight: bold;
 		color: #7E6E57;
 	}
+	.btn-social{
+		display: block;
+		float: none;
+		width: 90%;
+		margin: 5px auto;
 
+	}
+	.socNet {
+		width: inherit;
+		margin: 40px auto;
+	} 
 }
