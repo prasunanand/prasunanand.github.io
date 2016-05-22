@@ -1,0 +1,33 @@
+---
+layout: post
+title:  "mitab (MITab file parser)"
+date:   2016-03-30 22:18:41 +0530
+categories: ruby gem
+---
+I buid a ruby-gem "mitab" that helps in parsing a PSI-Mitab file.
+
+Installing the gem:
+{% highlight bash %}
+$ gem install mitab
+{% endhighlight %}
+
+
+Working with the gem:
+{% highlight ruby %}
+require 'mitab'
+
+text = open(filename) { |f| f.read }
+m = Mitab::MitabParser.new(text)
+
+m.print
+puts m.mitab
+puts m.nodes
+puts m.scores
+puts m.links
+{% endhighlight %}
+
+Check out the [Mitab Gem][mitab-gem]. File all bugs/feature requests at [Mitab’s GitHub repo][mitab-gh]. If you have questions, you can mail them to [prasunanand.bitsp@gmail.com][prasun-mail]
+
+[mitab-gem]: https://rubygems.org/gems/mitab
+[mitab-gh]: https://github.com/prasunanand/mitab
+[prasun-mail]: mail-to:prasunanand.bitsp@gmail.com

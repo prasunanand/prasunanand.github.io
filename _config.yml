@@ -1,0 +1,19 @@
+# Welcome to Jekyll!
+#
+# This config file is meant for settings that affect your whole blog, values
+# which you are expected to set up once and rarely need to edit after that.
+# For technical reasons, this file is *NOT* reloaded automatically when you use
+# 'jekyll serve'. If you change this file, please restart the server process.
+
+# Site settings
+title: Prasun Anand's blog
+email: prasunanand.bitsp@gmail.com
+description: > # this means to ignore newlines until "baseurl:"
+  I am a programmer from India interested in FOSS. Currently, I am working as a student developer for Ruby Science Foundation for GSoC 2016.
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "http://yourdomain.com" # the base hostname & protocol for your site
+twitter_username: prasun_anand
+github_username:  prasunanand
+
+# Build settings
+markdown: kramdown
