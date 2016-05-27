@@ -4,7 +4,7 @@ title:  "mitab (MITab file parser)"
 date:   2016-03-30 22:18:41 +0530
 categories: ruby gem
 ---
-I buid a ruby-gem "mitab" that helps in parsing a PSI-Mitab file.
+I built a ruby-gem "mitab" that helps in parsing a PSI-Mitab file.
 
 Installing the gem:
 {% highlight bash %}
