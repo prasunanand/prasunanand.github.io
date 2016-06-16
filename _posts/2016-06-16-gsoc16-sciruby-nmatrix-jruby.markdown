@@ -250,7 +250,7 @@ end
 ```
 Now there are just two initializations (only 1 if we don't have 2D Matrix). Also, there is less "passing by value" to functions.
 
-*lib/nmatrix/nmatrix_java.rb ( Matrix Addition )*
+*lib/nmatrix/nmatrix_java.rb* ( Matrix Addition )
 
 ```ruby
 def +(other)
@@ -276,7 +276,7 @@ def +(other)
 end
 ```
 
-*lib/nmatrix/nmatrix_java.rb ( Matrix Multiplication )*
+*lib/nmatrix/nmatrix_java.rb* ( Matrix Multiplication )
 
 ```ruby
 def dot(other)
