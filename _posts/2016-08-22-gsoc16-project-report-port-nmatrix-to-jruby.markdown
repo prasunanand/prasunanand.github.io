@@ -8,7 +8,9 @@ comments: true
 
 ## **Introduction**
 
-I have been working on the project **Port NMatrix to JRuby** as my GSoC project. NMatrix, a linear algebra library wraps Apache Commons Maths for its core functionalities. By the end of GSoC, I have been able to implement NMatrix for dense matrices with double and object ( ruby objects ) data type. I have also worked on porting mixed-models gem to JRuby which heavily uses NMatrix at its core.
+I have been working on "Port NMatrix to JRuby" as my GSoC project. I am pleased to announce that **JRuby is ready for Nmatrix users**.
+
+NMatrix, a linear algebra library wraps Apache Commons Maths for its core functionalities. By the end of GSoC, I have been able to implement NMatrix for dense matrices with double and object ( ruby objects ) data type. I have also worked on porting mixed-models gem to JRuby which heavily uses NMatrix at its core.
 
 This blog post summarizes my work on the project with Sciruby, and reports the final status of the project.
 
@@ -456,8 +458,9 @@ Note:
 
 **Result:**
 
-1. NMatrix-JRuby is currently slower than NMatrix-MRI when we are dealing with two dimensional matrices.
-2. However, NMatrix-JRuby is a clear winner when we are working with matrices of arbitrary dimension.
+1. For, two dimensional matrices, NMatrix-JRuby is currently slower than NMatrix-MRI for matrix multiplication, and matrix decomposition functionalities(calculating determinant and factorizing a matrix). NMatrix-JRuby is faster than NMatrix-MRI for other functionalities of a two dimensional matrix, like addition, subtraction, trigonometic operations, etc.
+
+2. NMatrix-JRuby is a clear winner when we are working with matrices of arbitrary dimension.
 
 ## **Test Report**
 
@@ -485,7 +488,11 @@ Why some tests fail?
 
 
 ## **Conclusion**
-The main goal of this project was to bring  **Scientific Computation to JRuby**, to gain from the performance JRuby offers. By the end of the   GSoC, we have been able to successfully create a linear algebra library, NMatrix for JRuby users, which they can easily run on their machines. We have mixed-models gem simultaneously ported to JRuby. Even here, we are very close to MRI if performance is considered.
+The main goal of this project was to bring  **Scientific Computation to JRuby**, to gain from the performance JRuby offers.
+
+By the end of the GSoC, we have been able to successfully create a linear algebra library, NMatrix for JRuby users, which they can easily run on their machines unless they want to use Complex numbers.
+
+We have mixed-models gem simultaneously ported to JRuby. Even here, we are very close to MRI if performance is considered.
 
  **Future work**
 
