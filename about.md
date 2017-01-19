@@ -4,8 +4,8 @@ title: About
 permalink: /about/
 ---
 
-I am a final-year student at BITS Pilani KK Birla Goa Campus, Goa, India pursuing a dual degree in M.Sc. in Biological Sciences and B.E. in Chemical Engineering.
+I am a final-year student at BITS Pilani KK Birla Goa Campus, Goa, India pursuing a dual degree in M.Sc. in Biological Sciences and B.E. in Chemical Engineering. I am a huge supporter of Open-source software.
 
-I like FOSS and previously I have made a few contributions to Jquery foundation and BioJavascript( BioJS ). 
+I worked as a student developer for Ruby Science Foundation for **Google Summer of Code 2016** on the project **"Port NMatrix to JRuby"**.
 
-Currently, I am working as a student developer for Ruby Science Foundation for GSoC 2016.
+Recently, I have been exploring the GPU world. I am interested in creating super-fast Math libraries for Ruby. One such effort is building the [ArrayFire](https://github.com/arrayfire/arrayfire-rb) gem that wraps ArrayFire library and will make it easy for programmers to use Ruby for **Big Data**.
