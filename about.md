@@ -16,7 +16,7 @@ Currently, he is involved with different open-source projects aimed at super fas
 ## Programming
 
 Prasun likes to program in C, C++, Java, D and Ruby. He is inclined towards using Parallelism for exploiting multiple cores
-on CPU and is a road to master **Heterogeneous Parallel Programming**.
+on CPU and is on the road to master **Heterogeneous Parallel Programming**.
 
 He has been exploring the GPU world to create super-fast Math libraries for Ruby. One such effort is building the [ArrayFire](https://github.com/arrayfire/arrayfire-rb) gem that wraps ArrayFire library and will make it easy for programmers to use Ruby for **Big Data**.
 
