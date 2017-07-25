@@ -29,7 +29,7 @@ There has been previous attempts at Calling D from Ruby. In my search for the ex
 "Calling D from Ruby", I stumbled upon these resources.
 
 1. [FFI](https://wiki.dlang.org/Call_D_from_Ruby_using_FFI): Use the Ruby-FFI gem to call a D function from C.
-2. [RuDy](http://tomash.wrug.eu/blog/2009/03/03/rudy-ruby-native-extensions-in-d-programming-language/): An effort / library / gem to enable
+2. [RuDy](https://github.com/tomash/rudy): An effort / library / gem to enable
 and ease writing Ruby native extensions in D programming language. It depends on creatind D bindings for the API calls in `ruby.h` header
 file.
 3. [Ruby-Dlang](https://github.com/llaine/ruby-dlang): Similar approach as Rudy.
@@ -46,6 +46,7 @@ run the example on my machine using `DMD`, however I could not run it with `LDC`
 with LDC because `faster_lmm_d` makes use of `LDC` compiler switches and it would take a lot of effort to be able to
 run it with `DMD`.
 
+
 The error I encountered are:
 
 1. Error with ld :
@@ -61,9 +62,57 @@ I have also tried some hit and trial and yet I was unable to properly compile th
 
 # Exploring RuDy
 
-I find Rudy as a more suitable way to create Ruby native extensions. RuDy [doesn't have complete support](https://github.com/tomash/rudy#limitations-and-areas-for-development)
-for `LDC` and I am still getting my head around using RuDy to create Ruby native extensions.
+I find Rudy as a more suitable way to create Ruby native extensions.
 
+When creating a Ruby native extension in C, we have a set of APIs provided by `ruby.h` that helps in creating a
+`Module` or a `Class` and the `methods` are nested to it.
+
+For example, `rb_define_module` helps in creating a module and `rb_define_class_under` is used to create a class
+nested in a module. `rb_define_method` and `rb_define_singleton_method` are used to create methods. The variables
+are used as `VALUE` which are passed around between Ruby frontend and C backend.
+
+A simple code snippet.
+
+```c
+// calculater.c
+void Init_extension() {
+  Calculator = rb_define_module("Calculator");              // Calculator module
+  IO = rb_define_class_under(Calculator, "IO", rb_cObject); // Calculator::IO class
+  rb_define_alloc_func(IO, io_alloc);                       // memory allocator for C structs
+  rb_define_method(IO, "initialize", io_init, -1);          // Calculator::IO#new constructor
+  rb_define_method(IO, "get_stream",io_get_stream,1 );      // Calculator::IO#get_stream method
+}
+
+static VALUE io_init(int argc, VALUE* argv, VALUE self){
+  // code...
+  return self;
+}
+
+static VALUE io_get_stream(VALUE self, VALUE some_val){
+  return Qtrue;
+}
+
+```
+
+After the C code with the module, classes and methods are in place, we compile it to get a shared object `extension.so`. Then a Ruby
+file `calculater.rb` can just load that `extension.so` as:
+
+```ruby
+# calculater.rb
+require 'calculater.so'
+
+```
+
+This seems simple but as the size of application grows, the extension becomes tough to manage.
+
+
+I believe D to be a superior C and provides modern programming paradigm and the LDC compiler is very promising. So, it would be great if we could write the
+native extension in D and get a shared library. Also, LDC has an incredible garbage collecter that would be very helpful for scientific computing Ruby libraries.
+
+To write the extension in D, the `ruby.h` bindings could be created in D using [`dstep`](http://www.dsource.org/projects/dstep) or [`bcd`](http://www.dsource.org/projects/bcd).
+
+RuDy [doesn't have complete support](https://github.com/tomash/rudy#limitations-and-areas-for-development)
+for `LDC` and I am still getting my head around using RuDy to create Ruby native extensions.
 
 # Conclusion
 
