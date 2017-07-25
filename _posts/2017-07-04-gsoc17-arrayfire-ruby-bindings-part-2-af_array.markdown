@@ -271,7 +271,7 @@ ArrayFire for Ruby can successfully create arrays on GPU using `Af_Array` class 
 elementwise binary operations. Similarly, I have implemented elementwise unary operations like `Af_Array#sin`
 `Af_Array#erfc`.
 
-In the next blog, I will explain about the BLAS and LAPACK routines.
+In the next blog, I will explain about the test-suite and Algorithm class.
 
 {% if page.comments %}
 <div id="disqus_thread"></div>
