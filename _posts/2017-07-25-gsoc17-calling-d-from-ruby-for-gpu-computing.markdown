@@ -6,9 +6,12 @@ categories: gpu-computing
 comments: true
 ---
 
-As ArrayFire-rb had started taking shape, the next goal was to interface it with NMatrix, so we could
-run Linear Mixed Models(mixed_models). I have written an LMM solver for Genome Wide Association studies
-called [faster_lmm_d](https://github.com/prasunanand/faster_lmm_d). It has two GPU backends:
+As [`ArrayFire-rb`](https://github.com/prasunanand/arrayfire-rb), a GPGPU libray has started taking shape,
+the next goal is to interface it with [`NMatrix`](https://github.com/sciruby/nmatrix) library, so we can
+run Linear Mixed Models([`mixed_models`](https://github.com/agisga/mixed_models/)).
+
+I have also written an LMM(Linear Mixed Models) solver in D for Genome Wide Association studies
+called [faster_lmm_d](https://github.com/prasunanand/faster_lmm_d) which has two GPU backends:
 1. CUDA backend which helps it directly interact with CUBLAS libraries and runs only on Nvidia Hardware.
 For CUDA backend, `Faster_LMM_D` uses [`cuda_d`](https://github.com/prasunanand/cuda_d)(The D bindings I wrote for CUDA libraries).
 
@@ -47,7 +50,7 @@ with LDC because `faster_lmm_d` makes use of `LDC` compiler switches and it woul
 run it with `DMD`.
 
 
-The error I encountered are:
+The error I encountered is:
 
 1. Error with ld :
 ```bash
@@ -57,6 +60,8 @@ $ ldc2 -shared -m64 -relocation-model=pic i.d
 collect2: error: ld returned 1 exit status
 Error: /usr/lib/nvidia-cuda-toolkit/bin/gcc failed with status: 1
 ```
+
+
 I have also tried some hit and trial and yet I was unable to properly compile the file.
 
 
@@ -121,7 +126,7 @@ better choice over C. In the meanwhile, porting faster-lmm-d is a work in progre
 when it is ready.
 
 The progress of Ruby port of `faster-lmm-d` can be tracked at [`Bio-faster_lmm_d`](https://github.com/prasunanand/bio-faster_lmm_d)
-and would become a part of BioRuby project. The latest progress can be tracked here.
+and would become a part of [BioRuby](http://bioruby.org/) project. The latest progress can be tracked here.
 
 {% if page.comments %}
 <div id="disqus_thread"></div>
