@@ -112,7 +112,7 @@ native extension in D and get a shared library. Also, LDC has an incredible garb
 To write the extension in D, the `ruby.h` bindings could be created in D using [`dstep`](http://www.dsource.org/projects/dstep) or [`bcd`](http://www.dsource.org/projects/bcd).
 
 RuDy [doesn't have complete support](https://github.com/tomash/rudy#limitations-and-areas-for-development)
-for `LDC` and I am still getting my head around using RuDy to create Ruby native extensions. However [here](http://tomash.wrug.eu/blog/2009/03/03/rudy-ruby-native-extensions-in-d-programming-language/) is a nice blog post about RuDy project.
+for `LDC` and I am still getting my head around using RuDy to create Ruby native extensions. [Here](http://tomash.wrug.eu/blog/2009/03/03/rudy-ruby-native-extensions-in-d-programming-language/) is a nice blog post about RuDy project.
 
 # Conclusion
 
