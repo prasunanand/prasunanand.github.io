@@ -112,11 +112,11 @@ pry
 => #<ArrayFire::Af_Array:0x00000001970738>
 [4] pry(main)> c = a + b
 => #<ArrayFire::Af_Array:0x0000000191a1a8>
-[5] pry(main)> c.array
+[5] pry(main)> c.elements
 => [2.0, 4.0, 6.0, 8.0]
 [6] pry(main)> d = ArrayFire::BLAS.matmul(a,b)
 => #<ArrayFire::Af_Array:0x00000001626258>
-[7] pry(main)> d.array
+[7] pry(main)> d.elements
 => [7.0, 10.0, 15.0, 22.0]
 ```
 
