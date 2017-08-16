@@ -19,8 +19,11 @@ The speedup achieved is outstanding.
 and Nvidia GTX 750Ti GPU.)
 
 The figure shows that ArrayFire takes the least computation time of all.
-ArrayFire is 10,000 times faster than NMatrix for Ruby whereas
+For matrix multiplication,  ArrayFire is 10,000 times faster than NMatrix for Ruby whereas
 1,000 times faster than NMatrix for JRuby.
+
+`ArrayFire-rb` is 60 times faster than `NMatrix-JRuby` and 2 times faster than NMatrix-Ruby
+with LAPACK backend.
 
 Lets take a look at the implementation.
 
