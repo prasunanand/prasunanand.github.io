@@ -41,8 +41,8 @@ and be used to reproduce similar plots.
 and Nvidia GTX 750Ti GPU. CUDA backend of ArrayFire was used with double floating points.)
 
 The figure shows that ArrayFire takes the least computation time of all.
-ArrayFire is 2 e +6 times faster than NMatrix for JRuby and NMatrix for Ruby(not BLAS)
-whereas 2 e +5 times faster than NMatrix for Ruby(using BLAS).
+ArrayFire is 3 e +6 times faster than NMatrix for JRuby and NMatrix for Ruby(not BLAS)
+whereas 3 e +5 times faster than NMatrix for Ruby(using BLAS).
 
 
 Lets take a look at the implementation.
