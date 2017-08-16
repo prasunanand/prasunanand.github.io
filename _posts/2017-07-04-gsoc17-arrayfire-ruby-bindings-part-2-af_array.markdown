@@ -14,16 +14,36 @@ ArrayFire for Ruby stores arrays upto 4 dimension in the `Af_Array` class.
 
 The speedup achieved is outstanding.
 
-![Alt Matrix Addition](/assets/arrayfire/add.png?raw=true "Fig.1. Matrix Addition")
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
+
+<script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+<script type="text/javascript" src="https://code.highcharts.com/4.2.2/modules/exporting.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css">
+
+# Performance metrics
+<div ng-app="resultApp">
+    <div ng-controller="MainCtrl">
+      <div class="block">
+        <strong>Arithmetic Operations</strong>
+        <div id ="chartaddition" class="chart"></div>
+        <div id ="chartsubtraction" class="chart"></div>
+      </div>
+    </div>
+  <script type="text/javascript" src="/assets/js/chart.js"></script>
+</div>
+
 (Note: The above benchmarks have been done on an AMD FX 8350 octacore processor
 and Nvidia GTX 750Ti GPU.)
 
 The figure shows that ArrayFire takes the least computation time of all.
-For matrix multiplication,  ArrayFire is 10,000 times faster than NMatrix for Ruby whereas
-1,000 times faster than NMatrix for JRuby.
+For matrix multiplication,  ArrayFire is 2 e 4 times faster than NMatrix for Ruby whereas
+2 e 3 times faster than NMatrix for JRuby.
 
-`ArrayFire-rb` is 60 times faster than `NMatrix-JRuby` and 2 times faster than NMatrix-Ruby
-with LAPACK backend.
+The performance benchmarks for ArrayFire against NMatrix can be represented by the following figures.
+The code used for benchmarking and generating the plots can be found [here](https://github.com/prasunanand/arrayfire-rb-benchmark-suite)
+and be used to reproduce similar plots.
 
 Lets take a look at the implementation.
 

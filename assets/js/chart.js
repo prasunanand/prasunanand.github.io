@@ -65,13 +65,16 @@ app.controller('MainCtrl', function($scope, $http) {
                     },
                     series: [{
                       name: "NMatrix-Ruby",
-                      data: nmatrix_ruby[key]
+                      data: nmatrix_ruby[key],
+                      color: 'black'
                     },{
                       name: "NMatrix-JRuby",
-                      data: nmatrix_jruby[key]
+                      data: nmatrix_jruby[key],
+                      color: 'green'
                     },{
                       name: "ArrayFire",
-                      data: arrayfire[key]
+                      data: arrayfire[key],
+                      color: 'orange'
                     },
                   ]
                 });
