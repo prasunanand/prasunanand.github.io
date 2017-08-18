@@ -320,7 +320,7 @@ It works!
 We can now use `ArrayFire-rb` for linear algebra since the BLAS and LAPACK routines are in
 place. Also, the performance is outstanding.
 
-In the next blog, I will explain about using the Random Engine generator for ArrayFire.
+In the next blog, I will explain about using the Random Engine generator and Statistics methods for ArrayFire.
 
 {% if page.comments %}
 <div id="disqus_thread"></div>
