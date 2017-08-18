@@ -7,134 +7,13 @@ comments: true
 ---
 
 This post explains about the `Statistics` and `Random` class of `arrayfire` gem.
-`Random` class contains of methods to generate Random numbers and array of Random numbers
+`ArrayFire::Statistics` class consists of  methods that can be used to operate on `Af_Array` for statistical analysis. `ArrayFire::Random` class contains of methods to generate Random numbers and array of Random numbers
 on the GPU.
-
-ArrayFire supports three types of random engines: `:AF_RANDOM_ENGINE_PHILOX_4X32_10`,
-`:AF_RANDOM_ENGINE_THREEFRY_2X32_16` and `:AF_RANDOM_ENGINE_MERSENNE_GP11213` which can be
-passed as a type.
-
-The default randon engine is `:AF_RANDOM_ENGINE_PHILOX_4X32_10`. Random class helps  in creating
-an engine by specifying the type and seed. A programmer can set the seed on the fly and also create
-arrays with randomly generated values.
-
-```c
-void Init_arrayfire() {
-  ArrayFire = rb_define_module("ArrayFire");
-
-  Random = rb_define_class_under(ArrayFire, "Random", rb_cObject);
-  rb_define_alloc_func(Random, arf_engine_alloc);
-  rb_define_singleton_method(Random, "create_random_engine", (METHOD)arf_create_random_engine, 2);
-  rb_define_singleton_method(Random, "retain_random_engine", (METHOD)arf_retain_random_engine, 1);
-  rb_define_singleton_method(Random, "random_engine_set_type", (METHOD)arf_random_engine_set_type, 0);
-  rb_define_singleton_method(Random, "random_engine_get_type", (METHOD)arf_random_engine_get_type, 0);
-  rb_define_singleton_method(Random, "random_uniform", (METHOD)arf_random_uniform, 3);
-  rb_define_singleton_method(Random, "random_normal", (METHOD)arf_random_normal, 3);
-  rb_define_singleton_method(Random, "random_engine_set_seed", (METHOD)arf_random_engine_set_seed, 2);
-  rb_define_singleton_method(Random, "get_default_random_engine", (METHOD)arf_get_default_random_engine, 0);
-  rb_define_singleton_method(Random, "set_default_random_engine_type", (METHOD)arf_set_default_random_engine_type, 0);
-  rb_define_singleton_method(Random, "random_engine_get_seed", (METHOD)arf_random_engine_get_seed, 0);
-  rb_define_singleton_method(Random, "release_random_engine", (METHOD)arf_release_random_engine, 0);
-  rb_define_singleton_method(Random, "randu", (METHOD)arf_randu, 2);
-  rb_define_singleton_method(Random, "randn", (METHOD)arf_randn, 2);
-  rb_define_singleton_method(Random, "set_seed", (METHOD)arf_set_seed, 1);
-  rb_define_singleton_method(Random, "get_seed", (METHOD)arf_get_seed, 0);
-}
-```
-
-A Random enigne must be created so I write the ruby bindings to alloc memory
-and dealloc memory to a `af_random_engine` using `arf_engine_alloc` and `arf_engine_free`
-respectively. The rest is similar to how I created bindings in previous blog posts.
-
-```c
-
-typedef struct RANDOM_ENGINE_STRUCT
-{
-  af_random_engine cengine;
-}afrandomenginestruct;
-
-static VALUE arf_engine_alloc(VALUE klass)
-{
-  /* allocate */
-  afrandomenginestruct* afrandomengine = ALLOC(afrandomenginestruct);
-  /* wrap */
-  return Data_Wrap_Struct(klass, NULL, arf_engine_free, afrandomengine);
-}
-
-static void arf_engine_free(afrandomenginestruct* afrandomengine)
-{
-  free(afrandomengine);
-}
-
-static VALUE arf_create_random_engine(VALUE self, VALUE type_val, VALUE seed_val){
-  afrandomenginestruct* output = ALLOC(afrandomenginestruct);
-  af_random_engine_type rtype = arf_randome_engine_type_from_rbsymbol(type_val);
-
-  af_create_random_engine(&output->cengine, AF_RANDOM_ENGINE_DEFAULT, NUM2ULL(seed_val) ) ;
-
-  return Data_Wrap_Struct(Random, NULL, arf_engine_free, output);
-}
-
-static VALUE arf_randu(VALUE self, VALUE ndims_val, VALUE dim_val){
-  afstruct* out_array = ALLOC(afstruct);
-
-  dim_t ndims = (dim_t)FIX2LONG(ndims_val);
-  dim_t* dimensions = (dim_t*)malloc(ndims * sizeof(dim_t));
-  dim_t count = 1;
-  for (dim_t index = 0; index < ndims; index++) {
-    dimensions[index] = (dim_t)FIX2LONG(RARRAY_AREF(dim_val, index));
-    count *= dimensions[index];
-  }
-  af_randu(&out_array->carray, ndims, dimensions,f64);
-  return Data_Wrap_Struct(Af_Array, NULL, arf_free, out_array);
-}
-```
-
-
-Now, we have the bindings ready, we can check it using `pry`.
-
-```ruby
-$ rake pry
-pry -r './lib/arrayfire.rb'
-[1] pry(main)> engine = ArrayFire::Random.create_random_engine(:AF_RANDOM_ENGINE_PHILOX_4X32_10, 100)
-=> #<ArrayFire::Random:0x00000002a41350>
-[2] pry(main)> ArrayFire::Random.random_engine_get_seed(engine)
-=> 100
-[3] pry(main)> ArrayFire::Random.random_engine_set_seed(engine, 123)
-=> #<ArrayFire::Random:0x00000002cfbd98>
-[4] pry(main)> ArrayFire::Random.random_engine_get_seed(engine)
-=> 123
-[5] pry(main)> ArrayFire::Random.random_engine_get_type engine
-=> "AF_RANDOM_ENGINE_PHILOX_4X32_10"
-[6] pry(main)> arr = ArrayFire::Random.randu(2, [4, 4])
-=> #<ArrayFire::Af_Array:0x00000002b185f8>
-[7] pry(main)> ArrayFire::Util.print_array(arr)
-No Name Array
-[4 4 1 1]
-    0.3990     0.7353     0.9455     0.7089
-    0.6720     0.5160     0.1587     0.9434
-    0.5339     0.3932     0.8831     0.1227
-    0.1386     0.2706     0.0621     0.9107
-
-=> true
-[8] pry(main)> arr2 = ArrayFire::Random.randn(2, [4, 4])
-=> #<ArrayFire::Af_Array:0x000000029fd4c0>
-[9] pry(main)> ArrayFire::Util.print_array(arr2)
-No Name Array
-[4 4 1 1]
-    0.2985    -0.8873    -1.0309     0.5312
-   -2.7126    -0.3550    -1.4627    -1.7783
-    0.4584     1.9841     0.0075    -0.5459
-    1.5579    -0.9308    -1.0512     0.4640
-
-=> true
-```
-
-we have the `Random` support ready for `ArrayFire-rb`
 
 # Statistics Class
 
-The `Statistics` class provides methods to do statistical analysis on an `Af_Array`.
+The `Statistics` class contains of singleton methods like `mean`, `var`, `median`, `stddev`, etc.
+Let us take a look at the implementation.
 
 ```c
 void Init_arrayfire() {
@@ -265,6 +144,132 @@ No Name Array
 [7] pry(main)> mean_all_weighted = ArrayFire::Statistics.mean_all_weighted(arr, weighted_array)
 => 0.5184718370437622
 ```
+
+# Random Class
+
+ArrayFire supports three types of random engines: `:AF_RANDOM_ENGINE_PHILOX_4X32_10`,
+`:AF_RANDOM_ENGINE_THREEFRY_2X32_16` and `:AF_RANDOM_ENGINE_MERSENNE_GP11213` which can be
+passed as a type.
+
+The default randon engine is `:AF_RANDOM_ENGINE_PHILOX_4X32_10`. Random class helps  in creating
+an engine by specifying the type and seed. A programmer can set the seed on the fly and also create
+arrays with randomly generated values.
+
+```c
+void Init_arrayfire() {
+  ArrayFire = rb_define_module("ArrayFire");
+
+  Random = rb_define_class_under(ArrayFire, "Random", rb_cObject);
+  rb_define_alloc_func(Random, arf_engine_alloc);
+  rb_define_singleton_method(Random, "create_random_engine", (METHOD)arf_create_random_engine, 2);
+  rb_define_singleton_method(Random, "retain_random_engine", (METHOD)arf_retain_random_engine, 1);
+  rb_define_singleton_method(Random, "random_engine_set_type", (METHOD)arf_random_engine_set_type, 0);
+  rb_define_singleton_method(Random, "random_engine_get_type", (METHOD)arf_random_engine_get_type, 0);
+  rb_define_singleton_method(Random, "random_uniform", (METHOD)arf_random_uniform, 3);
+  rb_define_singleton_method(Random, "random_normal", (METHOD)arf_random_normal, 3);
+  rb_define_singleton_method(Random, "random_engine_set_seed", (METHOD)arf_random_engine_set_seed, 2);
+  rb_define_singleton_method(Random, "get_default_random_engine", (METHOD)arf_get_default_random_engine, 0);
+  rb_define_singleton_method(Random, "set_default_random_engine_type", (METHOD)arf_set_default_random_engine_type, 0);
+  rb_define_singleton_method(Random, "random_engine_get_seed", (METHOD)arf_random_engine_get_seed, 0);
+  rb_define_singleton_method(Random, "release_random_engine", (METHOD)arf_release_random_engine, 0);
+  rb_define_singleton_method(Random, "randu", (METHOD)arf_randu, 2);
+  rb_define_singleton_method(Random, "randn", (METHOD)arf_randn, 2);
+  rb_define_singleton_method(Random, "set_seed", (METHOD)arf_set_seed, 1);
+  rb_define_singleton_method(Random, "get_seed", (METHOD)arf_get_seed, 0);
+}
+```
+
+A Random enigne must be created so I write the ruby bindings to alloc memory
+and dealloc memory to a `af_random_engine` using `arf_engine_alloc` and `arf_engine_free`
+respectively. The rest is similar to how I created bindings in previous blog posts.
+
+```c
+
+typedef struct RANDOM_ENGINE_STRUCT
+{
+  af_random_engine cengine;
+}afrandomenginestruct;
+
+static VALUE arf_engine_alloc(VALUE klass)
+{
+  /* allocate */
+  afrandomenginestruct* afrandomengine = ALLOC(afrandomenginestruct);
+  /* wrap */
+  return Data_Wrap_Struct(klass, NULL, arf_engine_free, afrandomengine);
+}
+
+static void arf_engine_free(afrandomenginestruct* afrandomengine)
+{
+  free(afrandomengine);
+}
+
+static VALUE arf_create_random_engine(VALUE self, VALUE type_val, VALUE seed_val){
+  afrandomenginestruct* output = ALLOC(afrandomenginestruct);
+  af_random_engine_type rtype = arf_randome_engine_type_from_rbsymbol(type_val);
+
+  af_create_random_engine(&output->cengine, AF_RANDOM_ENGINE_DEFAULT, NUM2ULL(seed_val) ) ;
+
+  return Data_Wrap_Struct(Random, NULL, arf_engine_free, output);
+}
+
+static VALUE arf_randu(VALUE self, VALUE ndims_val, VALUE dim_val){
+  afstruct* out_array = ALLOC(afstruct);
+
+  dim_t ndims = (dim_t)FIX2LONG(ndims_val);
+  dim_t* dimensions = (dim_t*)malloc(ndims * sizeof(dim_t));
+  dim_t count = 1;
+  for (dim_t index = 0; index < ndims; index++) {
+    dimensions[index] = (dim_t)FIX2LONG(RARRAY_AREF(dim_val, index));
+    count *= dimensions[index];
+  }
+  af_randu(&out_array->carray, ndims, dimensions,f64);
+  return Data_Wrap_Struct(Af_Array, NULL, arf_free, out_array);
+}
+```
+
+
+Now, we have the bindings ready, we can check it using `pry`.
+
+```ruby
+$ rake pry
+pry -r './lib/arrayfire.rb'
+[1] pry(main)> engine = ArrayFire::Random.create_random_engine(:AF_RANDOM_ENGINE_PHILOX_4X32_10, 100)
+=> #<ArrayFire::Random:0x00000002a41350>
+[2] pry(main)> ArrayFire::Random.random_engine_get_seed(engine)
+=> 100
+[3] pry(main)> ArrayFire::Random.random_engine_set_seed(engine, 123)
+=> #<ArrayFire::Random:0x00000002cfbd98>
+[4] pry(main)> ArrayFire::Random.random_engine_get_seed(engine)
+=> 123
+[5] pry(main)> ArrayFire::Random.random_engine_get_type engine
+=> "AF_RANDOM_ENGINE_PHILOX_4X32_10"
+[6] pry(main)> arr = ArrayFire::Random.randu(2, [4, 4])
+=> #<ArrayFire::Af_Array:0x00000002b185f8>
+[7] pry(main)> ArrayFire::Util.print_array(arr)
+No Name Array
+[4 4 1 1]
+    0.3990     0.7353     0.9455     0.7089
+    0.6720     0.5160     0.1587     0.9434
+    0.5339     0.3932     0.8831     0.1227
+    0.1386     0.2706     0.0621     0.9107
+
+=> true
+[8] pry(main)> arr2 = ArrayFire::Random.randn(2, [4, 4])
+=> #<ArrayFire::Af_Array:0x000000029fd4c0>
+[9] pry(main)> ArrayFire::Util.print_array(arr2)
+No Name Array
+[4 4 1 1]
+    0.2985    -0.8873    -1.0309     0.5312
+   -2.7126    -0.3550    -1.4627    -1.7783
+    0.4584     1.9841     0.0075    -0.5459
+    1.5579    -0.9308    -1.0512     0.4640
+
+=> true
+```
+
+we have the `Random` support ready for `ArrayFire-rb`
+
+
 
 Hence, Ruby bindings for Statistics and Random methods have been successfully implemented.
 
