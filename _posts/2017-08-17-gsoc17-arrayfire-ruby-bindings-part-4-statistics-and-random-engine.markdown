@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "ArrayFire Ruby Bindings<br>(Part V : Statistics and Randome Engine routines)"
+title:  "ArrayFire Ruby Bindings<br>(Part V : Statistics and Random Engine routines)"
 date:   2017-08-17 14:00:00 +0530
 categories: arrayfire
 comments: true
