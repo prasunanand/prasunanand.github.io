@@ -80,7 +80,6 @@ require_relative 'mkmf.rb'
 
 extension_name = 'arrayfire'
 
-dir_config(extension_name)
 
 $INSTALLFILES = [
   ['ruby_arrayfire.h'       , '$(archdir)'],
@@ -93,13 +92,25 @@ $CFLAGS = ["-Wall -Werror=return-type",$CFLAGS].join(" ")
 $CXXFLAGS = ["-Wall -Werror=return-type",$CXXFLAGS].join(" ")
 $CPPFLAGS = ["-Wall -Werror=return-type",$CPPFLAGS].join(" ")
 
-dir_config('arrayfire', '/usr/local/include/', '/usr/local/lib/')
 
-# $LOCAL_LIBS =
 LIBDIR      = RbConfig::CONFIG['libdir']
 INCLUDEDIR  = RbConfig::CONFIG['includedir']
 
-HEADER_DIRS = [INCLUDEDIR, '/usr/local/include/', '/usr/local/include/af/']
+HEADER_DIRS = [
+  '/opt/local/include',
+  '/usr/local/include',
+  INCLUDEDIR,
+  '/usr/include'
+]
+
+LIB_DIRS = [
+  '/opt/local/lib',
+  '/usr/local/lib',
+  LIBDIR,
+  '/usr/lib'
+]
+
+dir_config(extension_name, HEADER_DIRS, LIB_DIRS)
 
 have_library('afcuda')
 have_library('cusolver')
