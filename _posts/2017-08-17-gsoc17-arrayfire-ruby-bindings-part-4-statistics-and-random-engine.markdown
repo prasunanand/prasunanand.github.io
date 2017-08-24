@@ -280,8 +280,8 @@ on GPU, we can feed it large amount of data from real world.
 
 Random engine can help in creating large arrays with randomly generated values in seconds.
 
-In the next blog, I will explain about using multiple backends using `ArrayFire` , i.e. OpenCL, CUDA
-and even use CPUs.
+In the next blog, I will explain about using the `Device` and `Util` class to manage GPU devices
+and device memory and other utilities like saving an `Af_Array` to file.
 
 {% if page.comments %}
 <div id="disqus_thread"></div>
