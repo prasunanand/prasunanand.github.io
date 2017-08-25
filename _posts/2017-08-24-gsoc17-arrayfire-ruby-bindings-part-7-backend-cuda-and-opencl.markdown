@@ -198,7 +198,7 @@ order of preference of default backend to harness maximum computing power helps 
 not worry too much about performance tuning in the early stages of development, hence supporting
 the philosophy of preferring **convention over configuration**.
 
-In the next blog post, I will discuss about interacing `ArrayFire-rb` to `NMatrix`.
+In the next blog post, I will discuss about interfacing `ArrayFire-rb` to `NMatrix`.
 
 {% if page.comments %}
 <div id="disqus_thread"></div>
