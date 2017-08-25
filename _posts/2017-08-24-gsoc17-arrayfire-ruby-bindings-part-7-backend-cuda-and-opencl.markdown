@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "ArrayFire Ruby Bindings<br>(Part VI : Multiple Backends: CUDA, OpenCL and CPU)"
+title:  "ArrayFire Ruby Bindings<br>(Part VII : Multiple Backends: CUDA, OpenCL and CPU)"
 date:   2017-08-24 14:00:00 +0530
 categories: arrayfire
 comments: true
