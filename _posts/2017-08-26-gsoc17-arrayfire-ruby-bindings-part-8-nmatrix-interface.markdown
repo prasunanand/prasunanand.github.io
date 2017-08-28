@@ -210,5 +210,22 @@ No Name Array
 => #<ArrayFire::Af_Array:0x00000001436088>
 ```
 
-Woah! It works.
+It works!.
 
+Hence, NMatrix and ArrayFire can be easily interfaced to each other.
+
+
+{% if page.comments %}
+<div id="disqus_thread"></div>
+<script>
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//prasunanandblog.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+{% endif %}
