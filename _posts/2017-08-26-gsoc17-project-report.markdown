@@ -25,12 +25,22 @@ Bio::FasterLmmD : Codebase can be found [here](https://github.com/prasunanand/bi
 ArrayFire-rb now supports linear algebra on GPU and CPU. Currently only float dtype has been implemented.
 It supports dense and sparse matrices. It has multiple backends namely, CUDA, OpenCL and CPU.
 
-The work on creating the bindings have been explained in last ten blog posts.
+The work on creating the bindings have been explained in last nine blog posts:
+
+1. [Ruby C extensions for complex projects](/ruby-c-extensions/2017/06/23/gsoc17-ruby-c-extensions-for-complex-projects.html)
+2. [Installation](/arrayfire/2017/06/23/gsoc17-arrayfire-ruby-bindings-part-1-installation.html)
+3. [Af_Array](/arrayfire/2017/07/04/gsoc17-arrayfire-ruby-bindings-part-2-af_array.html)(see performance)
+4. [Test-suite and Algorithm class](/arrayfire/2017/07/22/gsoc17-arrayfire-ruby-bindings-part-3-minitest-algorithm.html)
+5. [BLAS and LAPACK routines](/arrayfire/2017/08/16/gsoc17-arrayfire-ruby-bindings-part-4-blas-lapack.html)(see performance)
+6. [Statistics and Random Engine routines](/arrayfire/2017/08/17/gsoc17-arrayfire-ruby-bindings-part-4-statistics-and-random-engine.html)
+7. [Device and Util](/arrayfire/2017/08/22/gsoc17-arrayfire-ruby-bindings-part-6-device.html)
+8. [Multiple Backends: CUDA, OpenCL and CPU](/arrayfire/2017/08/24/gsoc17-arrayfire-ruby-bindings-part-7-backend-cuda-and-opencl.html)
+9. [ArrayFire-NMatrix Interface](/arrayfire/2017/08/24/gsoc17-arrayfire-ruby-bindings-part-8-nmatrix-interface.html)
 
 The performance of ArrayFire-rb is outstanding as expected.
 
 I took a side-track working on `Bio::FasterLmmD` . This work is not complete and still in progress.
-It is an effort to `call D from Ruby`. The work has been explaiined in a previous blog post.
+It is an effort to `call D from Ruby`. The work has been explaiined in a previous [blog post](/gpu-computing/2017/07/25/gsoc17-calling-d-from-ruby-for-gpu-computing.html).
 
 The work on ArrayFire-rb - JRuby has been postponed for now as I wanted to concentrate on MRI for
 the best results.
@@ -38,7 +48,8 @@ the best results.
 # Future Work
 
 The future work involves improving the ArrayFire-rb code and writing tutorials. ArrayFire is not limited to
-linear algebra so I will create bindings for Signal Processing, Computer Vision, etc.
+linear algebra so I will create bindings for Signal Processing, Computer Vision, etc. I will also add support
+for data types other than `double`.
 
 The work on ArrayFire-rb - JRuby will begin as soon as ArrayFire gem is published.
 
