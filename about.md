@@ -47,10 +47,11 @@ for programmers to use Ruby for **Big Data**.
 
 1. [NMatrix](https://github.com/sciruby/nmatrix)
 2. [ArrayFire-rb](https://github.com/arrayfire/arrayfire-rb)
-3. [Mitab parser](https://github.com/prasunanand/mitab/tree/lazyparse_pcows)
-4. [Faster_lmm_d](https://github.com/prasunanand/faster_lmm_d)
-5. [gperftools_d](https://github.com/prasunanand/gperftools_d)
-6. [Dmatrix](https://github.com/prasunanand/dmatrix)
+3. [ArrayFire-d](https://github.com/arrayfire/arrayfire-d)
+4. [Mitab parser](https://github.com/prasunanand/mitab/tree/lazyparse_pcows)
+5. [Faster_lmm_d](https://github.com/prasunanand/faster_lmm_d)
+6. [gperftools_d](https://github.com/prasunanand/gperftools_d)
+7. [Dmatrix](https://github.com/prasunanand/dmatrix)
 
 # Other interests
 
