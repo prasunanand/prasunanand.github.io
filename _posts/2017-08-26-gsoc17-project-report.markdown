@@ -14,7 +14,7 @@ The GSoC 2017 application can be found [here](https://github.com/prasunanand/res
 
 # Code
 
-ArrayFire-rb: The [pull request](https://github.com/arrayfire/arrayfire-rb/pull/3) is undergoing a review.
+[ArrayFire-rb](https://github.com/prasunanand/arrayfire-rb): The [pull request](https://github.com/arrayfire/arrayfire-rb/pull/3) is undergoing a review.
 
 ArrayFire-rb Benchmarks: Codebase can be found [here](https://github.com/prasunanand/arrayfire-rb-benchmark-suite).
 
@@ -40,7 +40,7 @@ The work on creating the bindings have been explained in last nine blog posts:
 The performance of ArrayFire-rb is outstanding as expected.
 
 I took a side-track working on `Bio::FasterLmmD` . This work is not complete and still in progress.
-It is an effort to `call D from Ruby`. The work has been explaiined in a previous [blog post](/gpu-computing/2017/07/25/gsoc17-calling-d-from-ruby-for-gpu-computing.html).
+It is an effort to `call D from Ruby`. The work has been explained in a previous [blog post](/gpu-computing/2017/07/25/gsoc17-calling-d-from-ruby-for-gpu-computing.html).
 
 The work on ArrayFire-rb - JRuby has been postponed for now as I wanted to concentrate on MRI for
 the best results.
@@ -63,7 +63,8 @@ best platform for the aspiring programmers improve their skill and give back to 
 and open source software.
 
 Last year's GSoC work helped me to present a talk at FOSDEM 2017 and Ruby Conf India 2017.  I got active
-in the Indian Ruby Community. This year, I have been invited as a speaker to Ruby World Conference 2017, Matsue, Japan.
+in the Indian Ruby Community. Recently, I have been invited as a speaker to Ruby World Conference 2017, Matsue, Japan
+to talk on "GPU computing with Ruby".
 
 I plan to continue contributing to open source, strive for improving my skills, and help new programmers
 contribute to FOSS. I would be glad if I could mentor students next year for upcoming GSoCs.
