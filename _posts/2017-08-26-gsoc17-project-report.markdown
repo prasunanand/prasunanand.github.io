@@ -71,8 +71,8 @@ contribute to FOSS. I would be glad if I could mentor students next year for upc
 
 # Acknowledgements
 
-I would like to express my sincere gratitude to my mentor Pjotr Prins. I have learn a lot from
-him since my last GSoC.
+I would like to express my sincere gratitude to my mentor Pjotr Prins, for his guidance, patience and support.
+I have learn a lot from him since my last GSoC and still learning. I couldn't have hoped for a better mentor.
 
 I am grateful to Google and the Ruby Science Foundation for this golden opportunity.
 
