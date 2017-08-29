@@ -67,7 +67,7 @@ in the Indian Ruby Community. Recently, I have been invited as a speaker to Ruby
 to talk on "GPU computing with Ruby".
 
 I plan to continue contributing to open source, strive for improving my skills, and help new programmers
-contribute to FOSS. I would be glad if I could mentor students next year for upcoming GSoCs.
+contribute to FOSS. I would be glad if I could mentor students for upcoming GSoCs.
 
 # Acknowledgements
 
