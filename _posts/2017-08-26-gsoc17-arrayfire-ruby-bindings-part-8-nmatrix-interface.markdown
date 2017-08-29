@@ -214,6 +214,64 @@ It works!.
 
 Hence, NMatrix and ArrayFire can be easily interfaced to each other.
 
+# Benchmarks
+
+Now, we can see how using ArrayFire can beneficial over using NMatrix. I benchmarked the matrix multiplication for
+two matrices with same elements using [code](https://github.com/prasunanand/arrayfire-rb-benchmark-suite/blob/master/bin/interface.rb).
+
+```ruby
+shapeArray.each do |shape|
+  elements1 = Array.new(shape[0]*shape[1]) { rand(1...999999) }
+  elements2 = Array.new(shape[0]*shape[1]) { rand(1...999999) }
+  cpu_matrix1 = NMatrix.new(shape, elements1, dtype: :float64)
+  cpu_matrix2 = NMatrix.new(shape, elements2, dtype: :float64)
+
+  gpu_matrix1 = cpu_matrix1.to_af_array
+  gpu_matrix2 = cpu_matrix2.to_af_array
+
+  iters.times do
+    ArrayFire::BLAS.matmul(gpu_matrix1, gpu_matrix2, :AF_MAT_NONE, :AF_MAT_NONE) # warmup
+  end
+
+  result[:mat_mult_cpu] << [ shape[0]*shape[1], Benchmark.measure{cpu_matrix1.dot(cpu_matrix2)}.to_s.tr('()', '').split(" ")[3].to_f ]
+  result[:mat_mult_gpu] << [ shape[0]*shape[1], Benchmark.measure{ArrayFire::BLAS.matmul(gpu_matrix1, gpu_matrix2, :AF_MAT_NONE, :AF_MAT_NONE)}.to_s.tr('()', '').split(" ")[3].to_f ]
+
+end
+
+```
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"   integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="   crossorigin="anonymous"></script>
+
+<script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+<script type="text/javascript" src="https://code.highcharts.com/4.2.2/modules/exporting.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css">
+
+<div ng-app="resultApp">
+    <div ng-controller="MainCtrl">
+      <div class="block">
+        <div id ="chart_interface" class="chart"></div>
+      </div>
+    </div>
+  <script type="text/javascript" src="/assets/js/chart.js"></script>
+</div>
+(Note: The above benchmarks have been done on an AMD FX 8350 octacore processor
+and Nvidia GTX 750Ti GPU. CUDA backend of ArrayFire was used with double floating points.)
+
+As the matrix size increases, we can see the difference is huge.
+
+Using ArrayFire can speed up the calculation by 7 e +5 times.
+
+There may be overheads in copying data from CPU to GPU and vice-versa. But overall,
+for large matrices(Big Data), we can gain massive speedups when we use the right optimization.
+I would be discussing more about such optimizations in another blog post.
+
+However, ArrayFire being significantly faster than NMatrix can easily help Rubyists by adding small
+chunk of code and speeding up the critical/slower steps.
+
+Power to Ruby!
+
 
 {% if page.comments %}
 <div id="disqus_thread"></div>
