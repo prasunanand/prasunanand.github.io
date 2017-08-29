@@ -76,7 +76,7 @@ I have learn a lot from him since my last GSoC and still learning. I couldn't ha
 
 I am grateful to Google and the Ruby Science Foundation for this golden opportunity.
 
-I am very thankful to John Woods, Sameer Deshmukh, Alexej Gossmann and Pradeep Garigipati
+I am very thankful to John Woods, Sameer Deshmukh, Alexej Gossmann, Gaurav Tamba and Pradeep Garigipati
 who mentored me through the project.
 
 {% if page.comments %}
