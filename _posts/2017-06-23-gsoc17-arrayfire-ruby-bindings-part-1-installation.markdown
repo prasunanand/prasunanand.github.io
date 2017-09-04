@@ -7,7 +7,7 @@ comments: true
 ---
 
 I have been working on creating ArrayFire bindings for Ruby. ArrayFire is an opensource
-lbrary that is very useful and highly po[ular for GPGPU computings. It has strong abstracts that makes
+library that is very useful and highly popular for GPGPU computings. It has strong abstractions that makes
 it very easy for a programmer to benefit from GPU without being bothered about the configurations.
 
 I will be creating a blog series regarding that will explain how I created Ruby and JRuby bindings for
