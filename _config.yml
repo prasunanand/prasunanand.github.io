@@ -9,7 +9,7 @@
 title: Prasun Anand's blog
 email: prasunanand.bitsp@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
-  GSoC 2017, GSoC 2016, SciRuby, Polyglot, Scientific Programmer, BioInformatician, BITSian, FOSS supporter, GPU, HPC
+  GSoC 2017, GSoC 2016, SciRuby, Polyglot, Scientific Programmer, BioInformatics, BITSian, FOSS supporter, GPU, HPC
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "http://yourdomain.com" # the base hostname & protocol for your site
 twitter_username: prasun_anand
