@@ -109,6 +109,7 @@ method=[ _Z19gemm_kernel2x2_coreIdLb0ELb0ELb0ELb0ELb0EEvPT_PKS0_S3_iiiiiiS1_S1_S
 # Ruby Grant 2017
 
 This project is funded by Ruby Association. I am very thankful to them for supporting this project.
+[Link](http://www.ruby.or.jp/en/news/20171206).
 
 # Contributions are welcome!
 
