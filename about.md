@@ -17,8 +17,8 @@ He worked as a student developer for Ruby Science Foundation for
 **Google Summer of Code 2017** on the project **"Creating the fastest math libraries
 for Ruby/JRuby by using the GPU through OpenCL and ArrayFire"**.
 
-He is currently working on with the [Genenetwork](https://github.com/GENENETWORK) project
-and [RbCUDA](https://github.com/prasunanand/rbcuda) project.
+He is currently working on with the [Genenetwork](https://github.com/GENENETWORK) project, building
+GWAS tool for HPC devices, and [RbCUDA](https://github.com/prasunanand/rbcuda) project.
 
 ## Educational Qualifications
 
@@ -57,9 +57,9 @@ USA.<br>
 
 # Awards and Achievements
 1. Ruby Association Travel Grant 2017
-2. Ruby Grant 2017
-3. Google Summer of Code 2017
-4. Google Summer of Code 2016
+2. [Ruby Grant 2017](http://www.ruby.or.jp/en/news/20171206)
+3. [Google Summer of Code 2017](https://summerofcode.withgoogle.com/archive/2017/projects/5200694831218688/)
+4. [Google Summer of Code 2016](https://summerofcode.withgoogle.com/archive/2016/projects/4640058522992640/)
 
 ## Projects
 
