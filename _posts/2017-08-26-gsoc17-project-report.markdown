@@ -22,7 +22,7 @@ Bio::FasterLmmD : Codebase can be found [here](https://github.com/prasunanand/bi
 
 # Goals
 
-ArrayFire-rb now supports linear algebra on GPU and CPU. Currently only float dtype has been implemented.
+ArrayFire-rb now supports linear algebra on GPU and CPU. Currently only **double** dtype has been implemented.
 It supports dense and sparse matrices. It has multiple backends namely, CUDA, OpenCL and CPU.
 
 The work on creating the bindings have been explained in last nine blog posts:
