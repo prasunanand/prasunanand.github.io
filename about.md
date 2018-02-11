@@ -37,23 +37,30 @@ He has been exploring the GPU world to create super-fast Math libraries for Ruby
 for programmers to use Ruby for **Big Data**.
 
 
-## Talks and Presentations
+## Talks
 
-1. Speaker at RubyConf2017, New Orleans, USA, 2017 to talk about [High Performance GPU Computing on Ruby](http://rubyconf.org/program#session-234). <br>
+1. Speaker at Ruby Conference India, 2018 to talk about [GPU Accelerated Libraries for Ruby](http://rubyconfindia.org/program/#prasun). <br>
+[Slides](https://www.slideshare.net/PrasunAnand2/rubyconfindia2018-gpu-accelerated-libraries-for-ruby)
+
+2. Speaker at RubyConf 2017, New Orleans, USA to talk about [High Performance GPU Computing on Ruby](http://rubyconf.org/program#session-234). <br>
 [Slides](https://www.slideshare.net/PrasunAnand2/high-performance-gpu-computing-with-ruby-rubyconf-2017)| [Video](http://confreaks.tv/videos/rubyconf2017-high-performance-gpu-computing-with-ruby)
 
-2. Speaker at RubyWorld Conference, Matsue Japan, 2017 to talk about [High Performance GPU Computing on Ruby](http://2017.rubyworld-conf.org/en/program/). <br>
+3. Speaker at RubyWorld Conference, Matsue Japan, 2017 to talk about [High Performance GPU Computing on Ruby](http://2017.rubyworld-conf.org/en/program/). <br>
 [Slides](https://www.slideshare.net/PrasunAnand2/high-performance-gpu-computing-with-ruby)| [Video](https://youtu.be/_NeFdIhzz1o?t=9159)
-
-3. Poster on **Faster Linear Mixed Models (LMM) for online GWAS omics analysis​** at Complex Trait Community Conference 2017, Memphis, Tennessee,
-USA.<br>
-[Poster](https://github.com/prasunanand/resume/blob/master/CTC_2017_Poster_Faster_LMM_D.pdf)
 
 4. Speaker at Ruby DevRoom at FOSDEM 2017, Brussels, Belgium to talk about [Scientific Computing on JRuby](https://fosdem.org/2017/schedule/event/ruby_scientific_computing_on_jruby/).<br>
 [Slides](https://www.slideshare.net/PrasunAnand2/fosdem2017-scientific-computing-on-jruby)| [Video](https://video.fosdem.org/2017/K.4.201/ruby_scientific_computing_on_jruby.mp4)
 
 5. Speaker at Ruby Conference India, 2017 to talk about [Scientific Computing on JRuby](http://rubyconfindia.org/program/#prasun-anand). <br>
 [Slides](https://www.slideshare.net/PrasunAnand2/scientific-computing-on-jruby)| [Video](https://www.youtube.com/watch?v=mZEZ13nr-LQ)
+
+
+## Posters
+
+1. Poster on **Faster Linear Mixed Models (LMM) for online GWAS omics analysis​** at [Complex Trait Community Conference 2017](http://complextrait.org/ctc2017/), Memphis, Tennessee,
+USA.<br>
+[Poster](https://github.com/prasunanand/resume/blob/master/CTC_2017_Poster_Faster_LMM_D.pdf)
+
 
 # Awards and Achievements
 1. Ruby Association Travel Grant 2017
