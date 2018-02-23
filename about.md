@@ -20,7 +20,7 @@ for Ruby/JRuby by using the GPU through OpenCL and ArrayFire"**.
 He is currently working on with the [Genenetwork](https://github.com/GENENETWORK) project, building
 GWAS tool for HPC devices, and [RbCUDA](https://github.com/prasunanand/rbcuda) project.
 
-## Educational Qualifications
+# Educational Qualifications
 
 * M.Sc., Biological Sciences (2012 - 2017) <br>
  Birla Institute of Technology and Science, Pilani, India
@@ -28,7 +28,7 @@ GWAS tool for HPC devices, and [RbCUDA](https://github.com/prasunanand/rbcuda) p
 * B.E., Chemical Engineering (2012 - 2017) <br>
  Birla Institute of Technology and Science, Pilani, India
 
-## Programming
+# Programming
 
 Prasun likes to program in C, C++, Java, D and Ruby.
 
@@ -37,7 +37,7 @@ He has been exploring the GPU world to create super-fast Math libraries for Ruby
 for programmers to use Ruby for **Big Data**.
 
 
-## Talks
+# Talks
 
 1. Speaker at Ruby Conference India, 2018 to talk about [GPU Accelerated Libraries for Ruby](http://rubyconfindia.org/program/#prasun). <br>
 [Slides](https://www.slideshare.net/PrasunAnand2/rubyconfindia2018-gpu-accelerated-libraries-for-ruby)
@@ -55,20 +55,27 @@ for programmers to use Ruby for **Big Data**.
 [Slides](https://www.slideshare.net/PrasunAnand2/scientific-computing-on-jruby)| [Video](https://www.youtube.com/watch?v=mZEZ13nr-LQ)
 
 
-## Posters
+# Posters
 
 1. Poster on **Faster Linear Mixed Models (LMM) for online GWAS omics analysis​** at [Complex Trait Community Conference 2017](http://complextrait.org/ctc2017/), Memphis, Tennessee,
 USA.<br>
 [Poster](https://github.com/prasunanand/resume/blob/master/CTC_2017_Poster_Faster_LMM_D.pdf)
 
+2. Poster on **RbCUDA: CUDA Bindings for Ruby** at [Ruby 25th Event](http://25.ruby.or.jp/), Tokyo, Japan.
+<br>
+[Poster](https://github.com/prasunanand/resume/blob/master/rbcuda.pdf)
 
-# Awards and Achievements
-1. Ruby Association Travel Grant 2017
-2. [Ruby Grant 2017](http://www.ruby.or.jp/en/news/20171206)
-3. [Google Summer of Code 2017](https://summerofcode.withgoogle.com/archive/2017/projects/5200694831218688/)
-4. [Google Summer of Code 2016](https://summerofcode.withgoogle.com/archive/2016/projects/4640058522992640/)
 
-## Projects
+# Awards
+1. Finalist for [Fukuoka Ruby Award 2018](https://www.ruby-lang.org/en/news/2017/12/27/fukuoka-ruby-award-2018/) for activity: **Ruby for High Performance Scientific Computing using Arrayfire gem and RbCUDA gem**.
+2. Ruby Association Travel Grant 2017
+
+# Achievements
+1. [Ruby Grant 2017](http://www.ruby.or.jp/en/news/20171206)
+2. [Google Summer of Code 2017](https://summerofcode.withgoogle.com/archive/2017/projects/5200694831218688/)
+3. [Google Summer of Code 2016](https://summerofcode.withgoogle.com/archive/2016/projects/4640058522992640/)
+
+# Projects
 
 1. [RbCUDA](https://github.com/prasunanand/rbcuda)
 2. [ArrayFire-rb](https://github.com/arrayfire/arrayfire-rb)
