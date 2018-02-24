@@ -4,21 +4,26 @@ title: About
 permalink: /about/
 ---
 
-Prasun is involved with different open-source projects aimed at super fast
-Scientific Computing on Ruby and D. He is a huge supporter of Open-source
-software and loves Bioinformatics.
+I am with different open-source projects aimed at super fast Scientific Computing on Ruby and D. I am a
+huge supporter of Open-source software and loves Bioinformatics.
 
-He is highly motivated to bring Scientific Computing to Ruby.
+I am highly motivated to bring Scientific Computing to Ruby.
 
-He worked as a student developer for Ruby Science Foundation for
-**Google Summer of Code 2016** on the project **"Port NMatrix to JRuby"**.
+I am currently working on with the [Genenetwork](https://github.com/GENENETWORK) project, building `Faster-LMM-D`, a
+GWAS tool for HPC devices. Faster_LMM_D supports Linear Mixed Models. Bayesian Sparse Models are on the way. It has
+a GPU backend that helps it run on CUDA and OpenCL environment.
 
-He worked as a student developer for Ruby Science Foundation for
-**Google Summer of Code 2017** on the project **"Creating the fastest math libraries
-for Ruby/JRuby by using the GPU through OpenCL and ArrayFire"**.
+I am also simultaneously working on [RbCUDA](https://github.com/prasunanand/rbcuda): CUDA bindings
+for Ruby. The project has been awarded Ruby Grant 2017 by Ruby Association, Japan. RbCUDA is the fastest Ruby library
+for matrix multiplication.
 
-He is currently working on with the [Genenetwork](https://github.com/GENENETWORK) project, building
-GWAS tool for HPC devices, and [RbCUDA](https://github.com/prasunanand/rbcuda) project.
+
+I worked as a student developer for Ruby Science Foundation for
+**Google Summer of Code 2016** on the project **["Port NMatrix to JRuby"](https://summerofcode.withgoogle.com/archive/2016/projects/4640058522992640/)**.
+
+I worked as a student developer for Ruby Science Foundation for
+**Google Summer of Code 2017** on the project **["Creating the fastest math libraries
+for Ruby/JRuby by using the GPU through OpenCL and ArrayFire"](https://summerofcode.withgoogle.com/archive/2017/projects/5200694831218688/)**.
 
 # Educational Qualifications
 
@@ -30,11 +35,15 @@ GWAS tool for HPC devices, and [RbCUDA](https://github.com/prasunanand/rbcuda) p
 
 # Programming
 
-Prasun likes to program in C, C++, Java, D and Ruby.
+I like to program in C, C++, Java, D and Ruby.
 
-He has been exploring the GPU world to create super-fast Math libraries for Ruby. One such effort is building the
-[ArrayFire](https://github.com/arrayfire/arrayfire-rb) gem that wraps ArrayFire library and will make it easy
-for programmers to use Ruby for **Big Data**.
+I love GPU programming and have built opensource libraries in D and Ruby that help in GPU acceleration. I am
+the creator and maintainer of ArrayFire-rb, ArrayFire-D, cuda_d and RbCUDA.
+
+I am highly-skilled in building data-intensive applications and speeding up the algorithms by modifying the code,
+exploiting multicore CPUs and GPUs.
+
+Very recently, I have developed an interest in Deep Learning and AI.
 
 
 # Talks
