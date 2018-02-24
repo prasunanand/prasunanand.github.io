@@ -10,19 +10,19 @@ This post explains the architecture of `RbCUDA`.
 
 # Installation
 
-1. Install `CUDA` on your machine.
+Install `CUDA` on your machine.
 
-2. Building `RbCUDA` from source.
+### Building `RbCUDA` from source.
 
 ```sh
-Building from source
 git clone https://github.com/prasunanand/rbcuda
 cd rbcuda
 bundle install
 rake compile
 ```
 
-3. Installing the gem
+### Installing the gem
+
 ```sh
 gem build rbcuda.gemspec
 gem install rbcuda-0.0.0.gem
@@ -49,7 +49,7 @@ If you are successfully able to retrive the name of GPU card, you are all set.
 `extconf.rb` that helps in building the shared object file can be found [here](https://github.com/prasunanand/rbcuda/blob/master/ext/rbcuda/extconf.rb).
 
 
-`rbcuda.h` defines all the Ruby structs that correspond to CUDA types. In the following code a CUfunction type can be represented as `function_ptr`.
+`rbcuda.h` defines all the Ruby structs that correspond to CUDA types. In the following code `CUfunction` type can be represented as `function_ptr`.
 
 
 ```ruby
@@ -79,7 +79,7 @@ RbCuFunction  = rb_define_class_under(RbCUDA, "RbCuFunction",  rb_cObject);
 
 # Dev Array
 
-An array in RbCUDA is handled using Dev_Array class.
+An array in RbCUDA is handled using Dev_Array class. Implementation is as follows:
 
 ```
 typedef struct DEV_PTR
@@ -90,17 +90,21 @@ typedef struct DEV_PTR
 Dev_Array = rb_define_class_under(RbCUDA, "Dev_Array", rb_cObject);
 
 ```
+A Dev Array stores the pointer to the array data stored on the GPU. The usage will be explained in the next blog.
+
 # Functionalities
 
 RbCUDA has the following modules:
-1. CUDA
-2. Runtime
-3. CuBLAS
-4. CuSolver
-5. CuRand
-6. Profiler
+1. CUDA : It consists of low-level APIs called the CUDA driver APIs.
+2. Runtime : It consists of higher-level APIs called the CUDA runtime APIs that are implemented on top of the CUDA driver APIs.
+3. CuBLAS : It consists of BLAS APIs provided by cuBLAS library.
+4. CuSolver : It consists of APIs provided by cuSolver library.
+5. CuRand : It consists APIs provided by cuRand library.
+6. Profiler : It consists of APIs for profiling CUDA code.
 
 # Conclusion
+
+I have explained how the underlying architecture looks like.
 
 We have got `RbCUDA` successfully installed on our system. In the next blog I will talk about implementing Runtime APIs.
 
