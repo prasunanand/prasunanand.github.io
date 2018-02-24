@@ -9,8 +9,8 @@ huge supporter of Open-source software and loves Bioinformatics.
 
 I am highly motivated to bring Scientific Computing to Ruby.
 
-I am currently working on with the [Genenetwork](https://github.com/GENENETWORK) project, building `Faster-LMM-D`, a
-GWAS tool for HPC devices. Faster_LMM_D supports Linear Mixed Models. Bayesian Sparse Models are on the way. It has
+I am currently working on the [Genenetwork](https://github.com/GENENETWORK) project with University of Tennessee Health Science Center, building
+`Faster-LMM-D`, a GWAS tool for HPC devices. Faster_LMM_D supports Linear Mixed Models. Bayesian Sparse Models are on the way. It has
 a GPU backend that helps it run on CUDA and OpenCL environment.
 
 I am also simultaneously working on [RbCUDA](https://github.com/prasunanand/rbcuda): CUDA bindings
@@ -38,7 +38,7 @@ for Ruby/JRuby by using the GPU through OpenCL and ArrayFire"](https://summerofc
 I like to program in C, C++, Java, D and Ruby.
 
 I love GPU programming and have built opensource libraries in D and Ruby that help in GPU acceleration. I am
-the creator and maintainer of ArrayFire-rb, ArrayFire-D, cuda_d and RbCUDA.
+the creator and maintainer of `ArrayFire-rb`, `ArrayFire-D`, `cuda_d` and `RbCUDA`.
 
 I am highly-skilled in building data-intensive applications and speeding up the algorithms by modifying the code,
 exploiting multicore CPUs and GPUs.
