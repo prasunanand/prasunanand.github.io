@@ -4,7 +4,7 @@ title: About
 permalink: /about/
 ---
 
-I am with different open-source projects aimed at super fast Scientific Computing on Ruby and D. I am a
+Hi, I am Prasun and I am involved with different open-source projects aimed at super fast Scientific Computing on Ruby and D. I am a
 huge supporter of Open-source software and loves Bioinformatics.
 
 I am highly motivated to bring Scientific Computing to Ruby.
