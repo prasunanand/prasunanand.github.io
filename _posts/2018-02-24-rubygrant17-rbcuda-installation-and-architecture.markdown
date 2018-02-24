@@ -6,7 +6,7 @@ categories: cuda opencl ruby rbcuda
 comments: true
 ---
 
-This post explains the architecture of `RbCUDA`.
+This post explains the architecture of `RbCUDA` and how you can install it on your machine.
 
 # Installation
 
