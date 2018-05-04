@@ -5,18 +5,16 @@ permalink: /about/
 ---
 
 Hi, I am Prasun and I am involved with different open-source projects aimed at super fast Scientific Computing on Ruby and D. I am a
-huge supporter of Open-source software and loves Bioinformatics.
+huge supporter of Open-source software and love Bioinformatics. I am highly motivated to bring Scientific Computing to Ruby.
 
-I am highly motivated to bring Scientific Computing to Ruby.
+I work as a Software Architect at Modak Analytics Software. Here, I am responsible for building Genome scan tools optimized for GPU clusters, targetted for
+Big Pharma. 
 
-I am currently working on the [Genenetwork](https://github.com/GENENETWORK) project with University of Tennessee Health Science Center, building
+I am an active member of the [Genenetwork](https://github.com/GENENETWORK) team with University of Tennessee Health Science Center, building
 `Faster-LMM-D`, a GWAS tool for HPC devices. Faster_LMM_D supports Linear Mixed Models. Bayesian Sparse Models are on the way. Faster_LMM_D has
 a GPU backend that helps it run in CUDA and OpenCL environment.
 
-I am also simultaneously working on [RbCUDA](https://github.com/prasunanand/rbcuda): CUDA bindings
-for Ruby. The project has been awarded Ruby Grant 2017 by Ruby Association, Japan. RbCUDA is the fastest Ruby library
-for matrix multiplication.
-
+I am a Ruby Grant 2017 recipient. Ruby Grant is awarded every year to 3-5 projects by Ruby Association, Japan. It helped me build [RbCUDA](https://github.com/prasunanand/rbcuda): CUDA bindings for Ruby. RbCUDA is the fastest Ruby library for matrix multiplication.
 
 I worked as a student developer for Ruby Science Foundation for
 **Google Summer of Code 2016** on the project **["Port NMatrix to JRuby"](https://summerofcode.withgoogle.com/archive/2016/projects/4640058522992640/)**.
@@ -45,22 +43,23 @@ compiler level optimizations, code profiling, exploiting multicore CPUs and GPUs
 
 Very recently, I have developed an interest in Deep Learning and AI.
 
-
 # Talks
 
-1. Speaker at Ruby Conference India, 2018 to talk about [GPU Accelerated Libraries for Ruby](http://rubyconfindia.org/program/#prasun). <br>
-[Slides](https://www.slideshare.net/PrasunAnand2/rubyconfindia2018-gpu-accelerated-libraries-for-ruby)
+1. Invited as a Speaker at RubyKaigi 2018, Sendai, Japan to talk about [High Performance GPU Computing with Ruby](http://rubykaigi.org/2018/presentations/prasun_anand.html#jun02).
 
-2. Speaker at RubyConf 2017, New Orleans, USA to talk about [High Performance GPU Computing on Ruby](http://rubyconf.org/program#session-234). <br>
+2. Speaker at Ruby Conference India, 2018 to talk about [GPU Accelerated Libraries for Ruby](http://rubyconfindia.org/program/#prasun). <br>
+[Slides](https://www.slideshare.net/PrasunAnand2/rubyconfindia2018-gpu-accelerated-libraries-for-ruby)| [Video](https://www.youtube.com/watch?v=Um8DhAk7DOo)
+
+3. Speaker at RubyConf 2017, New Orleans, USA to talk about [High Performance GPU Computing on Ruby](http://rubyconf.org/program#session-234). <br>
 [Slides](https://www.slideshare.net/PrasunAnand2/high-performance-gpu-computing-with-ruby-rubyconf-2017)| [Video](http://confreaks.tv/videos/rubyconf2017-high-performance-gpu-computing-with-ruby)
 
-3. Speaker at RubyWorld Conference, Matsue Japan, 2017 to talk about [High Performance GPU Computing on Ruby](http://2017.rubyworld-conf.org/en/program/). <br>
+4. Speaker at RubyWorld Conference, Matsue Japan, 2017 to talk about [High Performance GPU Computing on Ruby](http://2017.rubyworld-conf.org/en/program/). <br>
 [Slides](https://www.slideshare.net/PrasunAnand2/high-performance-gpu-computing-with-ruby)| [Video](https://youtu.be/_NeFdIhzz1o?t=9159)
 
-4. Speaker at Ruby DevRoom at FOSDEM 2017, Brussels, Belgium to talk about [Scientific Computing on JRuby](https://fosdem.org/2017/schedule/event/ruby_scientific_computing_on_jruby/).<br>
+5. Speaker at Ruby DevRoom at FOSDEM 2017, Brussels, Belgium to talk about [Scientific Computing on JRuby](https://fosdem.org/2017/schedule/event/ruby_scientific_computing_on_jruby/).<br>
 [Slides](https://www.slideshare.net/PrasunAnand2/fosdem2017-scientific-computing-on-jruby)| [Video](https://video.fosdem.org/2017/K.4.201/ruby_scientific_computing_on_jruby.mp4)
 
-5. Speaker at Ruby Conference India, 2017 to talk about [Scientific Computing on JRuby](http://rubyconfindia.org/program/#prasun-anand). <br>
+6. Speaker at Ruby Conference India, 2017 to talk about [Scientific Computing on JRuby](http://rubyconfindia.org/program/#prasun-anand). <br>
 [Slides](https://www.slideshare.net/PrasunAnand2/scientific-computing-on-jruby)| [Video](https://www.youtube.com/watch?v=mZEZ13nr-LQ)
 
 
@@ -83,6 +82,10 @@ USA.<br>
 1. [Ruby Grant 2017](http://www.ruby.or.jp/en/news/20171206)
 2. [Google Summer of Code 2017](https://summerofcode.withgoogle.com/archive/2017/projects/5200694831218688/)
 3. [Google Summer of Code 2016](https://summerofcode.withgoogle.com/archive/2016/projects/4640058522992640/)
+
+# Mentoring
+
+1. [Google Summer of Code 2018](https://summerofcode.withgoogle.com/organizations/6467792971235328/): Mentoring two students on the development of "Ruby port of Matplotlib", with Ruby Science Foundation. 
 
 # Projects
 
