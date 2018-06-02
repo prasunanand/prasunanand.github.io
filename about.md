@@ -41,25 +41,28 @@ the creator and maintainer of `ArrayFire-rb`, `ArrayFire-D`, `cuda_d` and `RbCUD
 I am highly-skilled in building data-intensive applications and speeding up the algorithms by optimizing the underlying code, introducing
 compiler level optimizations, code profiling, exploiting multicore CPUs and GPUs.
 
-Very recently, I have developed an interest in Deep Learning and AI.
-
 # Talks
 
-1. Invited as a Speaker at RubyKaigi 2018, Sendai, Japan to talk about [High Performance GPU Computing with Ruby](http://rubykaigi.org/2018/presentations/prasun_anand.html#jun02).
+1. Talk on [Linear Mixed Models: GEMMA advances in Genome-wide association mapping](http://www.complextrait.org/ctc2018/abstracts.html) at Complex Trait Community Conference 2018, Glasgow, Scotland.<br>
+Pjotr Prins<sup>1</sup>, Christian Fischer<sup>1</sup>, Prasun Anand<sup>1</sup><br>
+<sup>1</sup>University of Tennessee Health Science Center
 
-2. Speaker at Ruby Conference India, 2018 to talk about [GPU Accelerated Libraries for Ruby](http://rubyconfindia.org/program/#prasun). <br>
+2. Speaker at RubyKaigi 2018, Sendai, Japan to talk about [High Performance GPU Computing with Ruby](http://rubykaigi.org/2018/presentations/prasun_anand.html#jun02). <br>
+[Slides](https://www.slideshare.net/PrasunAnand2/high-performance-gpu-computing-with-ruby-rubykaigi-2018)
+
+3. Speaker at Ruby Conference India, 2018 to talk about [GPU Accelerated Libraries for Ruby](http://rubyconfindia.org/program/#prasun). <br>
 [Slides](https://www.slideshare.net/PrasunAnand2/rubyconfindia2018-gpu-accelerated-libraries-for-ruby)| [Video](https://www.youtube.com/watch?v=Um8DhAk7DOo)
 
-3. Speaker at RubyConf 2017, New Orleans, USA to talk about [High Performance GPU Computing on Ruby](http://rubyconf.org/program#session-234). <br>
+4. Speaker at RubyConf 2017, New Orleans, USA to talk about [High Performance GPU Computing on Ruby](http://rubyconf.org/program#session-234). <br>
 [Slides](https://www.slideshare.net/PrasunAnand2/high-performance-gpu-computing-with-ruby-rubyconf-2017)| [Video](http://confreaks.tv/videos/rubyconf2017-high-performance-gpu-computing-with-ruby)
 
-4. Speaker at RubyWorld Conference, Matsue Japan, 2017 to talk about [High Performance GPU Computing on Ruby](http://2017.rubyworld-conf.org/en/program/). <br>
+5. Speaker at RubyWorld Conference, Matsue Japan, 2017 to talk about [High Performance GPU Computing on Ruby](http://2017.rubyworld-conf.org/en/program/). <br>
 [Slides](https://www.slideshare.net/PrasunAnand2/high-performance-gpu-computing-with-ruby)| [Video](https://youtu.be/_NeFdIhzz1o?t=9159)
 
-5. Speaker at Ruby DevRoom at FOSDEM 2017, Brussels, Belgium to talk about [Scientific Computing on JRuby](https://fosdem.org/2017/schedule/event/ruby_scientific_computing_on_jruby/).<br>
+6. Speaker at Ruby DevRoom at FOSDEM 2017, Brussels, Belgium to talk about [Scientific Computing on JRuby](https://fosdem.org/2017/schedule/event/ruby_scientific_computing_on_jruby/).<br>
 [Slides](https://www.slideshare.net/PrasunAnand2/fosdem2017-scientific-computing-on-jruby)| [Video](https://video.fosdem.org/2017/K.4.201/ruby_scientific_computing_on_jruby.mp4)
 
-6. Speaker at Ruby Conference India, 2017 to talk about [Scientific Computing on JRuby](http://rubyconfindia.org/program/#prasun-anand). <br>
+7. Speaker at Ruby Conference India, 2017 to talk about [Scientific Computing on JRuby](http://rubyconfindia.org/program/#prasun-anand). <br>
 [Slides](https://www.slideshare.net/PrasunAnand2/scientific-computing-on-jruby)| [Video](https://www.youtube.com/watch?v=mZEZ13nr-LQ)
 
 
