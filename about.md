@@ -43,7 +43,9 @@ compiler level optimizations, code profiling, exploiting multicore CPUs and GPUs
 
 # Talks
 
-1. Talk on [Linear Mixed Models: GEMMA advances in Genome-wide association mapping](http://www.complextrait.org/ctc2018/abstracts.html) at Complex Trait Community Conference 2018, Glasgow, Scotland.<br>
+1. Invited as a speaker at [RubyConf Malaysia 2018](http://rubyconf.my/#speakers), Kuala Lumpur, Malaysia.
+
+2. Talk on [Linear Mixed Models: GEMMA advances in Genome-wide association mapping](http://www.complextrait.org/ctc2018/abstracts.html) at Complex Trait Community Conference 2018, Glasgow, Scotland.<br>
 Pjotr Prins<sup>1</sup>, Christian Fischer<sup>1</sup>, Prasun Anand<sup>1</sup><br>
 <sup>1</sup>University of Tennessee Health Science Center
 
@@ -78,7 +80,7 @@ USA.<br>
 
 
 # Awards
-1. Finalist for [Fukuoka Ruby Award 2018](https://www.ruby-lang.org/en/news/2017/12/27/fukuoka-ruby-award-2018/) for activity: **Ruby for High Performance Scientific Computing using Arrayfire gem and RbCUDA gem**.
+1. Awarded [Fukuoka Ruby Award 2018](https://www.ruby-lang.org/en/news/2017/12/27/fukuoka-ruby-award-2018/) for activity: **Ruby for High Performance Scientific Computing using Arrayfire gem and RbCUDA gem**.
 2. Ruby Association Travel Grant 2017
 
 # Achievements
