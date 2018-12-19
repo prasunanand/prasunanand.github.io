@@ -4,17 +4,15 @@ title: About
 permalink: /about/
 ---
 
-Hi, I am Prasun and I am involved with different open-source projects aimed at super fast Scientific Computing on Ruby and D. I am a
-huge supporter of Open-source software and love Bioinformatics. I am highly motivated to bring Scientific Computing to Ruby.
+Hi, I am Prasun and I am involved with different open-source projects aimed at super fast Scientific Computing on Ruby and D. I am a huge supporter of Open-source software and love Bioinformatics. I am highly motivated to bring Scientific Computing to Ruby.
 
-I work as a Software Architect at Modak Analytics Software. Here, I am responsible for building Genome scan tools optimized for GPU clusters, targetted for
-Big Pharma. 
+I work as a Software Architect at Modak Analytics Software. Here, I am responsible for building Genome scan tools optimized for GPU clusters, targetted for Big Pharma.
 
 I am an active member of the [Genenetwork](https://github.com/GENENETWORK) team with University of Tennessee Health Science Center, building
 `Faster-LMM-D`, a GWAS tool for HPC devices. Faster_LMM_D supports Linear Mixed Models. Bayesian Sparse Models are on the way. Faster_LMM_D has
 a GPU backend that helps it run in CUDA and OpenCL environment.
 
-I am a Ruby Grant 2017 recipient. Ruby Grant is awarded every year to 3-5 projects by Ruby Association, Japan. It helped me build [RbCUDA](https://github.com/prasunanand/rbcuda): CUDA bindings for Ruby. RbCUDA is the fastest Ruby library for matrix multiplication.
+I am a Ruby Grant 2017 recipient from Ruby Association, Japan. It helped me build [RbCUDA](https://github.com/prasunanand/rbcuda): CUDA bindings for Ruby. RbCUDA is the fastest Ruby library for matrix multiplication.
 
 I worked as a student developer for Ruby Science Foundation for
 **Google Summer of Code 2016** on the project **["Port NMatrix to JRuby"](https://summerofcode.withgoogle.com/archive/2016/projects/4640058522992640/)**.
@@ -43,7 +41,7 @@ compiler level optimizations, code profiling, exploiting multicore CPUs and GPUs
 
 # Talks
 
-1. Invited as a speaker at [RubyConf Malaysia 2018](http://rubyconf.my/#speakers), Kuala Lumpur, Malaysia.
+1. Speaker at [RubyConf Malaysia 2018](http://rubyconf.my/#speakers), Kuala Lumpur, Malaysia.
 
 2. Talk on [Linear Mixed Models: GEMMA advances in Genome-wide association mapping](http://www.complextrait.org/ctc2018/abstracts.html) at Complex Trait Community Conference 2018, Glasgow, Scotland.<br>
 Pjotr Prins<sup>1</sup>, Christian Fischer<sup>1</sup>, Prasun Anand<sup>1</sup><br>
@@ -90,7 +88,7 @@ USA.<br>
 
 # Mentoring
 
-1. [Google Summer of Code 2018](https://summerofcode.withgoogle.com/organizations/6467792971235328/): Mentoring two students on the development of "Ruby port of Matplotlib", with Ruby Science Foundation. 
+1. [Google Summer of Code 2018](https://summerofcode.withgoogle.com/organizations/6467792971235328/): Mentoring two students on the development of "Ruby port of Matplotlib", with Ruby Science Foundation.
 
 # Projects
 
