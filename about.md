@@ -4,9 +4,11 @@ title: About
 permalink: /about/
 ---
 
-Hi, I am Prasun and I am involved with different open-source projects aimed at super fast Scientific Computing on Ruby and D. I am a huge supporter of Open-source software and love Bioinformatics. I am highly motivated to bring Scientific Computing to Ruby.
+Hi, I am Prasun. I work as a software engineer at [Quansight](https://www.quansight.com/). Currently I am working on the [Pytorch](https://pytorch.org/) library.
 
-I work as a Software Architect at Modak Analytics Software. Here, I am responsible for building Genome scan tools optimized for GPU clusters, targetted for Big Pharma.
+I am a huge supporter of Open-source software and love Bioinformatics. I am involved with different open-source projects aimed at super fast Scientific Computing on Python, Ruby and D. 
+
+I briefly worked as a Software Architect at Modak Analytics Software where I was leading the Genomics team. Here, I was responsible for building Genome scan tools optimized for GPU clusters, to aid pharmaceutical companies study large-scale genomics data. I built a strong team from the ground up and set up collaborations with some of the top research organisations in India and around the world.
 
 I am an active member of the [Genenetwork](https://github.com/GENENETWORK) team with University of Tennessee Health Science Center, building
 `Faster-LMM-D`, a GWAS tool for HPC devices. Faster_LMM_D supports Linear Mixed Models. Bayesian Sparse Models are on the way. Faster_LMM_D has
