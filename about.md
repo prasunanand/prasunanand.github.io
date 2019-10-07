@@ -4,9 +4,9 @@ title: About
 permalink: /about/
 ---
 
-Hi, I am Prasun. I work as a software engineer at [Quansight](https://www.quansight.com/). Currently I am working on the [Pytorch](https://pytorch.org/) library.
+Hi, I am Prasun. I work as a software engineer at [Quansight](https://www.quansight.com/). Currently I am working on the [Pytorch](https://pytorch.org/) library. I am contributing to [Uarray](https://github.com/Quansight-Labs/uarray) and [Unumpy](https://github.com/Quansight-Labs/unumpy) development.
 
-I am a huge supporter of Open-source software and love Bioinformatics. I am involved with different open-source projects aimed at super fast Scientific Computing on Python, Ruby and D. 
+I am a huge supporter of Open-source software and love Bioinformatics. I am involved with different open-source projects aimed at super fast Scientific Computing on Python, Ruby and D.
 
 I briefly worked as a Software Architect at Modak Analytics Software where I was leading the Genomics team. Here, I was responsible for building Genome scan tools optimized for GPU clusters, to aid pharmaceutical companies study large-scale genomics data. I built a strong team from the ground up and set up collaborations with some of the top research organisations in India and around the world.
 
@@ -33,7 +33,7 @@ for Ruby/JRuby by using the GPU through OpenCL and ArrayFire"](https://summerofc
 
 # Programming
 
-I like to program in C, C++, Java, D and Ruby.
+I like to program in C++, C, Python, Java, D and Ruby.
 
 I love GPU programming and have built opensource libraries in D and Ruby that help in GPU acceleration. I am
 the creator and maintainer of `ArrayFire-rb`, `ArrayFire-D`, `cuda_d` and `RbCUDA`.
@@ -90,7 +90,8 @@ USA.<br>
 
 # Mentoring
 
-1. [Google Summer of Code 2018](https://summerofcode.withgoogle.com/organizations/6467792971235328/): Mentoring two students on the development of "Ruby port of Matplotlib", with Ruby Science Foundation.
+1. [Google Summer of Code 2019](https://summerofcode.withgoogle.com/archive/2019/organizations/6207728010133504/):  Mentored one student on the project "Improving NMatrix: Adding features to NMatrix core", with Ruby Science Foundation. Served as Org Admin and represented the organisation in Google Summer of Code Mentor Summit 2019, held in Munich, Germany.
+2. [Google Summer of Code 2018](https://summerofcode.withgoogle.com/organizations/6467792971235328/): Mentored two students on the development of "Ruby port of Matplotlib", with Ruby Science Foundation. represented the organisation in Google Summer of Code Mentor Summit 2018, held in San Francisco, USA.
 
 # Projects
 
