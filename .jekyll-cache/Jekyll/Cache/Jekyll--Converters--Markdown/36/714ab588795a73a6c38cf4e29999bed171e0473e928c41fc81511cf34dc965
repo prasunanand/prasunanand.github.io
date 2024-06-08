@@ -1,0 +1,3 @@
+I"”<p>This post covers how I implemented the test-suite and <code class="language-plaintext highlighter-rouge">Algorithm</code> class for <code class="language-plaintext highlighter-rouge">ArrayFire-rb</code> using  ArrayFire C API, and
+how to use <code class="language-plaintext highlighter-rouge">Algorithm</code> class methods with <code class="language-plaintext highlighter-rouge">Af_Array</code>.</p>
+:ET

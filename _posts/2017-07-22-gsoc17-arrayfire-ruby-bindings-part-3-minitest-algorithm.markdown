@@ -4,6 +4,8 @@ title:  "ArrayFire Ruby Bindings<br>(Part III : Test-suite and Algorithm class)"
 date:   2017-07-22 10:01:00 +0530
 categories: arrayfire
 comments: true
+author: Prasun Anand
+banner: /images/banner.png
 ---
 
 This post covers how I implemented the test-suite and `Algorithm` class for `ArrayFire-rb` using  ArrayFire C API, and

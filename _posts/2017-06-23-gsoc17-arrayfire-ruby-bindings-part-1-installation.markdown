@@ -4,6 +4,8 @@ title:  "ArrayFire Ruby Bindings<br>(Part I : Installation)"
 date:   2017-06-23 14:15:00 +0530
 categories: arrayfire
 comments: true
+author: Prasun Anand
+banner: /images/banner.png
 ---
 
 I have been working on creating ArrayFire bindings for Ruby. ArrayFire is an opensource

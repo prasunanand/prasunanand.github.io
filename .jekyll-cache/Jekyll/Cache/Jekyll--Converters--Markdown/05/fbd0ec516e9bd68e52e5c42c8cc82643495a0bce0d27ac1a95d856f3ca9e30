@@ -1,0 +1,5 @@
+I"<p>ArrayFire-rb has been interfaced to NMatrix so that they can work together. Sometimes, copying data
+from GPU memory to CPU memory and vice versa can be slower than the computation time. Hence, a lot of
+developers prefer to use GPU computing for the most time consuming task. The interface between <code class="language-plaintext highlighter-rouge">ArrayFire-rb</code>
+and <code class="language-plaintext highlighter-rouge">NMatrix</code> helps in providing maximum freedom to the developers to use the libraries of their choice.</p>
+:ET

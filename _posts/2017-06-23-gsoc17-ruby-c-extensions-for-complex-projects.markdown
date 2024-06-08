@@ -4,6 +4,8 @@ title:  "Ruby C extensions for complex projects"
 date:   2017-06-23 13:18:41 +0530
 categories: ruby-c-extensions
 comments: true
+author: Prasun Anand
+banner: /images/banner.png
 ---
 
 In this blog and a few others that will follow, I would share my expereiences creating

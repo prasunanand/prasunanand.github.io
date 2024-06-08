@@ -1,0 +1,125 @@
+I"�"<p>This post explains the architecture of <code class="language-plaintext highlighter-rouge">RbCUDA</code> and how you can install it on your machine.</p>
+
+<p>todo:
+I have been working on “Port NMatrix to JRuby” as my GSoC project. I am pleased to announce that <strong>JRuby is ready for Nmatrix users</strong>.</p>
+
+<p>NMatrix, a linear algebra library wraps Apache Commons Maths for its core functionalities. By the end of GSoC, I have been able to implement NMatrix for dense matrices with double and object ( ruby objects ) data type. I have also worked on porting mixed-models gem to JRuby which heavily uses NMatrix at its core.</p>
+
+<h1 id="installation">Installation</h1>
+
+<p>Install <code class="language-plaintext highlighter-rouge">CUDA</code> on your machine.</p>
+
+<h3 id="building-rbcuda-from-source">Building <code class="language-plaintext highlighter-rouge">RbCUDA</code> from source.</h3>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/prasunanand/rbcuda
+<span class="nb">cd </span>rbcuda
+bundle <span class="nb">install
+</span>rake compile
+</code></pre></div></div>
+
+<h3 id="installing-the-gem">Installing the gem</h3>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gem build rbcuda.gemspec
+gem <span class="nb">install </span>rbcuda-0.0.0.gem
+</code></pre></div></div>
+
+<p>To check if installation was successful, run pry.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">rake</span> <span class="n">pry</span>
+<span class="n">pry</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'./lib/rbcuda.rb'</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">RbCUDA</span><span class="o">::</span><span class="no">CUDA</span><span class="p">.</span><span class="nf">cuInit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">device</span> <span class="o">=</span> <span class="no">RbCUDA</span><span class="o">::</span><span class="no">CUDA</span><span class="p">.</span><span class="nf">cuDeviceGet</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="nb">puts</span> <span class="n">device</span>
+<span class="c1">#&lt;RbCUDA::RbCuDevice:0x00000001a9a2d0&gt;</span>
+<span class="o">=&gt;</span> <span class="kp">nil</span>
+<span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="nb">puts</span> <span class="no">RbCUDA</span><span class="o">::</span><span class="no">CUDA</span><span class="p">.</span><span class="nf">cuDeviceGetName</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">device</span><span class="p">);</span>
+<span class="no">GeForce</span> <span class="no">GTX</span> <span class="mi">750</span> <span class="no">Ti</span>
+</code></pre></div></div>
+<p>If you are successfully able to retrive the name of GPU card, you are all set.</p>
+
+<h1 id="code-organisation">Code organisation</h1>
+
+<p><code class="language-plaintext highlighter-rouge">extconf.rb</code> that helps in building the shared object file can be found <a href="https://github.com/prasunanand/rbcuda/blob/master/ext/rbcuda/extconf.rb">here</a>.</p>
+
+<p><code class="language-plaintext highlighter-rouge">rbcuda.h</code> defines all the Ruby structs that correspond to CUDA types. In the following code <code class="language-plaintext highlighter-rouge">CUfunction</code> type can be represented as <code class="language-plaintext highlighter-rouge">function_ptr</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">typedef</span> <span class="n">struct</span> <span class="no">FUNCTION_PTR</span>
+<span class="p">{</span>
+  <span class="no">CUfunction</span> <span class="n">function</span><span class="p">;</span>
+<span class="p">}</span><span class="n">function_ptr</span><span class="p">;</span>
+
+<span class="n">typedef</span> <span class="n">struct</span> <span class="no">DEVICE_PTR</span>
+<span class="p">{</span>
+  <span class="no">CUdevice</span> <span class="n">device</span><span class="p">;</span>
+<span class="p">}</span><span class="n">device_ptr</span><span class="p">;</span>
+
+</code></pre></div></div>
+<p>The struct <code class="language-plaintext highlighter-rouge">fuction_ptr</code> is then wrapped by a Ruby object called <code class="language-plaintext highlighter-rouge">RbCuFunction</code> in the file <code class="language-plaintext highlighter-rouge">ruby_rbcuda.c</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">RbCUDA</span> <span class="o">=</span> <span class="n">rb_define_module</span><span class="p">(</span><span class="s2">"RbCUDA"</span><span class="p">);</span>
+
+<span class="no">VALUE</span> <span class="no">RbCuDevice</span> <span class="o">=</span> <span class="no">Qnil</span><span class="p">;</span>
+<span class="no">VALUE</span> <span class="no">RbCuFunction</span> <span class="o">=</span> <span class="no">Qnil</span><span class="p">;</span>
+
+<span class="no">RbCuDevice</span>    <span class="o">=</span> <span class="n">rb_define_class_under</span><span class="p">(</span><span class="no">RbCUDA</span><span class="p">,</span> <span class="s2">"RbCuDevice"</span><span class="p">,</span>    <span class="n">rb_cObject</span><span class="p">);</span>
+<span class="no">RbCuFunction</span>  <span class="o">=</span> <span class="n">rb_define_class_under</span><span class="p">(</span><span class="no">RbCUDA</span><span class="p">,</span> <span class="s2">"RbCuFunction"</span><span class="p">,</span>  <span class="n">rb_cObject</span><span class="p">);</span>
+
+</code></pre></div></div>
+
+<h1 id="dev-array">Dev Array</h1>
+
+<p>An array in RbCUDA is handled using Dev_Array class. Implementation is as follows:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef struct DEV_PTR
+{
+  double* carray;
+}dev_ptr;
+
+Dev_Array = rb_define_class_under(RbCUDA, "Dev_Array", rb_cObject);
+
+</code></pre></div></div>
+<p>A Dev Array stores the pointer to the array data stored on the GPU. The usage will be explained in the next blog.</p>
+
+<h1 id="functionalities">Functionalities</h1>
+
+<p>RbCUDA has the following modules:</p>
+<ol>
+  <li>CUDA : It consists of low-level APIs called the CUDA driver APIs.</li>
+  <li>Runtime : It consists of higher-level APIs called the CUDA runtime APIs that are implemented on top of the CUDA driver APIs.</li>
+  <li>CuBLAS : It consists of BLAS APIs provided by cuBLAS library.</li>
+  <li>CuSolver : It consists of APIs provided by cuSolver library.</li>
+  <li>CuRand : It consists APIs provided by cuRand library.</li>
+  <li>Profiler : It consists of APIs for profiling CUDA code.</li>
+</ol>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>I have explained how the underlying architecture looks like.</p>
+
+<p>We have got <code class="language-plaintext highlighter-rouge">RbCUDA</code> successfully installed on our system. In the next blog I will talk about implementing Runtime APIs.</p>
+
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//prasunanandblog.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+:ET

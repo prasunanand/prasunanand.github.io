@@ -4,6 +4,8 @@ title:  "ArrayFire Ruby Bindings<br>(Part V : Statistics and Random Engine routi
 date:   2017-08-17 14:00:00 +0530
 categories: arrayfire
 comments: true
+author: Prasun Anand
+banner: /images/banner.png
 ---
 
 This post explains about the `Statistics` and `Random` class of `arrayfire` gem.

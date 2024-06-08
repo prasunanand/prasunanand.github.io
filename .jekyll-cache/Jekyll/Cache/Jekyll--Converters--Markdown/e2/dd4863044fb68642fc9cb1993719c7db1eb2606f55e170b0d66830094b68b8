@@ -1,0 +1,254 @@
+I"m:<p>In this blog and a few others that will follow, I would share my expereiences creating
+Ruby Bindings for C/C++ libraries. It covers a practical example rather than a
+<code class="language-plaintext highlighter-rouge">Hello world!</code> or <code class="language-plaintext highlighter-rouge">chairs and tables</code> examples.</p>
+
+<p>When I started working on ArrayFire bindings for Ruby, I was searching on
+the Internet <code class="language-plaintext highlighter-rouge">How to create Ruby C extensions?</code> I was able to learn the basics but
+I wasn’t able to figure out <code class="language-plaintext highlighter-rouge">how to implement it</code> for a practical application.</p>
+
+<p>For example, if you are working on a  <strong>Number Cruncing</strong> library, you need to handle
+data of different types like double, float, int, unsigned int, complex. To handle
+all these data types, to prevent repeatition of code, we need templates. But  C doesn’t
+support templates and you need to use C++ to do it.  But you never learnt to bind C++ to
+Ruby.</p>
+
+<p>Hence, I am writing this blog post to explain how to engineer complex Ruby applications that take
+advantage of C/C++ libraries. I will explain it by citing examples from <strong>NMatrix</strong>,
+and <strong>ArrayFire</strong>.</p>
+
+<h1 id="basics">Basics</h1>
+
+<p>The first step of creating a Ruby binding is to create a shared object file that binds to
+your ruby code. The shared object contains information about your Ruby Modules, Classes,
+Methods and Variables.</p>
+
+<p>An example tutorial which I like a lot, can be seen <a href="https://tenderlovemaking.com/2009/12/18/writing-ruby-c-extensions-part-1.html">here</a> and <a href="https://tenderlovemaking.com/2010/12/11/writing-ruby-c-extensions-part-2.html">here</a>.</p>
+
+<p>Now the challenging task would be how you will use C++, if you want to use Object Oriented
+paradigm of C++.</p>
+
+<h1 id="directory-structure">Directory Structure</h1>
+
+<pre><code class="language-tree">├── ext
+│   └── mri
+│       ├── arith.cpp
+│       ├── arrayfire.c
+│       ├── blas.cpp
+│       ├── extconf.rb
+│       ├── lapack.cpp
+│       ├── mkmf.rb
+│       ├── ruby_arrayfire.cpp
+│       └── ruby_arrayfire.h
+├── lib
+│   ├── arrayfire
+│   │   └── arrayfire.rb
+│   └── arrayfire.rb
+└── Rakefile
+
+</code></pre>
+
+<h1 id="compiling">Compiling</h1>
+
+<p>NMatrix uses <a href="https://github.com/prasunanand/arrayfire-rb/blob/master/ext/mri/mkmf.rb">mkmf.rb</a> file
+which helps you compile C++ and C code. If you want to explore more, you can look into what this code
+does.</p>
+
+<p>mkmf.rb helps you create an entry to shared object is through a C++ files that also contains the
+C files. The C file contains all the directives responsible for creating Ruby modules, classes
+, methods and variables and to prevent mangling we use extern to refer C and C++ code.</p>
+
+<h1 id="makefile">Makefile</h1>
+
+<p>The extconf.rb needs to have a little modifcations that would help the Makefile find the
+source files, dependencies and output the <code class="language-plaintext highlighter-rouge">.so</code> file.</p>
+
+<p><strong>extconf.rb</strong></p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require_relative</span> <span class="s1">'mkmf.rb'</span>
+
+<span class="n">extension_name</span> <span class="o">=</span> <span class="s1">'arrayfire'</span>
+
+
+<span class="vg">$INSTALLFILES</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">[</span><span class="s1">'ruby_arrayfire.h'</span>       <span class="p">,</span> <span class="s1">'$(archdir)'</span><span class="p">],</span>
+  <span class="p">[</span><span class="s1">'ruby_arrayfire.hpp'</span>     <span class="p">,</span> <span class="s1">'$(archdir)'</span><span class="p">],</span>
+  <span class="p">[</span><span class="s1">'arrayfire_config.h'</span><span class="p">,</span> <span class="s1">'$(archdir)'</span><span class="p">],</span>
+<span class="p">]</span>
+
+<span class="vg">$DEBUG</span> <span class="o">=</span> <span class="kp">true</span>
+<span class="vg">$CFLAGS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"-Wall -Werror=return-type"</span><span class="p">,</span><span class="vg">$CFLAGS</span><span class="p">].</span><span class="nf">join</span><span class="p">(</span><span class="s2">" "</span><span class="p">)</span>
+<span class="vg">$CXXFLAGS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"-Wall -Werror=return-type"</span><span class="p">,</span><span class="vg">$CXXFLAGS</span><span class="p">].</span><span class="nf">join</span><span class="p">(</span><span class="s2">" "</span><span class="p">)</span>
+<span class="vg">$CPPFLAGS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"-Wall -Werror=return-type"</span><span class="p">,</span><span class="vg">$CPPFLAGS</span><span class="p">].</span><span class="nf">join</span><span class="p">(</span><span class="s2">" "</span><span class="p">)</span>
+
+
+<span class="no">LIBDIR</span>      <span class="o">=</span> <span class="no">RbConfig</span><span class="o">::</span><span class="no">CONFIG</span><span class="p">[</span><span class="s1">'libdir'</span><span class="p">]</span>
+<span class="no">INCLUDEDIR</span>  <span class="o">=</span> <span class="no">RbConfig</span><span class="o">::</span><span class="no">CONFIG</span><span class="p">[</span><span class="s1">'includedir'</span><span class="p">]</span>
+
+<span class="no">HEADER_DIRS</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="s1">'/opt/local/include'</span><span class="p">,</span>
+  <span class="s1">'/usr/local/include'</span><span class="p">,</span>
+  <span class="no">INCLUDEDIR</span><span class="p">,</span>
+  <span class="s1">'/usr/include'</span>
+<span class="p">]</span>
+
+<span class="no">LIB_DIRS</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="s1">'/opt/local/lib'</span><span class="p">,</span>
+  <span class="s1">'/usr/local/lib'</span><span class="p">,</span>
+  <span class="no">LIBDIR</span><span class="p">,</span>
+  <span class="s1">'/usr/lib'</span>
+<span class="p">]</span>
+
+<span class="n">dir_config</span><span class="p">(</span><span class="n">extension_name</span><span class="p">,</span> <span class="no">HEADER_DIRS</span><span class="p">,</span> <span class="no">LIB_DIRS</span><span class="p">)</span>
+
+<span class="n">have_library</span><span class="p">(</span><span class="s1">'afcuda'</span><span class="p">)</span>
+<span class="n">have_library</span><span class="p">(</span><span class="s1">'cusolver'</span><span class="p">)</span>
+<span class="n">have_library</span><span class="p">(</span><span class="s1">'cudart'</span><span class="p">)</span>
+<span class="n">have_library</span><span class="p">(</span><span class="s1">'cufft'</span><span class="p">)</span>
+<span class="n">have_library</span><span class="p">(</span><span class="s1">'cublas'</span><span class="p">)</span>
+
+<span class="n">basenames</span> <span class="o">=</span> <span class="sx">%w{ruby_arrayfire}</span>
+<span class="vg">$objs</span> <span class="o">=</span> <span class="n">basenames</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">b</span><span class="o">|</span> <span class="s2">"</span><span class="si">#{</span><span class="n">b</span><span class="si">}</span><span class="s2">.o"</span>   <span class="p">}</span>
+<span class="vg">$srcs</span> <span class="o">=</span> <span class="n">basenames</span><span class="p">.</span><span class="nf">map</span> <span class="p">{</span> <span class="o">|</span><span class="n">b</span><span class="o">|</span> <span class="s2">"</span><span class="si">#{</span><span class="n">b</span><span class="si">}</span><span class="s2">.cpp"</span> <span class="p">}</span>
+
+<span class="n">create_conf_h</span><span class="p">(</span><span class="s2">"arrayfire_config.h"</span><span class="p">)</span>
+<span class="n">create_makefile</span><span class="p">(</span><span class="n">extension_name</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="return-type">Return type</h2>
+
+<p>In the headerfile, we can add info regarding how to cast the objects and juggle them
+easily between C and C++ code.</p>
+
+<p>Each Ruby binding must return a VALUE and we need to cast it which can be seen in the
+following lines of code.</p>
+
+<p><strong>ruby_arrayfire.h</strong></p>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#ifndef RUBY_ARRAYFIRE_H
+</span>  <span class="cp">#define RUBY_ARRAYFIRE_H
+#endif
+</span>
+<span class="cm">/*
+ * Functions
+*/</span>
+
+<span class="cp">#ifdef __cplusplus
+</span><span class="k">typedef</span> <span class="nf">VALUE</span> <span class="p">(</span><span class="o">*</span><span class="n">METHOD</span><span class="p">)(...);</span>
+<span class="cp">#endif
+</span>
+<span class="cp">#include &lt;ruby.h&gt;
+#ifdef __cplusplus
+</span><span class="k">extern</span> <span class="s">"C"</span> <span class="p">{</span>
+<span class="cp">#endif
+</span>
+  <span class="kt">void</span> <span class="n">Init_arrayfire</span><span class="p">();</span>
+
+<span class="cp">#ifdef __cplusplus
+</span><span class="p">}</span>
+<span class="cp">#endif
+</span>
+</code></pre></div></div>
+
+<h1 id="name-mangling">Name Mangling</h1>
+
+<p>Now since you are loading the C file through a C++ interface you need to take care of casting the
+return value from an expression.</p>
+
+<p>A C++ compiler distinguishes between different functions when it generates object code by
+adding extra information about arguments to the function name, which is called Name Mangling.</p>
+
+<p>Hence, whenever we import C code, we place it in <code class="language-plaintext highlighter-rouge">extern "C"</code> block.</p>
+
+<p>The following code shows how to use it.</p>
+
+<p>Here we create an <code class="language-plaintext highlighter-rouge">arf</code> namespace and we create a method <code class="language-plaintext highlighter-rouge">test_cpp</code> that will print
+“Set up is successful!”. <code class="language-plaintext highlighter-rouge">arf::test_cpp</code> will be called by <code class="language-plaintext highlighter-rouge">ArrayFire#test</code>. <code class="language-plaintext highlighter-rouge">test</code> method
+will be defined in C and will call <code class="language-plaintext highlighter-rouge">arf::test_cpp</code>.</p>
+
+<p><strong>ruby_arrayfire.cpp</strong></p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;ruby.h&gt;
+#include &lt;algorithm&gt;
+#include &lt;fstream&gt;
+#include &lt;arrayfire.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;math.h&gt;
+</span>
+<span class="cm">/*
+ * Project Includes
+ */</span>
+
+<span class="cp">#include "arrayfire.h"
+#include "ruby_arrayfire.h"
+</span>
+<span class="n">namespace</span> <span class="n">arf</span> <span class="p">{</span>
+
+  <span class="k">static</span> <span class="kt">void</span> <span class="n">test_cpp</span><span class="p">()</span>
+  <span class="p">{</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"Setup is successful!"</span><span class="p">);</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="k">extern</span> <span class="s">"C"</span> <span class="p">{</span>
+  <span class="cp">#include "arrayfire.c"
+</span><span class="p">}</span>
+</code></pre></div></div>
+
+<h1 id="ruby-c-bindings">Ruby C bindings</h1>
+
+<p>This is the piece of code where we create the Ruby bindings.</p>
+
+<p><strong>arrayfire.c</strong></p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">VALUE</span> <span class="n">ArrayFire</span> <span class="o">=</span> <span class="n">Qnil</span><span class="p">;</span>
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">test</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="nf">Init_arrayfire</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">ArrayFire</span> <span class="o">=</span> <span class="n">rb_define_module</span><span class="p">(</span><span class="s">"ArrayFire"</span><span class="p">);</span>
+  <span class="n">rb_define_method</span><span class="p">(</span><span class="n">ArrayFire</span><span class="p">,</span> <span class="s">"test"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">test</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">VALUE</span> <span class="nf">test</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">arf</span><span class="o">::</span><span class="n">test_cpp</span><span class="p">();</span>
+  <span class="k">return</span> <span class="n">Qnil</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<h1 id="loading-the-shared-library">Loading the Shared Library</h1>
+
+<p><strong>lib/arrayfire/arrayfire.rb</strong></p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">require</span> <span class="s1">'ext/arrayfire.so'</span>
+</code></pre></div></div>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>This is how we have created our basic layout for Ruby C extension with C and C++.</p>
+
+<p>Now, we will create some arrayfire bindings.</p>
+
+<p>In the following blogs, I will write about building upon this codebase. I will
+introduce templates and later Garbage collection .</p>
+
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//prasunanandblog.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+:ET

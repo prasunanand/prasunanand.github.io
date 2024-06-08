@@ -1,0 +1,271 @@
+I"	�<p>ArrayFire-rb has been interfaced to NMatrix so that they can work together. Sometimes, copying data
+from GPU memory to CPU memory and vice versa can be slower than the computation time. Hence, a lot of
+developers prefer to use GPU computing for the most time consuming task. The interface between <code class="language-plaintext highlighter-rouge">ArrayFire-rb</code>
+and <code class="language-plaintext highlighter-rouge">NMatrix</code> helps in providing maximum freedom to the developers to use the libraries of their choice.</p>
+
+<p>This post explains how NMatrix and ArrayFire-rb interface has been created. It starts with adding
+nmatrix as a dependency to <code class="language-plaintext highlighter-rouge">arrayfire</code>.</p>
+<h2 id="gemspec">Gemspec</h2>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">gem</span><span class="p">.</span><span class="nf">add_development_dependency</span> <span class="s1">'nmatrix'</span><span class="p">,</span> <span class="s1">'~&gt; 0.2.1'</span>
+</code></pre></div></div>
+
+<h2 id="extconfrb">extconf.rb</h2>
+
+<p>Next add <code class="language-plaintext highlighter-rouge">nmatrix.h</code> header file allowing us to call <code class="language-plaintext highlighter-rouge">nmatrix</code>’s <code class="language-plaintext highlighter-rouge">C/C++ methods</code> from <code class="language-plaintext highlighter-rouge">arrayfire</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">nmatrix_path</span> <span class="o">=</span> <span class="no">Gem</span><span class="o">::</span><span class="no">Specification</span><span class="p">.</span><span class="nf">find_all_by_name</span><span class="p">(</span><span class="s1">'nmatrix'</span><span class="p">).</span><span class="nf">compact</span>
+<span class="nb">abort</span> <span class="s2">"Cannot locate NMatrix installation"</span> <span class="k">unless</span> <span class="n">nmatrix_path</span>
+<span class="n">nmatrix_header_dir</span> <span class="o">=</span> <span class="no">File</span><span class="p">.</span><span class="nf">join</span><span class="p">(</span><span class="n">nmatrix_path</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nf">require_path</span><span class="p">)</span>
+
+<span class="no">HEADER_DIRS</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="s1">'/opt/local/include'</span><span class="p">,</span>
+  <span class="s1">'/usr/local/include'</span><span class="p">,</span>
+  <span class="no">INCLUDEDIR</span><span class="p">,</span>
+  <span class="s1">'/usr/include'</span><span class="p">,</span>
+  <span class="n">nmatrix_header_dir</span>
+<span class="p">]</span>
+
+<span class="no">LIB_DIRS</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="s1">'/opt/local/lib'</span><span class="p">,</span>
+  <span class="s1">'/usr/local/lib'</span><span class="p">,</span>
+  <span class="no">LIBDIR</span><span class="p">,</span>
+  <span class="s1">'/usr/lib'</span><span class="p">,</span>
+  <span class="n">nmatrix_header_dir</span>
+<span class="p">]</span>
+
+<span class="n">dir_config</span><span class="p">(</span><span class="n">extension_name</span><span class="p">,</span> <span class="no">HEADER_DIRS</span><span class="p">,</span> <span class="no">LIB_DIRS</span><span class="p">)</span>
+
+<span class="n">have_library</span><span class="p">(</span><span class="s1">'af'</span><span class="p">)</span>
+</code></pre></div></div>
+<h2 id="nmatrix-c-api">NMatrix C++ API</h2>
+
+<p>An NMatrix Ruby C object is denoted by <code class="language-plaintext highlighter-rouge">cNMatrix</code>. Since, <code class="language-plaintext highlighter-rouge">cNMatrix</code> has been initially defined in <code class="language-plaintext highlighter-rouge">nmatrix.h</code> file
+we represent it as extern <code class="language-plaintext highlighter-rouge">VALUE</code> and <code class="language-plaintext highlighter-rouge">C++</code> has been specified as we are using the <code class="language-plaintext highlighter-rouge">C++</code>interface.</p>
+
+<p>Next, we create the Ruby bindings.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">extern</span> <span class="s">"C++"</span> <span class="p">{</span>
+  <span class="n">VALUE</span> <span class="n">cNMatrix</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">Init_arrayfire</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">ArrayFire</span> <span class="o">=</span> <span class="n">rb_define_module</span><span class="p">(</span><span class="s">"ArrayFire"</span><span class="p">);</span>
+
+  <span class="n">Af_Array</span> <span class="o">=</span> <span class="n">rb_define_class_under</span><span class="p">(</span><span class="n">ArrayFire</span><span class="p">,</span> <span class="s">"Af_Array"</span><span class="p">,</span> <span class="n">rb_cObject</span><span class="p">);</span>
+  <span class="n">rb_define_method</span><span class="p">(</span><span class="n">Af_Array</span><span class="p">,</span> <span class="s">"to_nmatrix"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_af_array_to_nmatrix</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+
+  <span class="n">cNMatrix</span> <span class="o">=</span> <span class="n">rb_define_class</span><span class="p">(</span><span class="s">"NMatrix"</span><span class="p">,</span> <span class="n">rb_cObject</span><span class="p">);</span>
+  <span class="n">rb_define_method</span><span class="p">(</span><span class="n">cNMatrix</span><span class="p">,</span> <span class="s">"to_af_array"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_nmatrix_to_af_array_method</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The C functions have been implemented as the following code snippets.</p>
+
+<p><code class="language-plaintext highlighter-rouge">nm</code> namespace is used to store <code class="language-plaintext highlighter-rouge">NMatrix</code> <code class="language-plaintext highlighter-rouge">types</code> and <code class="language-plaintext highlighter-rouge">structs</code>.</p>
+
+<h1 id="af_array-to-nmatrix">Af_Array to NMatrix</h1>
+
+<p>An <code class="language-plaintext highlighter-rouge">Af_Array#to_nmatrix</code> is called to convert an <code class="language-plaintext highlighter-rouge">Af_Array</code> object to <code class="language-plaintext highlighter-rouge">NMatrix</code> object. The <code class="language-plaintext highlighter-rouge">#to_nmatrix</code> method calls
+<code class="language-plaintext highlighter-rouge">arf_af_array_to_nmatrix</code> method which is responsible for calling <code class="language-plaintext highlighter-rouge">NMatrix C++ APIs</code>.
+The <code class="language-plaintext highlighter-rouge">rb_nmatrix_dense_create()</code> is NMatrix API to create a dense <code class="language-plaintext highlighter-rouge">NMatrix</code> object. <code class="language-plaintext highlighter-rouge">nm::FLOAT64</code> is the <code class="language-plaintext highlighter-rouge">dtype</code> of NMatrix.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ext/mri/interface/nmatrix.c</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_af_array_to_nmatrix</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">input</span><span class="p">;</span>
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
+  <span class="n">dim_t</span> <span class="n">count</span><span class="p">;</span>
+  <span class="n">uint</span> <span class="n">ndims</span><span class="p">;</span>
+  <span class="n">af_get_numdims</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ndims</span><span class="p">,</span> <span class="n">input</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="n">dim_t</span><span class="o">*</span> <span class="n">dims</span> <span class="o">=</span> <span class="p">(</span><span class="n">dim_t</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">ndims</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">dim_t</span><span class="p">));</span>
+
+  <span class="n">af_get_dims</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dims</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">dims</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">dims</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">dims</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">input</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="kt">size_t</span><span class="o">*</span> <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="kt">size_t</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">ndims</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">size_t</span><span class="p">));;</span>
+  <span class="k">for</span> <span class="p">(</span><span class="n">dim_t</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">ndims</span><span class="p">;</span> <span class="n">index</span><span class="o">++</span><span class="p">){</span>
+    <span class="n">shape</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kt">size_t</span><span class="p">)(</span><span class="n">dims</span><span class="p">[</span><span class="n">index</span><span class="p">]);</span>
+  <span class="p">}</span>
+
+  <span class="n">af_get_elements</span><span class="p">(</span><span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="n">input</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="kt">double</span><span class="o">*</span> <span class="n">elements</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">count</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">double</span><span class="p">));</span>
+  <span class="n">af_get_data_ptr</span><span class="p">(</span><span class="n">elements</span><span class="p">,</span> <span class="n">input</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">rb_nmatrix_dense_create</span><span class="p">(</span><span class="n">nm</span><span class="o">::</span><span class="n">FLOAT64</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">ndims</span><span class="p">,</span> <span class="n">elements</span><span class="p">,</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">count</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<h1 id="nmatrix-to-af_array">NMatrix to Af_Array</h1>
+
+<p>An <code class="language-plaintext highlighter-rouge">NMatrix#to_af_array</code> is called to convert an <code class="language-plaintext highlighter-rouge">NMatrix</code> object to <code class="language-plaintext highlighter-rouge">Af_Array</code> object. The <code class="language-plaintext highlighter-rouge">#to_af_array</code> method calls
+<code class="language-plaintext highlighter-rouge">arf_nmatrix_to_af_array_method</code> method which is responsible for calling <code class="language-plaintext highlighter-rouge">NMatrix C++ APIs</code>. <code class="language-plaintext highlighter-rouge">NM_DTYPE()</code> is used  to check
+the dtype of an <code class="language-plaintext highlighter-rouge">NMatrix</code> object. Currentlt, only <code class="language-plaintext highlighter-rouge">nm::FLOAT64</code> is supported.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">arf_nmatrix_to_af_array</code> is called by <code class="language-plaintext highlighter-rouge">arf_nmatrix_to_af_array_method</code> method and an <code class="language-plaintext highlighter-rouge">Af_Array</code> object.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// ext/mri/interface/nmatrix.c</span>
+
+<span class="k">extern</span> <span class="n">VALUE</span> <span class="nf">arf_nmatrix_to_af_array_method</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">nmatrix</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">NM_DIM</span><span class="p">(</span><span class="n">nmatrix</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">rb_raise</span><span class="p">(</span><span class="n">rb_eStandardError</span><span class="p">,</span>
+      <span class="s">"NMatrix must not have greater than 4 dimensions."</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="n">NM_DTYPE</span><span class="p">(</span><span class="n">nmatrix</span><span class="p">)</span> <span class="o">==</span> <span class="n">nm</span><span class="o">::</span><span class="n">FLOAT64</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">Data_Wrap_Struct</span><span class="p">(</span><span class="n">Af_Array</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">arf_free</span><span class="p">,</span> <span class="n">arf_nmatrix_to_af_array</span><span class="p">(</span><span class="n">nmatrix</span><span class="p">));</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="p">{</span>
+    <span class="n">rb_raise</span><span class="p">(</span><span class="n">rb_eStandardError</span><span class="p">,</span>
+      <span class="s">"NMatrix should be either :complex64, :complex128, :int32 or :float64 type."</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="n">Qnil</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+<span class="n">afstruct</span><span class="o">*</span> <span class="nf">arf_nmatrix_to_af_array</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">nm</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">DENSE_STORAGE</span><span class="o">*</span> <span class="n">nmat</span> <span class="o">=</span> <span class="n">NM_STORAGE_DENSE</span><span class="p">(</span><span class="n">nm</span><span class="p">);</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">output</span> <span class="o">=</span> <span class="n">ALLOC</span><span class="p">(</span><span class="n">afstruct</span><span class="p">);</span>
+
+  <span class="k">if</span> <span class="p">(</span><span class="n">nmat</span><span class="o">-&gt;</span><span class="n">dtype</span> <span class="o">!=</span> <span class="n">nm</span><span class="o">::</span><span class="n">FLOAT64</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">rb_raise</span><span class="p">(</span><span class="n">rb_eStandardError</span><span class="p">,</span> <span class="s">"requires dtype of :float64 to convert to an Af_Array"</span><span class="p">);</span>
+  <span class="p">}</span>
+
+  <span class="n">dim_t</span><span class="o">*</span> <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">dim_t</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">nmat</span><span class="o">-&gt;</span><span class="n">dim</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">dim_t</span><span class="p">));;</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">nmat</span><span class="o">-&gt;</span><span class="n">dim</span><span class="p">;</span> <span class="n">index</span><span class="o">++</span><span class="p">){</span>
+    <span class="n">shape</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kt">size_t</span><span class="p">)(</span><span class="n">nmat</span><span class="o">-&gt;</span><span class="n">shape</span><span class="p">[</span><span class="n">index</span><span class="p">]);</span>
+  <span class="p">}</span>
+
+  <span class="n">af_create_array</span><span class="p">(</span><span class="o">&amp;</span><span class="n">output</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">nmat</span><span class="o">-&gt;</span><span class="n">elements</span><span class="p">,</span> <span class="n">nmat</span><span class="o">-&gt;</span><span class="n">dim</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">f64</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">output</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Let’s  pry it out.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">rake</span> <span class="n">pry</span>
+<span class="n">pry</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'./lib/arrayfire.rb'</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="nb">require</span> <span class="s1">'nmatrix'</span>
+<span class="o">=&gt;</span> <span class="kp">true</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span> <span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">4</span> <span class="mi">4</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">1.0000</span>    <span class="o">-</span><span class="mf">2.0000</span>     <span class="mf">1.0000</span>     <span class="mf">0.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">2.0000</span>     <span class="mf">4.0000</span>    <span class="o">-</span><span class="mf">3.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">1.0000</span>     <span class="mf">3.0000</span>     <span class="mf">2.0000</span>
+    <span class="mf">0.0000</span>     <span class="mf">3.0000</span>     <span class="mf">1.0000</span>     <span class="mf">9.0000</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x000000019bd6f0&gt;</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a</span><span class="p">.</span><span class="nf">to_nmatrix</span>
+<span class="o">=&gt;</span>
+<span class="p">[</span>
+  <span class="p">[</span> <span class="mf">1.0</span><span class="p">,</span>  <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+  <span class="p">[</span><span class="o">-</span><span class="mf">2.0</span><span class="p">,</span>  <span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">]</span>
+  <span class="p">[</span> <span class="mf">1.0</span><span class="p">,</span>  <span class="mf">4.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+  <span class="p">[</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">]</span>
+<span class="p">]</span>
+
+<span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="nf">to_af_array</span>
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x00000001a4d340&gt;</span>
+<span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">c</span><span class="p">.</span><span class="nf">elements</span>
+<span class="o">=&gt;</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">3.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">9.0</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Util</span><span class="p">.</span><span class="nf">print_array</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">4</span> <span class="mi">4</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">1.0000</span>    <span class="o">-</span><span class="mf">2.0000</span>     <span class="mf">1.0000</span>     <span class="mf">0.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">2.0000</span>     <span class="mf">4.0000</span>    <span class="o">-</span><span class="mf">3.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">1.0000</span>     <span class="mf">3.0000</span>     <span class="mf">2.0000</span>
+    <span class="mf">0.0000</span>     <span class="mf">3.0000</span>     <span class="mf">1.0000</span>     <span class="mf">9.0000</span>
+
+<span class="o">=&gt;</span> <span class="kp">true</span>
+<span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Util</span><span class="p">.</span><span class="nf">print_array</span><span class="p">(</span><span class="n">c</span><span class="p">)</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">4</span> <span class="mi">4</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">1.0000</span>    <span class="o">-</span><span class="mf">2.0000</span>     <span class="mf">1.0000</span>     <span class="mf">0.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">2.0000</span>     <span class="mf">4.0000</span>    <span class="o">-</span><span class="mf">3.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">1.0000</span>     <span class="mf">3.0000</span>     <span class="mf">2.0000</span>
+    <span class="mf">0.0000</span>     <span class="mf">3.0000</span>     <span class="mf">1.0000</span>     <span class="mf">9.0000</span>
+
+<span class="o">=&gt;</span> <span class="kp">true</span>
+<span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">c</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="nf">to_af_array</span>
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x00000001436088&gt;</span>
+</code></pre></div></div>
+
+<p>It works!.</p>
+
+<p>Hence, NMatrix and ArrayFire can be easily interfaced to each other.</p>
+
+<h1 id="benchmarks">Benchmarks</h1>
+
+<p>Now, we can see how using ArrayFire can beneficial over using NMatrix. I benchmarked the matrix multiplication for
+two matrices with same elements using <a href="https://github.com/prasunanand/arrayfire-rb-benchmark-suite/blob/master/bin/interface.rb">code</a>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">shapeArray</span><span class="p">.</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">shape</span><span class="o">|</span>
+  <span class="n">elements1</span> <span class="o">=</span> <span class="no">Array</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">{</span> <span class="nb">rand</span><span class="p">(</span><span class="mi">1</span><span class="o">...</span><span class="mi">999999</span><span class="p">)</span> <span class="p">}</span>
+  <span class="n">elements2</span> <span class="o">=</span> <span class="no">Array</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="p">{</span> <span class="nb">rand</span><span class="p">(</span><span class="mi">1</span><span class="o">...</span><span class="mi">999999</span><span class="p">)</span> <span class="p">}</span>
+  <span class="n">cpu_matrix1</span> <span class="o">=</span> <span class="no">NMatrix</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">elements1</span><span class="p">,</span> <span class="ss">dtype: :float64</span><span class="p">)</span>
+  <span class="n">cpu_matrix2</span> <span class="o">=</span> <span class="no">NMatrix</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">elements2</span><span class="p">,</span> <span class="ss">dtype: :float64</span><span class="p">)</span>
+
+  <span class="n">gpu_matrix1</span> <span class="o">=</span> <span class="n">cpu_matrix1</span><span class="p">.</span><span class="nf">to_af_array</span>
+  <span class="n">gpu_matrix2</span> <span class="o">=</span> <span class="n">cpu_matrix2</span><span class="p">.</span><span class="nf">to_af_array</span>
+
+  <span class="n">iters</span><span class="p">.</span><span class="nf">times</span> <span class="k">do</span>
+    <span class="no">ArrayFire</span><span class="o">::</span><span class="no">BLAS</span><span class="p">.</span><span class="nf">matmul</span><span class="p">(</span><span class="n">gpu_matrix1</span><span class="p">,</span> <span class="n">gpu_matrix2</span><span class="p">,</span> <span class="ss">:AF_MAT_NONE</span><span class="p">,</span> <span class="ss">:AF_MAT_NONE</span><span class="p">)</span> <span class="c1"># warmup</span>
+  <span class="k">end</span>
+
+  <span class="n">result</span><span class="p">[</span><span class="ss">:mat_mult_cpu</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="p">[</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="no">Benchmark</span><span class="p">.</span><span class="nf">measure</span><span class="p">{</span><span class="n">cpu_matrix1</span><span class="p">.</span><span class="nf">dot</span><span class="p">(</span><span class="n">cpu_matrix2</span><span class="p">)}.</span><span class="nf">to_s</span><span class="p">.</span><span class="nf">tr</span><span class="p">(</span><span class="s1">'()'</span><span class="p">,</span> <span class="s1">''</span><span class="p">).</span><span class="nf">split</span><span class="p">(</span><span class="s2">" "</span><span class="p">)[</span><span class="mi">3</span><span class="p">].</span><span class="nf">to_f</span> <span class="p">]</span>
+  <span class="n">result</span><span class="p">[</span><span class="ss">:mat_mult_gpu</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="p">[</span> <span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="no">Benchmark</span><span class="p">.</span><span class="nf">measure</span><span class="p">{</span><span class="no">ArrayFire</span><span class="o">::</span><span class="no">BLAS</span><span class="p">.</span><span class="nf">matmul</span><span class="p">(</span><span class="n">gpu_matrix1</span><span class="p">,</span> <span class="n">gpu_matrix2</span><span class="p">,</span> <span class="ss">:AF_MAT_NONE</span><span class="p">,</span> <span class="ss">:AF_MAT_NONE</span><span class="p">)}.</span><span class="nf">to_s</span><span class="p">.</span><span class="nf">tr</span><span class="p">(</span><span class="s1">'()'</span><span class="p">,</span> <span class="s1">''</span><span class="p">).</span><span class="nf">split</span><span class="p">(</span><span class="s2">" "</span><span class="p">)[</span><span class="mi">3</span><span class="p">].</span><span class="nf">to_f</span> <span class="p">]</span>
+
+<span class="k">end</span>
+
+</code></pre></div></div>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+
+<script type="text/javascript" src="https://code.highcharts.com/4.2.2/modules/exporting.js"></script>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css" />
+
+<div ng-app="resultApp">
+    <div ng-controller="MainCtrl">
+      <div class="block">
+        <div id="chart_interface" class="chart"></div>
+      </div>
+    </div>
+  <script type="text/javascript" src="/assets/js/chart.js"></script>
+</div>
+<p>(Note: The above benchmarks have been done on an AMD FX 8350 octacore processor
+and Nvidia GTX 750Ti GPU. CUDA backend of ArrayFire was used with double floating points.)</p>
+
+<p>As the matrix size increases, we can see the difference is huge.</p>
+
+<p>Using ArrayFire can speed up the calculation by 7 e +5 times.</p>
+
+<p>There may be overheads in copying data from CPU to GPU and vice-versa. But overall,
+for large matrices(Big Data), we can gain massive speedups when we use the right optimization.
+I would be discussing more about such optimizations in another blog post.</p>
+
+<p>However, ArrayFire being significantly faster than NMatrix can easily help Rubyists by adding small
+chunk of code and speeding up the critical/slower steps.</p>
+
+<p>Power to Ruby!</p>
+
+<div id="disqus_thread"></div>
+<script>
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//prasunanandblog.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+:ET

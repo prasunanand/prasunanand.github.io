@@ -1,0 +1,336 @@
+I"ͧ<p>This post covers how to use <code class="language-plaintext highlighter-rouge">BLAS</code> and <code class="language-plaintext highlighter-rouge">LAPACK</code> routines with <code class="language-plaintext highlighter-rouge">ArrayFire-rb</code>, and how these functions
+have been implemented by creating Ruby bindings to ArrayFire C API.</p>
+
+<p>The performance benchmarks for ArrayFire against NMatrix can be represented by the following figures.
+The code used for benchmarking and generating the plots can be found <a href="https://github.com/prasunanand/arrayfire-rb-benchmark-suite">here</a>
+and be used to reproduce similar plots.</p>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+
+<script type="text/javascript" src="https://code.highcharts.com/4.2.2/modules/exporting.js"></script>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css" />
+
+<h1 id="performance-metrics">Performance metrics</h1>
+<div ng-app="resultApp">
+    <div ng-controller="MainCtrl">
+      <div class="block">
+        <strong>BLAS Routines</strong>
+        <div id="chartmat_mult" class="chart"></div>
+      </div>
+      <div class="block">
+        <strong>LAPACK Routines</strong>
+          <div id="chartdeterminant" class="chart"></div><br />
+          <div id="chartlu_factorization" class="chart"></div><br />
+      </div>
+    </div>
+  <script type="text/javascript" src="/assets/js/chart.js"></script>
+</div>
+
+<p>(Note: The above benchmarks have been done on an AMD FX 8350 octacore processor
+and Nvidia GTX 750Ti GPU. CUDA backend of ArrayFire was used with double floating points.)</p>
+
+<p>The figure shows that ArrayFire takes the least computation time of all.
+ArrayFire is 3 e +6 times faster than NMatrix for JRuby and NMatrix for Ruby(not BLAS)
+whereas 7 e +5 times faster than NMatrix for Ruby(using BLAS).</p>
+
+<p>For LAPACK routines, like calculating determinant and lower-upper factorization,
+ArrayFire is 100 times faster than NMatrix for JRuby
+whereas 6 times faster than NMatrix for Ruby(using LAPACKE).</p>
+
+<p>Lets take a look at the implementation.</p>
+
+<h1 id="blas-routines">BLAS Routines</h1>
+
+<p>All the BLAS methods are <code class="language-plaintext highlighter-rouge">singleton_methods</code>.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">Init_arrayfire</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">ArrayFire</span> <span class="o">=</span> <span class="n">rb_define_module</span><span class="p">(</span><span class="s">"ArrayFire"</span><span class="p">);</span>
+
+  <span class="n">Blas</span> <span class="o">=</span> <span class="n">rb_define_class_under</span><span class="p">(</span><span class="n">ArrayFire</span><span class="p">,</span> <span class="s">"BLAS"</span><span class="p">,</span> <span class="n">rb_cObject</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Blas</span><span class="p">,</span> <span class="s">"matmul"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_matmul</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Blas</span><span class="p">,</span> <span class="s">"dot"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_dot</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Blas</span><span class="p">,</span> <span class="s">"transpose"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_transpose</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">arf_matmul</code> and <code class="language-plaintext highlighter-rouge">arf_transpose</code> call <code class="language-plaintext highlighter-rouge">af_matmul</code> and <code class="language-plaintext highlighter-rouge">af_transpose</code> respectively.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_matmul</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">left_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">right_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">left_prop_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">right_prop_val</span><span class="p">){</span>
+
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">left</span><span class="p">;</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">right</span><span class="p">;</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">result</span> <span class="o">=</span> <span class="n">ALLOC</span><span class="p">(</span><span class="n">afstruct</span><span class="p">);</span>
+
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">left_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">left</span><span class="p">);</span>
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">right_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+
+  <span class="n">af_mat_prop</span> <span class="n">left_mat_prop</span> <span class="o">=</span> <span class="n">arf_mat_type_from_rbsymbol</span><span class="p">(</span><span class="n">left_prop_val</span><span class="p">);</span>
+  <span class="n">af_mat_prop</span> <span class="n">right_mat_prop</span> <span class="o">=</span> <span class="n">arf_mat_type_from_rbsymbol</span><span class="p">(</span><span class="n">right_prop_val</span><span class="p">);</span>
+
+  <span class="n">af_matmul</span><span class="p">(</span><span class="o">&amp;</span><span class="n">result</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">left</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">right</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">left_mat_prop</span><span class="p">,</span> <span class="n">right_mat_prop</span><span class="p">);</span>
+
+  <span class="n">af_print_array</span><span class="p">(</span><span class="n">result</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">Data_Wrap_Struct</span><span class="p">(</span><span class="n">CLASS_OF</span><span class="p">(</span><span class="n">left_val</span><span class="p">),</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">arf_free</span><span class="p">,</span> <span class="n">result</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_transpose</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">input</span><span class="p">){</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">obj</span><span class="p">;</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">result</span> <span class="o">=</span> <span class="n">ALLOC</span><span class="p">(</span><span class="n">afstruct</span><span class="p">);</span>
+
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">obj</span><span class="p">);</span>
+
+  <span class="n">af_transpose</span><span class="p">(</span><span class="o">&amp;</span><span class="n">result</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">obj</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+
+  <span class="n">af_print_array</span><span class="p">(</span><span class="n">result</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">Data_Wrap_Struct</span><span class="p">(</span><span class="n">CLASS_OF</span><span class="p">(</span><span class="n">input</span><span class="p">),</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">arf_free</span><span class="p">,</span> <span class="n">result</span><span class="p">);</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">af_matmul</code> expects the property of matrices passed to it. For example, <code class="language-plaintext highlighter-rouge">af_mat_prop AF_MAT_TRANS</code>
+signifies that the matrix is transposed. So, to pass the symbols to Ruby C function arf_matmul, I
+have used the code given below. I have creared a list of values <code class="language-plaintext highlighter-rouge">MAT_PROPERTIES</code> and a function
+<code class="language-plaintext highlighter-rouge">arf_mat_type_from_symbol</code> which is responsible for figuring out <code class="language-plaintext highlighter-rouge">af_mat_prop</code> from the symbol.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">*</span><span class="p">,</span> <span class="kt">size_t</span><span class="o">&gt;</span> <span class="n">MAT_PROPERTIES</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="p">{</span><span class="s">"AF_MAT_NONE"</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span>
+  <span class="p">{</span><span class="s">"AF_MAT_TRANS"</span><span class="p">,</span> <span class="mi">1</span><span class="p">},</span>
+  <span class="p">{</span><span class="s">"AF_MAT_CTRANS"</span><span class="p">,</span> <span class="mi">2</span><span class="p">},</span>
+  <span class="p">{</span><span class="s">"AF_MAT_CONJ"</span><span class="p">,</span> <span class="mi">4</span><span class="p">},</span>
+  <span class="p">{</span><span class="s">"AF_MAT_UPPER"</span><span class="p">,</span> <span class="mi">32</span><span class="p">},</span>
+  <span class="p">{</span><span class="s">"AF_MAT_LOWER"</span><span class="p">,</span> <span class="mi">64</span><span class="p">},</span>
+  <span class="p">{</span><span class="s">"AF_MAT_DIAG_UNIT"</span><span class="p">,</span> <span class="mi">128</span><span class="p">},</span>
+  <span class="p">{</span><span class="s">"AF_MAT_SYM"</span><span class="p">,</span> <span class="mi">512</span><span class="p">},</span>
+  <span class="p">{</span><span class="s">"AF_MAT_POSDEF"</span><span class="p">,</span> <span class="mi">1024</span><span class="p">},</span>
+  <span class="p">{</span><span class="s">"AF_MAT_ORTHOG"</span><span class="p">,</span> <span class="mi">2048</span><span class="p">},</span>
+  <span class="p">{</span><span class="s">"AF_MAT_TRI_DIAG"</span><span class="p">,</span> <span class="mi">4096</span><span class="p">},</span>
+  <span class="p">{</span><span class="s">"AF_MAT_BLOCK_DIAG"</span><span class="p">,</span> <span class="mi">8192</span><span class="p">}</span>
+<span class="p">};</span>
+
+
+<span class="n">af_mat_prop</span> <span class="nf">arf_mat_type_from_rbsymbol</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">sym</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">ID</span> <span class="n">sym_id</span> <span class="o">=</span> <span class="n">SYM2ID</span><span class="p">(</span><span class="n">sym</span><span class="p">);</span>
+
+  <span class="k">for</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">*</span><span class="p">,</span> <span class="kt">size_t</span><span class="o">&gt;::</span><span class="n">value_type</span><span class="o">&amp;</span> <span class="n">entry</span> <span class="o">:</span> <span class="n">MAT_PROPERTIES</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">sym_id</span> <span class="o">==</span> <span class="n">rb_intern</span><span class="p">(</span><span class="n">entry</span><span class="p">.</span><span class="n">first</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="n">static_cast</span><span class="o">&lt;</span><span class="n">af_mat_prop</span><span class="o">&gt;</span><span class="p">(</span><span class="n">entry</span><span class="p">.</span><span class="n">second</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="n">VALUE</span> <span class="n">str</span> <span class="o">=</span> <span class="n">rb_any_to_s</span><span class="p">(</span><span class="n">sym</span><span class="p">);</span>
+  <span class="n">rb_raise</span><span class="p">(</span><span class="n">rb_eArgError</span><span class="p">,</span> <span class="s">"invalid matrix type symbol (:%s) specified"</span><span class="p">,</span>
+   <span class="n">RSTRING_PTR</span><span class="p">(</span><span class="n">str</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>So, now I can check if the bindings work successfully.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">rake</span> <span class="n">pry</span>
+<span class="n">pry</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'./lib/arrayfire.rb'</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">left</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span> <span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">11</span> <span class="p">,</span> <span class="mi">2</span> <span class="p">,</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">3</span> <span class="mi">3</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">1.0000</span>     <span class="mf">4.0000</span>    <span class="o">-</span><span class="mf">5.0000</span>
+    <span class="mf">4.0000</span>    <span class="mf">11.0000</span>     <span class="mf">8.0000</span>
+    <span class="mf">6.0000</span>     <span class="mf">2.0000</span>    <span class="mf">10.0000</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x000000014e56c8&gt;</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">right</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span> <span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span> <span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">11</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">3</span> <span class="mi">2</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">1.0000</span>    <span class="mf">10.0000</span>
+    <span class="mf">0.0000</span>   <span class="o">-</span><span class="mf">11.0000</span>
+    <span class="mf">8.0000</span>     <span class="mf">8.0000</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x00000001591db0&gt;</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">BLAS</span><span class="p">.</span><span class="nf">matmul</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">,</span> <span class="ss">:AF_MAT_NONE</span><span class="p">,</span> <span class="ss">:AF_MAT_NONE</span><span class="p">)</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">3</span> <span class="mi">2</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+  <span class="o">-</span><span class="mf">39.0000</span>   <span class="o">-</span><span class="mf">74.0000</span>
+   <span class="mf">68.0000</span>   <span class="o">-</span><span class="mf">17.0000</span>
+   <span class="mf">86.0000</span>   <span class="mf">118.0000</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x000000016136f8&gt;</span>
+<span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">transposed</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">BLAS</span><span class="p">.</span><span class="nf">transpose</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">3</span> <span class="mi">3</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">1.0000</span>     <span class="mf">4.0000</span>     <span class="mf">6.0000</span>
+    <span class="mf">4.0000</span>    <span class="mf">11.0000</span>     <span class="mf">2.0000</span>
+   <span class="o">-</span><span class="mf">5.0000</span>     <span class="mf">8.0000</span>    <span class="mf">10.0000</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x00000001762f68&gt;</span>
+
+</code></pre></div></div>
+<p>It works!.</p>
+
+<h1 id="lapack-routines">LAPACK Routines</h1>
+
+<p>LAPACK routines similar to BLAS ones are singleton methods.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Lapack</span> <span class="o">=</span> <span class="n">rb_define_class_under</span><span class="p">(</span><span class="n">ArrayFire</span><span class="p">,</span> <span class="s">"LAPACK"</span><span class="p">,</span> <span class="n">rb_cObject</span><span class="p">);</span>
+<span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Lapack</span><span class="p">,</span> <span class="s">"svd_func"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_svd_func</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+<span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Lapack</span><span class="p">,</span> <span class="s">"svd_inplace_func"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_svd_inplace_func</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Lapack</span><span class="p">,</span> <span class="s">"lu_func"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_lu_func</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+<span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Lapack</span><span class="p">,</span> <span class="s">"lu_inplace_func"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_lu_inplace_func</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Lapack</span><span class="p">,</span> <span class="s">"qr_func"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_qr_func</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+<span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Lapack</span><span class="p">,</span> <span class="s">"qr_inplace_func"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_qr_inplace_func</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Lapack</span><span class="p">,</span> <span class="s">"cholesky_func"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_cholesky_func</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+<span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Lapack</span><span class="p">,</span> <span class="s">"cholesky_inplace_func"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_cholesky_inplace_func</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Lapack</span><span class="p">,</span> <span class="s">"solve_func"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_solve_func</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Lapack</span><span class="p">,</span> <span class="s">"solve_lu_func"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_solve_lu_func</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Lapack</span><span class="p">,</span> <span class="s">"inverse"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_inverse</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Lapack</span><span class="p">,</span> <span class="s">"rank"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_rank</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Lapack</span><span class="p">,</span> <span class="s">"det"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_det</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Lapack</span><span class="p">,</span> <span class="s">"norm"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_norm</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Lapack</span><span class="p">,</span> <span class="s">"is_lapack_available"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_is_lapack_available</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">LAPACK.svd</code> must return multiple objects and hence calls <code class="language-plaintext highlighter-rouge">LAPACK.arf_svd_func</code>. The implementation
+is as follows.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_svd_func</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">u_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">s_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">vt_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">val</span><span class="p">){</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">input</span><span class="p">;</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">u</span><span class="p">;</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">s</span><span class="p">;</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">vt</span><span class="p">;</span>
+
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">u_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">u</span><span class="p">);</span>
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">s_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">s</span><span class="p">);</span>
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">vt_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">vt</span><span class="p">);</span>
+
+  <span class="n">af_svd</span><span class="p">(</span><span class="o">&amp;</span><span class="n">u</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">s</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">vt</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">input</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">Qtrue</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">ArrayFire</span>
+  <span class="k">class</span> <span class="nc">LAPACK</span>
+
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">svd</span><span class="p">(</span><span class="n">af_array</span><span class="p">)</span>
+      <span class="n">u</span> <span class="o">=</span>  <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span>
+      <span class="n">s</span> <span class="o">=</span>  <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span>
+      <span class="n">vt</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span>
+      <span class="no">ArrayFire</span><span class="o">::</span><span class="no">LAPACK</span><span class="p">.</span><span class="nf">svd_func</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vt</span><span class="p">,</span> <span class="n">af_array</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">u</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vt</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">LAPACK.det</code> calls <code class="language-plaintext highlighter-rouge">af_det</code> to calculate the determinant. Currently, I haven’t
+created support for complex dtype. So, I have ignored the imaginary part of
+the result if it is not a real number.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_det</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">val</span><span class="p">){</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">matrix</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">det_real</span><span class="p">,</span> <span class="n">det_imag</span><span class="p">;</span>
+
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">matrix</span><span class="p">);</span>
+
+  <span class="n">af_det</span><span class="p">(</span><span class="o">&amp;</span><span class="n">det_real</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">det_imag</span><span class="p">,</span> <span class="n">matrix</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">DBL2NUM</span><span class="p">(</span><span class="n">det_real</span><span class="p">);</span>
+<span class="p">}</span>
+
+
+</code></pre></div></div>
+
+<p>Now, we can check the elementwise operations using <code class="language-plaintext highlighter-rouge">pry</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">rake</span> <span class="n">pry</span>
+<span class="n">pry</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'./lib/arrayfire.rb'</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">matrix</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">8</span><span class="p">]</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">4</span> <span class="mi">2</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">1.0000</span>     <span class="mf">2.0000</span>
+    <span class="mf">3.0000</span>     <span class="mf">4.0000</span>
+    <span class="mf">5.0000</span>     <span class="mf">6.0000</span>
+    <span class="mf">7.0000</span>     <span class="mf">8.0000</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x0000000265cbe0&gt;</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">u</span> <span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">vt</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">LAPACK</span><span class="p">.</span><span class="nf">svd</span><span class="p">(</span><span class="n">matrix</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="p">[</span><span class="c1">#&lt;ArrayFire::Af_Array:0x000000026ff070&gt;, #&lt;ArrayFire::Af_Array:0x000000026ff048&gt;, #&lt;ArrayFire::Af_Array:0x000000026ff020&gt;]</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Util</span><span class="p">.</span><span class="nf">print_array</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">4</span> <span class="mi">4</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+   <span class="o">-</span><span class="mf">0.1525</span>    <span class="o">-</span><span class="mf">0.8226</span>    <span class="o">-</span><span class="mf">0.3945</span>    <span class="o">-</span><span class="mf">0.3800</span>
+   <span class="o">-</span><span class="mf">0.3499</span>    <span class="o">-</span><span class="mf">0.4214</span>     <span class="mf">0.2428</span>     <span class="mf">0.8007</span>
+   <span class="o">-</span><span class="mf">0.5474</span>    <span class="o">-</span><span class="mf">0.0201</span>     <span class="mf">0.6979</span>    <span class="o">-</span><span class="mf">0.4614</span>
+   <span class="o">-</span><span class="mf">0.7448</span>     <span class="mf">0.3812</span>    <span class="o">-</span><span class="mf">0.5462</span>     <span class="mf">0.0407</span>
+
+<span class="o">=&gt;</span> <span class="kp">true</span>
+<span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Util</span><span class="p">.</span><span class="nf">print_array</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">2</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+   <span class="mf">14.2691</span>
+    <span class="mf">0.6268</span>
+
+<span class="o">=&gt;</span> <span class="kp">true</span>
+<span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Util</span><span class="p">.</span><span class="nf">print_array</span><span class="p">(</span><span class="n">vt</span><span class="p">)</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">2</span> <span class="mi">2</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+   <span class="o">-</span><span class="mf">0.6414</span>    <span class="o">-</span><span class="mf">0.7672</span>
+    <span class="mf">0.7672</span>    <span class="o">-</span><span class="mf">0.6414</span>
+
+<span class="o">=&gt;</span> <span class="kp">true</span>
+<span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">left</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span> <span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">]</span> <span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">11</span> <span class="p">,</span> <span class="mi">2</span> <span class="p">,</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">3</span> <span class="mi">3</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">1.0000</span>     <span class="mf">4.0000</span>    <span class="o">-</span><span class="mf">5.0000</span>
+    <span class="mf">4.0000</span>    <span class="mf">11.0000</span>     <span class="mf">8.0000</span>
+    <span class="mf">6.0000</span>     <span class="mf">2.0000</span>    <span class="mf">10.0000</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x00000002984c78&gt;</span>
+<span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">det</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">LAPACK</span><span class="p">.</span><span class="nf">det</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="mf">415.9999694824219</span>
+
+</code></pre></div></div>
+
+<p>It works!</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>We can now use <code class="language-plaintext highlighter-rouge">ArrayFire-rb</code> for linear algebra since the BLAS and LAPACK routines are in
+place. Also, the performance is outstanding.</p>
+
+<p>In the next blog, I will explain about using the Random Engine generator and Statistics methods for ArrayFire.</p>
+
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//prasunanandblog.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+:ET

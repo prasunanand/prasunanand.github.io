@@ -1,0 +1,138 @@
+I"?<p>I have been working on a new project called <strong>RbCUDA</strong>.</p>
+
+<p>In this project, I want to make it possible to combine the
+beauty of Ruby with transparent GPU processing with minimal overheads, so that software developers can easily use
+that power when available, and farm out computations transparently to GPU and CPU.</p>
+
+<p>Nvidia has been developing a lot of GPU accelerated libraries for linear algebra(CUDA, cuBLAS, cuSolver), Random Number
+Generation(cuRand), fast-fourier transform(cuFFT), Parallel Primitives and Data Structures(Thrust) and image processing
+(NVIDIA Performance Primitives Library). Many Python/Julia/C++ libraries are being built on top of these libraries.
+RbCUDA would fill this gap in the Ruby ecosystem making it a highly-preferable option for GPU computing.
+It will work on Nvidia hardware running on client computers and on servers that make use of TESLA’s.</p>
+
+<p>Recently, I was at Nvidia Developer Connect in my city. I was completely amazed by the new hardware launched by Nvidia this year. It
+makes me really confident about the great impact this project will create in the Ruby ecosystem.</p>
+
+<h1 id="previous-efforts">Previous Efforts</h1>
+
+<p><a href="https://github.com/xman/sgc-ruby-cuda">sgc-ruby-cuda</a> is an existing alternative for CUDA Ruby bindings. However, this library just helps in executing custom kernels.
+It also doesn’t have support cuBLAS, and other cuMath libraries.</p>
+
+<h1 id="objectives">Objectives</h1>
+
+<p>The main objectives of RbCUDA are:</p>
+
+<ol>
+  <li>Map all of CUDA into Ruby</li>
+  <li>Ready-made on-GPU linear algebra, reduction, scan using cuBLAS, cuMath, cuSolver libraries.</li>
+  <li>Random Numer generator using cuRand</li>
+  <li>Near-zero wrapping overhead.</li>
+  <li>CUDA profiler for Ruby.</li>
+</ol>
+
+<p>In the near future:</p>
+
+<ol>
+  <li>fast-fourier transform(cuFFT)</li>
+  <li>Parallel Primitives and Data Structures(Thrust)</li>
+  <li>Image processing (NVIDIA Performance Primitives Library).</li>
+  <li>Use CuDNN to power a Deep Learning Library written in Ruby.</li>
+</ol>
+
+<h1 id="codebase">Codebase</h1>
+
+<p><a href="https://github.com/prasunanand/rbcuda">https://github.com/prasunanand/rbcuda</a></p>
+
+<p>Contributions are welcome!</p>
+
+<h1 id="example">Example</h1>
+
+<p>Most of the times, when we want to use CUDA for accelerating our code, we end up optimizing matrix-multiplication.
+I wrote an <a href="https://github.com/prasunanand/rbcuda/blob/master/examples/matmul.rb">example</a> that showcases how RbCUDA
+is the most efficient Ruby library to be used for Number crunching.</p>
+
+<p>The example copies two matrices from CPU to GPU, runs matrix multiplication over it. Then the resulting matrix is copied
+back to the CPU from GPU.</p>
+
+<p>I benchmarked my code and compare it with other existing Ruby libraries.</p>
+
+<p><img src="https://github.com/prasunanand/resume/blob/master/img/rbcuda/rbcuda_gemm.png?raw=true" alt="rbcuda_gemm" title="Fig.1. Matrix Multiplication" /></p>
+
+<p>(Note: The above benchmarks have been done on an AMD FX 8350 octacore processor and Nvidia GTX 750Ti GPU.
+CUDA backend of ArrayFire was used with double floating points.)</p>
+
+<p><strong>RbCUDA is the fastest among all. Yay!</strong></p>
+
+<p>RbCUDA is the fastest of all the Ruby libraries. The time taken for matrix multiplication is 0.000017s on my machine. The plain C code
+takes me 0.000013s for this calculation.</p>
+
+<p>RbCUDA is 24x faster than ArrayFire for matrix multiplication, Most of the speed gain going straight to CUDA is probably from
+removing an interaction layer (and buffers) as well as how the data is organized and fed to the underlying architecture.</p>
+
+<p>Hence, an overhead of 0.000004s over plain C code makes, it highly efficient Maths library in Ruby.</p>
+
+<p>The great thing about this example is that the code is very Rubyish &lt;3.</p>
+
+<p>The Code Implementation of matrix multiplication will be discussed in my upcoming blog posts.</p>
+
+<h1 id="profiling-matrix-multiplication">Profiling matrix multiplication.</h1>
+
+<p>I have also created a profiler for RbCUDA . The profiling example can be found <a href="https://github.com/prasunanand/rbcuda/blob/master/examples/profiler.rb">here</a>.</p>
+
+<p>Output of the code.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">#</span><span class="w"> </span><span class="err">CUDA_PROFILE_LOG_VERSION</span><span class="w"> </span><span class="mf">2.0</span><span class="w">
+</span><span class="err">#</span><span class="w"> </span><span class="err">CUDA_DEVICE</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="err">GeForce</span><span class="w"> </span><span class="err">GTX</span><span class="w"> </span><span class="mi">750</span><span class="w"> </span><span class="err">Ti</span><span class="w">
+</span><span class="err">#</span><span class="w"> </span><span class="err">CUDA_CONTEXT</span><span class="w"> </span><span class="mi">1</span><span class="w">
+</span><span class="err">#</span><span class="w"> </span><span class="err">TIMESTAMPFACTOR</span><span class="w"> </span><span class="mi">14e96</span><span class="err">c</span><span class="mi">24317</span><span class="err">d</span><span class="mi">8324</span><span class="w">
+</span><span class="err">method,gputime,cputime,occupancy</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">memcpyHtoD</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">16.544</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">18.705</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">memcpyHtoD</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">16.288</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">22.089</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">memcpyHtoD</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">1.216</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">6.923</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">_Z</span><span class="mi">19</span><span class="err">gemm_kernel</span><span class="mi">2</span><span class="err">x</span><span class="mi">2</span><span class="err">_coreIdLb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">EEvPT_PKS</span><span class="mi">0</span><span class="err">_S</span><span class="mi">3</span><span class="err">_iiiiiiS</span><span class="mi">1</span><span class="err">_S</span><span class="mi">1</span><span class="err">_S</span><span class="mi">0</span><span class="err">_S</span><span class="mi">0</span><span class="err">_i</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">76.736</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">11.967</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">occupancy=</span><span class="p">[</span><span class="w"> </span><span class="mf">0.469</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">_Z</span><span class="mi">19</span><span class="err">gemm_kernel</span><span class="mi">2</span><span class="err">x</span><span class="mi">2</span><span class="err">_coreIdLb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">EEvPT_PKS</span><span class="mi">0</span><span class="err">_S</span><span class="mi">3</span><span class="err">_iiiiiiS</span><span class="mi">1</span><span class="err">_S</span><span class="mi">1</span><span class="err">_S</span><span class="mi">0</span><span class="err">_S</span><span class="mi">0</span><span class="err">_i</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">73.024</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">6.485</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">occupancy=</span><span class="p">[</span><span class="w"> </span><span class="mf">0.469</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">_Z</span><span class="mi">19</span><span class="err">gemm_kernel</span><span class="mi">2</span><span class="err">x</span><span class="mi">2</span><span class="err">_coreIdLb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">EEvPT_PKS</span><span class="mi">0</span><span class="err">_S</span><span class="mi">3</span><span class="err">_iiiiiiS</span><span class="mi">1</span><span class="err">_S</span><span class="mi">1</span><span class="err">_S</span><span class="mi">0</span><span class="err">_S</span><span class="mi">0</span><span class="err">_i</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">72.928</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">5.739</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">occupancy=</span><span class="p">[</span><span class="w"> </span><span class="mf">0.469</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">_Z</span><span class="mi">19</span><span class="err">gemm_kernel</span><span class="mi">2</span><span class="err">x</span><span class="mi">2</span><span class="err">_coreIdLb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">EEvPT_PKS</span><span class="mi">0</span><span class="err">_S</span><span class="mi">3</span><span class="err">_iiiiiiS</span><span class="mi">1</span><span class="err">_S</span><span class="mi">1</span><span class="err">_S</span><span class="mi">0</span><span class="err">_S</span><span class="mi">0</span><span class="err">_i</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">72.928</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">5.725</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">occupancy=</span><span class="p">[</span><span class="w"> </span><span class="mf">0.469</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">_Z</span><span class="mi">19</span><span class="err">gemm_kernel</span><span class="mi">2</span><span class="err">x</span><span class="mi">2</span><span class="err">_coreIdLb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">EEvPT_PKS</span><span class="mi">0</span><span class="err">_S</span><span class="mi">3</span><span class="err">_iiiiiiS</span><span class="mi">1</span><span class="err">_S</span><span class="mi">1</span><span class="err">_S</span><span class="mi">0</span><span class="err">_S</span><span class="mi">0</span><span class="err">_i</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">72.896</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">5.701</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">occupancy=</span><span class="p">[</span><span class="w"> </span><span class="mf">0.469</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+<p>(Note: The unit of time is microsecond).</p>
+
+<h1 id="ruby-grant-2017">Ruby Grant 2017</h1>
+
+<p>This project is funded by Ruby Association. I am very thankful to them for supporting this project.
+<a href="http://www.ruby.or.jp/en/news/20171206">Link</a>.</p>
+
+<h1 id="contributions-are-welcome">Contributions are welcome!</h1>
+
+<p>I request all the Rubyists if you have a Ruby code that you want to be accelerated by GPU, please try RbCUDA / ArrayFire. If you are
+into Deep learning, let me know if you want to use RbCUDA to power your neural nets for GPU acceleration.</p>
+
+<p>Feel free to open an issue!</p>
+
+<p>Stay tuned for more posts about GPU computing with Ruby.</p>
+
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//prasunanandblog.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+:ET

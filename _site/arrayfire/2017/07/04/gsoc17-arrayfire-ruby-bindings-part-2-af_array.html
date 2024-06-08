@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"/>
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/animate.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/css/responsive.css">
+
+    <link rel="icon" href="images/zasper_logo.ico" type="image/gif" sizes="32x32">
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VRJB8WTXR1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-VRJB8WTXR1');
+    </script>
+
+    <title>Prasun's Blog</title>
+  </head>
+  <body>
+    <section id="header-home">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <a class="navbar-brand" href="/">
+            <!-- <img src="images/logo.svg" alt="#"> -->
+            Prasun's blog
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu">
+            <i class="fa fa-bars"></i>
+          </button>
+          <div class="navbar-collapse justify-content-center offcanvas offcanvas-top offcanvas-body" id="offcanvasMenu">
+            <button type="button" class="colse-btn" data-bs-dismiss="offcanvas">
+              <i class="fa fa-times"></i>
+            </button>
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link active-menu" href="/about">About</a>
+              </li>
+            </ul>
+            <div class="menu-right-btn mobile-menu-login-signup">
+              <a href="https://zasper.io/login" class="custom-btn btn-border hover-bg">Login</a>
+              <a href="https://zasper.io/signup" class="custom-btn btn-bg hover-bg">Signup</a>
+            </div>
+          </div>
+          <div class="menu-right-btn justify-content-end">
+            <a href="https://zasper.io/login" class="custom-btn btn-border hover-bg">Login</a>
+            <a href="https://zasper.io/signup" class="custom-btn btn-bg hover-bg">Signup</a>
+          </div>
+        </div>
+      </nav>
+    </section>
+
+
+
+    <section id="blog-sec">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-12 col-lg-9">
+            <div class="blog-details-wraper">
+              <div class="blog-main-image wow fadeInUp">
+                <img src="/images/banner.png" alt="#">
+              </div>
+
+              <div class="blog-title wow fadeInUp">
+                <h2>ArrayFire Ruby Bindings<br>(Part II : Af_Array)</h2>
+              </div>
+
+              <div class="blog-published-info wow fadeInUp">
+                <span class="blog-post-date">4 July 2017 by</span>
+                <span class="blog-post-author">Prasun Anand</span>
+              </div>
+
+              <div class="blog-description wow fadeInUp">
+              	<p><p>This post covers how to create arrays using <code class="language-plaintext highlighter-rouge">arrayfire-rb</code>, perform elementwise
+operations like addition, multiplication, etc. and how these functions have been
+implemented by creating Ruby bindings to ArrayFire C API.</p>
+
+<p>ArrayFire for Ruby stores arrays upto 4 dimension in the <code class="language-plaintext highlighter-rouge">Af_Array</code> class.</p>
+
+<p>The speedup achieved is outstanding.</p>
+
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+
+<script type="text/javascript" src="https://code.highcharts.com/highcharts.js"></script>
+
+<script type="text/javascript" src="https://code.highcharts.com/4.2.2/modules/exporting.js"></script>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+
+<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.1.1/normalize.min.css" />
+
+<h1 id="performance-metrics">Performance metrics</h1>
+<div ng-app="resultApp">
+    <div ng-controller="MainCtrl">
+      <div class="block">
+        <strong>Arithmetic Operations</strong>
+        <div id="chartaddition" class="chart"></div>
+        <div id="chartsubtraction" class="chart"></div>
+      </div>
+    </div>
+  <script type="text/javascript" src="/assets/js/chart.js"></script>
+</div>
+
+<p>(Note: The above benchmarks have been done on an AMD FX 8350 octacore processor
+and Nvidia GTX 750Ti GPU.)</p>
+
+<p>The figure shows that ArrayFire takes the least computation time of all.
+For elementwise arithmetic operations,  ArrayFire is 2 e 4 times faster than NMatrix for Ruby whereas
+2 e 3 times faster than NMatrix for JRuby.</p>
+
+<p>The performance benchmarks for ArrayFire against NMatrix can be represented by the following figures.
+The code used for benchmarking and generating the plots can be found <a href="https://github.com/prasunanand/arrayfire-rb-benchmark-suite">here</a>
+and be used to reproduce similar plots.</p>
+
+<p>Lets take a look at the implementation.</p>
+
+<h1 id="initialization">Initialization</h1>
+
+<p>An <code class="language-plaintext highlighter-rouge">Af_Array</code> expects the number of dimensions( <code class="language-plaintext highlighter-rouge">ndims</code> ), size of array along each
+dimension(<code class="language-plaintext highlighter-rouge">dimension</code>) and the elements(<code class="language-plaintext highlighter-rouge">elements</code>).</p>
+
+<p>Af_Array class is created under the ArrayFire module using <code class="language-plaintext highlighter-rouge">rb_define_class_under()</code>.
+Next, I have added <code class="language-plaintext highlighter-rouge">arf_alloc</code> function using <code class="language-plaintext highlighter-rouge">rb_define_alloc_func</code> that allocates
+memory  to <code class="language-plaintext highlighter-rouge">Af_Array</code> and is run everytime <code class="language-plaintext highlighter-rouge">Af_Array#new</code> is called. <code class="language-plaintext highlighter-rouge">arf_alloc</code> works
+along with <code class="language-plaintext highlighter-rouge">arf_init</code> that accepts parameters from Ruby call and calls C to create
+an <code class="language-plaintext highlighter-rouge">af_array</code>. ArrayFire C apis use <code class="language-plaintext highlighter-rouge">af_array</code> pointer to store an array.</p>
+
+<p>The methods for elemetwise operations have also been implemented using <code class="language-plaintext highlighter-rouge">rb_define_method</code>.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">Init_arrayfire</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">ArrayFire</span> <span class="o">=</span> <span class="n">rb_define_module</span><span class="p">(</span><span class="s">"ArrayFire"</span><span class="p">);</span>
+
+  <span class="n">Af_Array</span> <span class="o">=</span> <span class="n">rb_define_class_under</span><span class="p">(</span><span class="n">ArrayFire</span><span class="p">,</span> <span class="s">"Af_Array"</span><span class="p">,</span> <span class="n">rb_cObject</span><span class="p">);</span>
+  <span class="n">rb_define_alloc_func</span><span class="p">(</span><span class="n">Af_Array</span><span class="p">,</span> <span class="n">arf_alloc</span><span class="p">);</span>
+  <span class="n">rb_define_method</span><span class="p">(</span><span class="n">Af_Array</span><span class="p">,</span> <span class="s">"initialize"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_init</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>
+
+  <span class="n">rb_define_method</span><span class="p">(</span><span class="n">Af_Array</span><span class="p">,</span> <span class="s">"+"</span><span class="p">,(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_ew_add</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_method</span><span class="p">(</span><span class="n">Af_Array</span><span class="p">,</span> <span class="s">"-"</span><span class="p">,(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_ew_subtract</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_method</span><span class="p">(</span><span class="n">Af_Array</span><span class="p">,</span> <span class="s">"*"</span><span class="p">,(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_ew_multiply</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_method</span><span class="p">(</span><span class="n">Af_Array</span><span class="p">,</span> <span class="s">"/"</span><span class="p">,(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_ew_divide</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>To store an <code class="language-plaintext highlighter-rouge">Af_Array</code>, I have create an afstruct that stores the <code class="language-plaintext highlighter-rouge">af_array</code> pointer.
+<code class="language-plaintext highlighter-rouge">arf_init(int argc, VALUE* argv, VALUE self)</code> can take any number of arguments and self
+is used to bind the <code class="language-plaintext highlighter-rouge">afstruct</code> to an <code class="language-plaintext highlighter-rouge">Af_Array</code> object.</p>
+
+<p>The Ruby C APIs uses <code class="language-plaintext highlighter-rouge">VALUE</code> to pass around pointers. I have casted all the <code class="language-plaintext highlighter-rouge">VALUE</code> types
+to the C types expected by ArrayFire C API. <code class="language-plaintext highlighter-rouge">NUM2LONG</code> and <code class="language-plaintext highlighter-rouge">NUM2DBL</code> have been used to
+convert the VALUE to <code class="language-plaintext highlighter-rouge">long</code> and <code class="language-plaintext highlighter-rouge">double</code> respectively.</p>
+
+<p>Once, I have the ndims, dimensions and elements, I can use <code class="language-plaintext highlighter-rouge">af_create_array</code> to create an
+array. <code class="language-plaintext highlighter-rouge">afstruct-&gt;carray</code> points to the array and the array can be accessed anytime by
+using this pointer.</p>
+
+<p>The point to note here is that all the data is on GPU now and hence, the time and resources
+for copying data from GPU to CPU is taken care of. It may not be clear now but it will be
+pivotal in the blogs to come when I interface <code class="language-plaintext highlighter-rouge">mixed_models</code> with arrayfire.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">AF_STRUCT</span>
+<span class="p">{</span>
+  <span class="n">af_array</span> <span class="n">carray</span><span class="p">;</span>
+<span class="p">}</span><span class="n">afstruct</span><span class="p">;</span>
+
+<span class="n">VALUE</span> <span class="nf">arf_init</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">VALUE</span><span class="o">*</span> <span class="n">argv</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">self</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">afarray</span><span class="p">;</span>
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">self</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">afarray</span><span class="p">);</span>
+  <span class="n">dim_t</span> <span class="n">ndims</span> <span class="o">=</span> <span class="p">(</span><span class="n">dim_t</span><span class="p">)</span><span class="n">NUM2LONG</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+  <span class="n">dim_t</span><span class="o">*</span> <span class="n">dimensions</span> <span class="o">=</span> <span class="p">(</span><span class="n">dim_t</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">ndims</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">dim_t</span><span class="p">));</span>
+  <span class="n">dim_t</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">ndims</span><span class="p">;</span> <span class="n">index</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">dimensions</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">dim_t</span><span class="p">)</span><span class="n">NUM2LONG</span><span class="p">(</span><span class="n">RARRAY_AREF</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">index</span><span class="p">));</span>
+    <span class="n">count</span> <span class="o">*=</span> <span class="n">dimensions</span><span class="p">[</span><span class="n">index</span><span class="p">];</span>
+  <span class="p">}</span>
+  <span class="kt">float</span><span class="o">*</span> <span class="n">host_array</span> <span class="o">=</span> <span class="p">(</span><span class="kt">float</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">count</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">));</span>
+  <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">count</span><span class="p">;</span> <span class="n">index</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">host_array</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kt">float</span><span class="p">)</span><span class="n">NUM2DBL</span><span class="p">(</span><span class="n">RARRAY_AREF</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">index</span><span class="p">));</span>
+  <span class="p">}</span>
+
+  <span class="n">af_create_array</span><span class="p">(</span><span class="o">&amp;</span><span class="n">afarray</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">host_array</span><span class="p">,</span> <span class="n">ndims</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span> <span class="n">f32</span><span class="p">);</span>
+
+  <span class="n">af_print_array</span><span class="p">(</span><span class="n">afarray</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">self</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_alloc</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">klass</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="cm">/* allocate */</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">af</span> <span class="o">=</span> <span class="n">ALLOC</span><span class="p">(</span><span class="n">afstruct</span><span class="p">);</span>
+  <span class="cm">/* wrap */</span>
+  <span class="k">return</span> <span class="n">Data_Wrap_Struct</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">arf_free</span><span class="p">,</span> <span class="n">af</span><span class="p">);</span>
+<span class="p">}</span>
+
+
+</code></pre></div></div>
+
+<p>So, now I can check if the bindings work successfully.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">rake</span> <span class="n">pry</span>
+<span class="n">pry</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'./lib/arrayfire.rb'</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">2</span> <span class="mi">2</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+   <span class="no">Offsets</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="p">]</span>
+   <span class="no">Strides</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">4</span> <span class="mi">4</span><span class="p">]</span>
+    <span class="mf">1.0000</span>     <span class="mf">3.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">4.0000</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x000000020aeab8&gt;</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span>
+
+</code></pre></div></div>
+<p>(Note: ArrayFire stores array in column-major format.)</p>
+
+<p>Voila! It works.</p>
+
+<h1 id="elementwise-operations">Elementwise operations</h1>
+
+<p>The following code snippets show how I implemented elemetwise operations like
+<code class="language-plaintext highlighter-rouge">addition</code>, <code class="language-plaintext highlighter-rouge">subtraction</code>, <code class="language-plaintext highlighter-rouge">multiplication</code> and <code class="language-plaintext highlighter-rouge">division</code>.</p>
+
+<p>I have created macros <code class="language-plaintext highlighter-rouge">DEF_ELEMENTWISE_RUBY_ACCESSOR</code> and  <code class="language-plaintext highlighter-rouge">DECL_ELEMENTWISE_RUBY_ACCESSOR</code>that
+define and declare the functions. The function names call the corresponding
+ArrayFire API.</p>
+
+<p>e.g. <code class="language-plaintext highlighter-rouge">Af_Array#+</code> calls <code class="language-plaintext highlighter-rouge">arf_ew_add</code> which is responsible for calling <code class="language-plaintext highlighter-rouge">af_add</code>.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="cp">#define DEF_ELEMENTWISE_RUBY_ACCESSOR(name, oper)                          \
+static VALUE arf_ew_##name(VALUE left_val, VALUE right_val) {              \
+  afstruct* left;                                                          \
+  afstruct* right;                                                         \
+  afstruct* result = ALLOC(afstruct);                                      \
+  Data_Get_Struct(left_val, afstruct, left);                               \
+  Data_Get_Struct(right_val, afstruct, right);                             \
+  af_##oper(&amp;result-&gt;carray,  left-&gt;carray, right-&gt;carray, true);          \
+  af_print_array(result-&gt;carray);                                          \
+  return Data_Wrap_Struct(CLASS_OF(left_val), NULL, arf_free, result);     \
+}
+</span>
+
+<span class="cp">#define DECL_ELEMENTWISE_RUBY_ACCESSOR(name)                               \
+static VALUE arf_ew_##name(VALUE left_val, VALUE right_val);
+</span>
+<span class="n">DECL_ELEMENTWISE_RUBY_ACCESSOR</span><span class="p">(</span><span class="n">add</span><span class="p">)</span>
+<span class="n">DECL_ELEMENTWISE_RUBY_ACCESSOR</span><span class="p">(</span><span class="n">subtract</span><span class="p">)</span>
+<span class="n">DECL_ELEMENTWISE_RUBY_ACCESSOR</span><span class="p">(</span><span class="n">multiply</span><span class="p">)</span>
+<span class="n">DECL_ELEMENTWISE_RUBY_ACCESSOR</span><span class="p">(</span><span class="n">divide</span><span class="p">)</span>
+
+<span class="n">DEF_ELEMENTWISE_RUBY_ACCESSOR</span><span class="p">(</span><span class="n">add</span><span class="p">,</span> <span class="n">add</span><span class="p">)</span>
+<span class="n">DEF_ELEMENTWISE_RUBY_ACCESSOR</span><span class="p">(</span><span class="n">subtract</span><span class="p">,</span> <span class="n">sub</span><span class="p">)</span>
+<span class="n">DEF_ELEMENTWISE_RUBY_ACCESSOR</span><span class="p">(</span><span class="n">multiply</span><span class="p">,</span> <span class="n">mul</span><span class="p">)</span>
+<span class="n">DEF_ELEMENTWISE_RUBY_ACCESSOR</span><span class="p">(</span><span class="n">divide</span><span class="p">,</span> <span class="n">div</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>Now, we can check the elementwise operations using <code class="language-plaintext highlighter-rouge">pry</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="err">$</span> <span class="n">rake</span> <span class="n">pry</span>
+<span class="n">pry</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'./lib/arrayfire.rb'</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">2</span> <span class="mi">2</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+   <span class="no">Offsets</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="p">]</span>
+   <span class="no">Strides</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">4</span> <span class="mi">4</span><span class="p">]</span>
+    <span class="mf">1.0000</span>     <span class="mf">3.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">4.0000</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x000000020a3e38&gt;</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">a</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">2</span> <span class="mi">2</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+   <span class="no">Offsets</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="p">]</span>
+   <span class="no">Strides</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">4</span> <span class="mi">4</span><span class="p">]</span>
+    <span class="mf">2.0000</span>     <span class="mf">6.0000</span>
+    <span class="mf">4.0000</span>     <span class="mf">8.0000</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x000000020625c8&gt;</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a</span> <span class="o">*</span> <span class="n">a</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">2</span> <span class="mi">2</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+   <span class="no">Offsets</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="p">]</span>
+   <span class="no">Strides</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">4</span> <span class="mi">4</span><span class="p">]</span>
+    <span class="mf">1.0000</span>     <span class="mf">9.0000</span>
+    <span class="mf">4.0000</span>    <span class="mf">16.0000</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x00000001fe6f90&gt;</span>
+
+</code></pre></div></div>
+<p>It works!</p>
+
+<p>Lets check it for 4 dimensional matrices</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">rake</span> <span class="n">pry</span>
+<span class="n">pry</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'./lib/arrayfire.rb'</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">4</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span>
+                                                          <span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span>
+                                                          <span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">12</span><span class="p">,</span>
+                                                          <span class="mi">13</span><span class="p">,</span><span class="mi">14</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">16</span><span class="p">]</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">2</span> <span class="mi">2</span> <span class="mi">2</span> <span class="mi">2</span><span class="p">]</span>
+   <span class="no">Offsets</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="p">]</span>
+   <span class="no">Strides</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">4</span> <span class="mi">8</span><span class="p">]</span>
+    <span class="mf">1.0000</span>     <span class="mf">3.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">4.0000</span>
+
+    <span class="mf">5.0000</span>     <span class="mf">7.0000</span>
+    <span class="mf">6.0000</span>     <span class="mf">8.0000</span>
+
+
+    <span class="mf">9.0000</span>    <span class="mf">11.0000</span>
+   <span class="mf">10.0000</span>    <span class="mf">12.0000</span>
+
+   <span class="mf">13.0000</span>    <span class="mf">15.0000</span>
+   <span class="mf">14.0000</span>    <span class="mf">16.0000</span>
+
+
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x000000016c7a40&gt;</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">b</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">a</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">2</span> <span class="mi">2</span> <span class="mi">2</span> <span class="mi">2</span><span class="p">]</span>
+   <span class="no">Offsets</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="p">]</span>
+   <span class="no">Strides</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">4</span> <span class="mi">8</span><span class="p">]</span>
+    <span class="mf">2.0000</span>     <span class="mf">6.0000</span>
+    <span class="mf">4.0000</span>     <span class="mf">8.0000</span>
+
+   <span class="mf">10.0000</span>    <span class="mf">14.0000</span>
+   <span class="mf">12.0000</span>    <span class="mf">16.0000</span>
+
+
+   <span class="mf">18.0000</span>    <span class="mf">22.0000</span>
+   <span class="mf">20.0000</span>    <span class="mf">24.0000</span>
+
+   <span class="mf">26.0000</span>    <span class="mf">30.0000</span>
+   <span class="mf">28.0000</span>    <span class="mf">32.0000</span>
+
+
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x00000001686f18&gt;</span>
+</code></pre></div></div>
+
+<p>Hence, Af_Array can successfully handle arrays upto 4 dimesnions.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>ArrayFire for Ruby can successfully create arrays on GPU using <code class="language-plaintext highlighter-rouge">Af_Array</code> class and supports
+elementwise binary operations. Similarly, I have implemented elementwise unary operations like <code class="language-plaintext highlighter-rouge">Af_Array#sin</code>
+<code class="language-plaintext highlighter-rouge">Af_Array#erfc</code>.</p>
+
+<p>In the next blog post, I will explain about the test-suite and Algorithm class.</p>
+
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//prasunanandblog.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</p>
+              </div>
+            </div>
+
+            <div class="related-blog-wraper wow fadeInUp">
+              <h6>Related Blog</h6>
+
+              
+
+              <div class="related-blog-item latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                <a href="/cuda/opencl/ruby/rbcuda/2018/02/24/rubygrant17-rbcuda-installation-and-architecture.html.html">
+                  <div class="latest-post-item-image">
+                    <img src="/images/banner.png" alt="#">
+                  </div>
+                  <div class="latest-post-item-content">
+                    <h2>RbCUDA: Installation and Architecture</h2>
+                    <span>24 February 2018</span>
+                  </div>
+                </a>
+              </div>
+              
+
+              <div class="related-blog-item latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                <a href="/cuda/opencl/ruby/rbcuda/2017/12/30/rubygrant17-rbcuda-introduction.html.html">
+                  <div class="latest-post-item-image">
+                    <img src="/images/banner.png" alt="#">
+                  </div>
+                  <div class="latest-post-item-content">
+                    <h2>RbCUDA: CUDA bindings for Ruby</h2>
+                    <span>30 December 2017</span>
+                  </div>
+                </a>
+              </div>
+              
+
+            </div>
+          </div>
+          
+
+          <div class="col-12 col-md-12 col-lg-3">
+            <div class="blog-page-right-wraper">
+              <div class="search-wraper wow fadeInUp" data-wow-delay="0.2s">
+                <h6>Search</h6>
+                <div class="search-form-wraper">
+                  <form action="/search.html" method="GET">
+                    <input type="text" name="query" id="search-box" placeholder="Search">
+                    <button class="btn-bg"><img src="/images/icons/search.svg" alt="#"></button>
+                  </form>
+                </div>
+              </div>
+
+              <div class="latest-post-wraper wow fadeInUp" data-wow-delay="0.3s">
+                <h6>Latest Post</h6>
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/cuda/opencl/ruby/rbcuda/2018/02/24/rubygrant17-rbcuda-installation-and-architecture.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>RbCUDA: Installation and Architecture</h2>
+                      <span>24 February 2018</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/cuda/opencl/ruby/rbcuda/2017/12/30/rubygrant17-rbcuda-introduction.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>RbCUDA: CUDA bindings for Ruby</h2>
+                      <span>30 December 2017</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/arrayfire/cuda/opencl/ruby/2017/08/28/gsoc17-project-report.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>GSoC 2017: Creating the fastest math libraries for Ruby by using the GPU through OpenCL and ArrayFire.</h2>
+                      <span>28 August 2017</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+              </div>
+
+              <div class="tags-wraper wow fadeInUp" data-wow-delay="0.4s">
+                <h6>Tag Clouds</h6>
+                <div class="tag-clouds">
+                  <a href="#">Engineering</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Future</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Future</a>
+                  <a href="#">Engineering</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Engineering</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Future</a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+
+
+        </div>
+      </div>
+    </section>
+
+    <section id="updates">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="updates-wraper">
+              <div class="updates-image wow fadeInUp" data-wow-delay="0.2s">
+                <img src="/images/image2.svg" alt="#">
+              </div>
+              <div class="updates-form header-form wow fadeInUp" data-wow-delay="0.2s">
+                <h5 class="font-h5">Subscribe for exclusive</h5>
+                <h3 class="font-h3">news and updates!</h3>
+                <form action="https://zasper.io/newsletter" method="POST">
+                  <div class="form-group">
+                    <input type="email" name="email" placeholder="Enter your email">
+                    <button type="submit" class="btn-bg hover-bg">Subscribe</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-4">
+            <div class="footer-info wow fadeInUp" data-wow-delay="0.2s">
+              <div class="footer-image wow fadeInUp" data-wow-delay="0.1s">
+                <img src="/images/logo.svg" alt="#">
+              </div>
+              <div class="footer-content wow fadeInUp" data-wow-delay="0.2s">
+                <p>Zasper strives to be at the forefront of the AI Revolution that is taking place around the world. We want to ease the pain of Data teams by enabling them to develop and deploy their AI solutions right from rapid prototyping to shipping into production.</p>
+              </div>
+              <div class="footer-social wow fadeInUp" data-wow-delay="0.3s">
+                <a href="https://www.linkedin.com/company/zasper"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+                <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+                <a href="https://github.com/zasperio"><i class="fa fa-github" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-8">
+            <div class="footer-menu-wraper wow fadeInUp" data-wow-delay="0.4s">
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.1s">
+                  <h6>Company</h6>
+                  <a href="https://zasper.io/product">Product</a>
+                  <a href="https://zasper.io/pricing">Pricing</a>
+                  <a href="https://zasper.io/partners">Partners</a>
+                  <a href="https://zasper.io/careers">Careers</a>
+                  <a href="https://zasper.io/support">Support</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.3s">
+                  <h6>Solutions</h6>
+                  <a href="https://zasper.io/solutions/banking">Banking</a>
+                  <a href="https://zasper.io/solutions/telecom">Telecom</a>
+                  <a href="https://zasper.io/solutions/oil-and-gas">Oil and Gas</a>
+                  <a href="https://zasper.io/solutions/healthcare">Healthcare</a>
+                  <a href="https://zasper.io/solutions/">View More</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.5s">
+                  <h6>Community</h6>
+                  <a href="/">Blog</a>
+                  <a href="https://docs.zasper.io">Docs</a>
+                  <a href="https://zasper.io/contact-us">Contact Us</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.6s">
+                  <h6>Legal</h6>
+                  <a href="https://zasper.io/terms-and-conditions">Terms and Conditions</a>
+                  <a href="https://zasper.io/privacy">Privacy Policy</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="copyright">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="copyright-text wow fadeInUp" data-wow-delay="0.2s">
+              <p>©2021 zasper ai labs pvt ltd | All rights reserved.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JavaScripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/wow.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/main.js"></script>
+
+  </body>
+</html>
+

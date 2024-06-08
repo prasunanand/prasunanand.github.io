@@ -4,6 +4,8 @@ title:  "RbCUDA: CUDA bindings for Ruby"
 date:   2017-12-30 12:10:41 +0530
 categories: cuda opencl ruby rbcuda
 comments: true
+author: Prasun Anand
+banner: /images/banner.png
 ---
 
 I have been working on a new project called **RbCUDA**.

@@ -1,0 +1,3 @@
+I"Y<p>This post covers how to use <code class="language-plaintext highlighter-rouge">BLAS</code> and <code class="language-plaintext highlighter-rouge">LAPACK</code> routines with <code class="language-plaintext highlighter-rouge">ArrayFire-rb</code>, and how these functions
+have been implemented by creating Ruby bindings to ArrayFire C API.</p>
+:ET

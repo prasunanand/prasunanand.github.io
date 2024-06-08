@@ -1,0 +1,233 @@
+I"3f<p>todo:
+I have been working on “Port NMatrix to JRuby” as my GSoC project. I am pleased to announce that <strong>JRuby is ready for Nmatrix users</strong>.</p>
+
+<p>NMatrix, a linear algebra library wraps Apache Commons Maths for its core functionalities. By the end of GSoC, I have been able to implement NMatrix for dense matrices with double and object ( ruby objects ) data type. I have also worked on porting mixed-models gem to JRuby which heavily uses NMatrix at its core.</p>
+
+<p>ArrayFire can run not just on GPU devices but also on CPU devices, which is one of its really cool features.
+With version <code class="language-plaintext highlighter-rouge">3.2</code> the <code class="language-plaintext highlighter-rouge">unified-backend</code> helps in changing the ArrayFire backend on the fly.
+When using the unified-backend, the preference order for the default backend is CUDA &gt; OpenCL &gt; CPU.</p>
+
+<p>The CPU backend requires <code class="language-plaintext highlighter-rouge">Intel MKL libraries</code> be installed. To install Intel MKL library, go to the official
+download <a href="https://software.intel.com/en-us/mkl">link</a>. Next extract the file and run <code class="language-plaintext highlighter-rouge">sudo install.sh</code> from the
+project root directory.</p>
+
+<p>For an AMD CPU, you need to specify the location of <code class="language-plaintext highlighter-rouge">libmkl_rt.so</code>.</p>
+
+<p>To solve this on a debian machine:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cd</span> /etc/ld.so.conf.d/
+<span class="nv">$ </span><span class="nb">sudo </span>nano mylibs.conf
+</code></pre></div></div>
+
+<p>Paste line:</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/opt/intel/compilers_and_libraries_2017/linux/mkl/lib/intel64_lin/
+</code></pre></div></div>
+
+<p>Next, run</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ sudo ldconfig
+</code></pre></div></div>
+
+<p>Now download arrayfire-rb from <a href="&quot;https://github.com/prasunanand/arrayfire-rb&quot;">link</a></p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">git</span> <span class="nb">clone</span> <span class="n">https</span><span class="ss">:/</span><span class="o">/</span><span class="n">github</span><span class="p">.</span><span class="nf">com</span><span class="o">/</span><span class="n">prasunanand</span><span class="o">/</span><span class="n">arrayfire</span><span class="o">-</span><span class="n">rb</span>
+<span class="err">$</span> <span class="n">rake</span> <span class="n">compile</span>
+<span class="err">$</span> <span class="n">rake</span> <span class="n">pry</span>
+<span class="n">pry</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'./lib/arrayfire.rb'</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Backend</span><span class="p">.</span><span class="nf">get_backend_count</span>
+<span class="o">=&gt;</span> <span class="mi">3</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Backend</span><span class="p">.</span><span class="nf">get_active_backend</span>
+<span class="o">=&gt;</span> <span class="s2">"AF_BACKEND_CUDA"</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Backend</span><span class="p">.</span><span class="nf">set_backend</span><span class="p">(</span><span class="ss">:AF_BACKEND_CPU</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="kp">nil</span>
+<span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Backend</span><span class="p">.</span><span class="nf">get_active_backend</span>
+<span class="o">=&gt;</span> <span class="s2">"AF_BACKEND_CPU"</span>
+</code></pre></div></div>
+
+<p>Voila! You can run ArrayFire on CPU.</p>
+
+<p>Lets look into the implementation and what else can we do.</p>
+
+<h1 id="backend">Backend</h1>
+
+<p>The class structure of Backend class is as follows:</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="kt">void</span> <span class="nf">Init_arrayfire</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">ArrayFire</span> <span class="o">=</span> <span class="n">rb_define_module</span><span class="p">(</span><span class="s">"ArrayFire"</span><span class="p">);</span>
+
+  <span class="n">Backend</span> <span class="o">=</span> <span class="n">rb_define_class_under</span><span class="p">(</span><span class="n">ArrayFire</span><span class="p">,</span> <span class="s">"Backend"</span><span class="p">,</span> <span class="n">rb_cObject</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Backend</span><span class="p">,</span> <span class="s">"get_backend_count"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_get_backend_count</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Backend</span><span class="p">,</span> <span class="s">"get_available_backends"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_get_available_backends</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Backend</span><span class="p">,</span> <span class="s">"get_backend_id"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_get_backend_id</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Backend</span><span class="p">,</span> <span class="s">"get_active_backend"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_get_active_backend</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Backend</span><span class="p">,</span> <span class="s">"get_device_id"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_get_backend_device_id</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Backend</span><span class="p">,</span> <span class="s">"set_backend"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_set_backend</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The C bindings were implemented as:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_get_backend_count</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">){</span>
+  <span class="n">uint</span> <span class="n">num_backends</span><span class="p">;</span>
+  <span class="n">af_get_backend_count</span><span class="p">(</span><span class="o">&amp;</span><span class="n">num_backends</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">UINT2NUM</span><span class="p">(</span><span class="n">num_backends</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_get_available_backends</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">){</span>
+  <span class="kt">int</span> <span class="n">backends</span><span class="p">;</span>
+  <span class="n">af_get_available_backends</span><span class="p">(</span><span class="o">&amp;</span><span class="n">backends</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">INT2NUM</span><span class="p">(</span><span class="n">backends</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_get_backend_id</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">array_val</span><span class="p">){</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">input</span><span class="p">;</span>
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">array_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
+  <span class="n">af_backend</span> <span class="n">backend</span><span class="p">;</span>
+  <span class="n">af_get_backend_id</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">backend</span><span class="p">,</span> <span class="n">input</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">backend_name</span> <span class="o">=</span> <span class="n">get_backend_name</span><span class="p">(</span><span class="n">backend</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">rb_str_new_cstr</span><span class="p">(</span><span class="n">backend_name</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_get_active_backend</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">){</span>
+  <span class="n">af_backend</span> <span class="n">backend</span><span class="p">;</span>
+  <span class="n">af_get_active_backend</span><span class="p">(</span><span class="o">&amp;</span><span class="n">backend</span><span class="p">);</span>
+  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">backend_name</span> <span class="o">=</span> <span class="n">get_backend_name</span><span class="p">(</span><span class="n">backend</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">rb_str_new_cstr</span><span class="p">(</span><span class="n">backend_name</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_set_backend</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">backend_val</span><span class="p">){</span>
+  <span class="n">af_backend</span> <span class="n">backend</span> <span class="o">=</span> <span class="n">arf_backend_type_from_rbsymbol</span><span class="p">(</span><span class="n">backend_val</span><span class="p">);</span>
+  <span class="n">af_set_backend</span><span class="p">(</span><span class="n">backend</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">Qnil</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>An <code class="language-plaintext highlighter-rouge">af_backend</code>  symbol can be <code class="language-plaintext highlighter-rouge">:AF_BACKEND_DEFAULT</code>, <code class="language-plaintext highlighter-rouge">:AF_BACKEND_CPU</code>, <code class="language-plaintext highlighter-rouge">:AF_BACKEND_CUDA</code>, or <code class="language-plaintext highlighter-rouge">:AF_BACKEND_OPENCL</code>.
+The implemetation is given below.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">*</span><span class="p">,</span> <span class="kt">size_t</span><span class="o">&gt;</span> <span class="n">BACKEND_TYPES</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="p">{</span><span class="s">"AF_BACKEND_DEFAULT"</span> <span class="p">,</span> <span class="mi">0</span><span class="p">},</span>                        <span class="c1">///&lt; Default backend order: OpenCL -&gt; CUDA -&gt; CPU</span>
+  <span class="p">{</span><span class="s">"AF_BACKEND_CPU"</span>     <span class="p">,</span> <span class="mi">1</span><span class="p">},</span>                        <span class="c1">///&lt; CPU a.k.a sequential algorithms</span>
+  <span class="p">{</span><span class="s">"AF_BACKEND_CUDA"</span>    <span class="p">,</span> <span class="mi">2</span><span class="p">},</span>                        <span class="c1">///&lt; CUDA Compute Backend</span>
+  <span class="p">{</span><span class="s">"AF_BACKEND_OPENCL"</span>  <span class="p">,</span> <span class="mi">4</span><span class="p">}</span>                         <span class="c1">///&lt; OpenCL Compute Backend</span>
+<span class="p">};</span>
+
+<span class="n">af_backend</span> <span class="nf">arf_backend_type_from_rbsymbol</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">sym</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">ID</span> <span class="n">sym_id</span> <span class="o">=</span> <span class="n">SYM2ID</span><span class="p">(</span><span class="n">sym</span><span class="p">);</span>
+
+  <span class="k">for</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">map</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">*</span><span class="p">,</span> <span class="kt">size_t</span><span class="o">&gt;::</span><span class="n">value_type</span><span class="o">&amp;</span> <span class="n">entry</span> <span class="o">:</span> <span class="n">BACKEND_TYPES</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">sym_id</span> <span class="o">==</span> <span class="n">rb_intern</span><span class="p">(</span><span class="n">entry</span><span class="p">.</span><span class="n">first</span><span class="p">))</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="n">static_cast</span><span class="o">&lt;</span><span class="n">af_backend</span><span class="o">&gt;</span><span class="p">(</span><span class="n">entry</span><span class="p">.</span><span class="n">second</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+
+  <span class="n">VALUE</span> <span class="n">str</span> <span class="o">=</span> <span class="n">rb_any_to_s</span><span class="p">(</span><span class="n">sym</span><span class="p">);</span>
+  <span class="n">rb_raise</span><span class="p">(</span><span class="n">rb_eArgError</span><span class="p">,</span> <span class="s">"invalid backend type symbol (:%s) specified"</span><span class="p">,</span> <span class="n">RSTRING_PTR</span><span class="p">(</span><span class="n">str</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">ArrayFire::Backend.get_available_backends</code> lets you know the backends available.
+This is the table that helps you decipher the backends available.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Value</th>
+      <th style="text-align: left">Backends</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td style="text-align: left">None</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td style="text-align: left">CPU</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td style="text-align: left">CUDA</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td style="text-align: left">CPU and CUDA</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td style="text-align: left">OpenCL</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td style="text-align: left">CPU and OpenCL</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td style="text-align: left">CUDA and OpenCL</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td style="text-align: left">CPU, CUDA and OpenCL</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Using <code class="language-plaintext highlighter-rouge">rake pry</code> to investigate the backend and device available for computing:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">rake</span> <span class="n">pry</span>
+<span class="n">pry</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'./lib/arrayfire.rb'</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">backends</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Backend</span><span class="p">.</span><span class="nf">get_available_backends</span>
+<span class="o">=&gt;</span> <span class="mi">7</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Backend</span><span class="p">.</span><span class="nf">get_backend_count</span>
+<span class="o">=&gt;</span> <span class="mi">3</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Backend</span><span class="p">.</span><span class="nf">get_active_backend</span>
+<span class="o">=&gt;</span> <span class="s2">"AF_BACKEND_CUDA"</span>
+<span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Device</span><span class="p">.</span><span class="nf">info</span>
+<span class="no">ArrayFire</span> <span class="n">v3</span><span class="o">.</span><span class="mf">4.0</span> <span class="p">(</span><span class="no">CUDA</span><span class="p">,</span> <span class="mi">64</span><span class="o">-</span><span class="n">bit</span> <span class="no">Linux</span><span class="p">,</span> <span class="n">build</span> <span class="mi">75</span><span class="n">cad40</span><span class="p">)</span>
+<span class="no">Platform</span><span class="p">:</span> <span class="no">CUDA</span> <span class="no">Toolkit</span> <span class="mf">7.5</span><span class="p">,</span> <span class="no">Driver</span><span class="p">:</span> <span class="mf">375.66</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="no">GeForce</span> <span class="no">GTX</span> <span class="mi">750</span> <span class="no">Ti</span><span class="p">,</span> <span class="mi">4042</span> <span class="no">MB</span><span class="p">,</span> <span class="no">CUDA</span> <span class="no">Compute</span> <span class="mf">5.0</span>
+<span class="o">=&gt;</span> <span class="kp">nil</span>
+<span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Backend</span><span class="p">.</span><span class="nf">set_backend</span><span class="p">(</span><span class="ss">:AF_BACKEND_CPU</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="kp">nil</span>
+<span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Device</span><span class="p">.</span><span class="nf">info</span>
+<span class="no">ArrayFire</span> <span class="n">v3</span><span class="o">.</span><span class="mf">4.0</span> <span class="p">(</span><span class="no">CPU</span><span class="p">,</span> <span class="mi">64</span><span class="o">-</span><span class="n">bit</span> <span class="no">Linux</span><span class="p">,</span> <span class="n">build</span> <span class="mi">75</span><span class="n">cad40</span><span class="p">)</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="no">AMD</span><span class="p">:</span> <span class="no">AMD</span> <span class="no">FX</span><span class="p">(</span><span class="n">tm</span><span class="p">)</span><span class="o">-</span><span class="mi">8350</span> <span class="no">Eight</span><span class="o">-</span><span class="no">Core</span> <span class="no">Processor</span>           <span class="p">,</span> <span class="mi">16077</span> <span class="no">MB</span><span class="p">,</span> <span class="no">Max</span> <span class="n">threads</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="kp">nil</span>
+<span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Backend</span><span class="p">.</span><span class="nf">set_backend</span><span class="p">(</span><span class="ss">:AF_BACKEND_OPENCL</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="kp">nil</span>
+<span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Device</span><span class="p">.</span><span class="nf">info</span>
+<span class="no">ArrayFire</span> <span class="n">v3</span><span class="o">.</span><span class="mf">4.0</span> <span class="p">(</span><span class="no">OpenCL</span><span class="p">,</span> <span class="mi">64</span><span class="o">-</span><span class="n">bit</span> <span class="no">Linux</span><span class="p">,</span> <span class="n">build</span> <span class="mi">75</span><span class="n">cad40</span><span class="p">)</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="no">NVIDIA</span>  <span class="p">:</span> <span class="no">GeForce</span> <span class="no">GTX</span> <span class="mi">750</span> <span class="no">Ti</span><span class="p">,</span> <span class="mi">4041</span> <span class="no">MB</span>
+
+</code></pre></div></div>
+
+<p>ArrayFire also helps in interacting custom <code class="language-plaintext highlighter-rouge">OpenCL</code> and <code class="language-plaintext highlighter-rouge">CUDA</code> kernels. Since, Ruby currently
+doesn’t have <code class="language-plaintext highlighter-rouge">rbCUDA</code> and <code class="language-plaintext highlighter-rouge">rbOpenCL</code> gems (Ruby bindings for  CUDA and OpenCL respectively), we
+can’t do much with <code class="language-plaintext highlighter-rouge">ArrayFire-rb</code>.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p><code class="language-plaintext highlighter-rouge">ArrayFire-rb</code> can be used as a standalone linear algebra library not restricted to GPUs.</p>
+
+<p>A user can change the backend on fly making it easier to leverage the power of CUDA and OpenCL. The
+order of preference of default backend to harness maximum computing power helps him
+not worry too much about performance tuning in the early stages of development, hence supporting
+the philosophy of preferring <strong>convention over configuration</strong>.</p>
+
+<p>In the next blog post, I will discuss about interfacing <code class="language-plaintext highlighter-rouge">ArrayFire-rb</code> to <code class="language-plaintext highlighter-rouge">NMatrix</code>.</p>
+
+<div id="disqus_thread"></div>
+<script>
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//prasunanandblog.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+:ET

@@ -4,6 +4,8 @@ title:  "JRuby Port of Mixed-Models"
 date:   2016-07-09 16:10:41 +0530
 categories: jruby ruby gem
 comments: true
+author: Prasun Anand
+banner: /images/banner.png
 ---
 
 ## **Introduction**

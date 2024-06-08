@@ -1,0 +1,4 @@
+I"<p>ArrayFire has Device and Util class that contains of methods which can be used to manage the CPU and GPU
+devices and various utility functions like printing and storing the arrays.
+This blog will explain my work regarding the bindings I have created and how to use them.</p>
+:ET

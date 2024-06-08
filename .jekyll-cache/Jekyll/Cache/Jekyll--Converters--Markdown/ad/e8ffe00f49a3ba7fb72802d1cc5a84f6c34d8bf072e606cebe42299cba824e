@@ -1,0 +1,133 @@
+I"�"<p>Hi, I am Prasun. I work as a software engineer at <a href="https://www.quansight.com/">Quansight</a>. Currently I am working on the <a href="https://pytorch.org/">Pytorch</a> library. I am contributing to <a href="https://github.com/Quansight-Labs/uarray">Uarray</a> and <a href="https://github.com/Quansight-Labs/unumpy">Unumpy</a> development.</p>
+
+<p>I am a huge supporter of Open-source software and love Bioinformatics. I am involved with different open-source projects aimed at super fast Scientific Computing on Python, Ruby and D.</p>
+
+<p>I briefly worked as a Software Architect at Modak Analytics Software where I was leading the Genomics team. Here, I was responsible for building Genome scan tools optimized for GPU clusters, to aid pharmaceutical companies study large-scale genomics data. I built a strong team from the ground up and set up collaborations with some of the top research organisations in India and around the world.</p>
+
+<p>I am an active member of the <a href="https://github.com/GENENETWORK">Genenetwork</a> team with University of Tennessee Health Science Center, building
+<code class="language-plaintext highlighter-rouge">Faster-LMM-D</code>, a GWAS tool for HPC devices. Faster_LMM_D supports Linear Mixed Models. Bayesian Sparse Models are on the way. Faster_LMM_D has
+a GPU backend that helps it run in CUDA and OpenCL environment.</p>
+
+<p>I am a Ruby Grant 2017 recipient from Ruby Association, Japan. It helped me build <a href="https://github.com/prasunanand/rbcuda">RbCUDA</a>: CUDA bindings for Ruby. RbCUDA is the fastest Ruby library for matrix multiplication.</p>
+
+<p>I worked as a student developer for Ruby Science Foundation for
+<strong>Google Summer of Code 2016</strong> on the project <strong><a href="https://summerofcode.withgoogle.com/archive/2016/projects/4640058522992640/">“Port NMatrix to JRuby”</a></strong>.</p>
+
+<p>I worked as a student developer for Ruby Science Foundation for
+<strong>Google Summer of Code 2017</strong> on the project <strong><a href="https://summerofcode.withgoogle.com/archive/2017/projects/5200694831218688/">“Creating the fastest math libraries
+for Ruby/JRuby by using the GPU through OpenCL and ArrayFire”</a></strong>.</p>
+
+<h1 id="educational-qualifications">Educational Qualifications</h1>
+
+<ul>
+  <li>
+    <p>M.Sc., Biological Sciences (2012 - 2017) <br />
+ Birla Institute of Technology and Science, Pilani, India</p>
+  </li>
+  <li>
+    <p>B.E., Chemical Engineering (2012 - 2017) <br />
+ Birla Institute of Technology and Science, Pilani, India</p>
+  </li>
+</ul>
+
+<h1 id="programming">Programming</h1>
+
+<p>I like to program in C++, C, Python, Java, D and Ruby.</p>
+
+<p>I love GPU programming and have built opensource libraries in D and Ruby that help in GPU acceleration. I am
+the creator and maintainer of <code class="language-plaintext highlighter-rouge">ArrayFire-rb</code>, <code class="language-plaintext highlighter-rouge">ArrayFire-D</code>, <code class="language-plaintext highlighter-rouge">cuda_d</code> and <code class="language-plaintext highlighter-rouge">RbCUDA</code>.</p>
+
+<p>I am highly-skilled in building data-intensive applications and speeding up the algorithms by optimizing the underlying code, introducing
+compiler level optimizations, code profiling, exploiting multicore CPUs and GPUs.</p>
+
+<h1 id="talks">Talks</h1>
+
+<ol>
+  <li>
+    <p>Speaker at <a href="http://rubyconf.my/#speakers">RubyConf Malaysia 2018</a>, Kuala Lumpur, Malaysia.</p>
+  </li>
+  <li>
+    <p>Talk on <a href="http://www.complextrait.org/ctc2018/abstracts.html">Linear Mixed Models: GEMMA advances in Genome-wide association mapping</a> at Complex Trait Community Conference 2018, Glasgow, Scotland.<br />
+Pjotr Prins<sup>1</sup>, Christian Fischer<sup>1</sup>, Prasun Anand<sup>1</sup><br />
+<sup>1</sup>University of Tennessee Health Science Center</p>
+  </li>
+  <li>
+    <p>Speaker at RubyKaigi 2018, Sendai, Japan to talk about <a href="http://rubykaigi.org/2018/presentations/prasun_anand.html#jun02">High Performance GPU Computing with Ruby</a>. <br />
+<a href="https://www.slideshare.net/PrasunAnand2/high-performance-gpu-computing-with-ruby-rubykaigi-2018">Slides</a></p>
+  </li>
+  <li>
+    <p>Speaker at Ruby Conference India, 2018 to talk about <a href="http://rubyconfindia.org/program/#prasun">GPU Accelerated Libraries for Ruby</a>. <br />
+<a href="https://www.slideshare.net/PrasunAnand2/rubyconfindia2018-gpu-accelerated-libraries-for-ruby">Slides</a>| <a href="https://www.youtube.com/watch?v=Um8DhAk7DOo">Video</a></p>
+  </li>
+  <li>
+    <p>Speaker at RubyConf 2017, New Orleans, USA to talk about <a href="http://rubyconf.org/program#session-234">High Performance GPU Computing on Ruby</a>. <br />
+<a href="https://www.slideshare.net/PrasunAnand2/high-performance-gpu-computing-with-ruby-rubyconf-2017">Slides</a>| <a href="http://confreaks.tv/videos/rubyconf2017-high-performance-gpu-computing-with-ruby">Video</a></p>
+  </li>
+  <li>
+    <p>Speaker at RubyWorld Conference, Matsue Japan, 2017 to talk about <a href="http://2017.rubyworld-conf.org/en/program/">High Performance GPU Computing on Ruby</a>. <br />
+<a href="https://www.slideshare.net/PrasunAnand2/high-performance-gpu-computing-with-ruby">Slides</a>| <a href="https://youtu.be/_NeFdIhzz1o?t=9159">Video</a></p>
+  </li>
+  <li>
+    <p>Speaker at Ruby DevRoom at FOSDEM 2017, Brussels, Belgium to talk about <a href="https://fosdem.org/2017/schedule/event/ruby_scientific_computing_on_jruby/">Scientific Computing on JRuby</a>.<br />
+<a href="https://www.slideshare.net/PrasunAnand2/fosdem2017-scientific-computing-on-jruby">Slides</a>| <a href="https://video.fosdem.org/2017/K.4.201/ruby_scientific_computing_on_jruby.mp4">Video</a></p>
+  </li>
+  <li>
+    <p>Speaker at Ruby Conference India, 2017 to talk about <a href="http://rubyconfindia.org/program/#prasun-anand">Scientific Computing on JRuby</a>. <br />
+<a href="https://www.slideshare.net/PrasunAnand2/scientific-computing-on-jruby">Slides</a>| <a href="https://www.youtube.com/watch?v=mZEZ13nr-LQ">Video</a></p>
+  </li>
+</ol>
+
+<h1 id="posters">Posters</h1>
+
+<ol>
+  <li>
+    <p>Poster on <strong>Faster Linear Mixed Models (LMM) for online GWAS omics analysis​</strong> at <a href="http://complextrait.org/ctc2017/">Complex Trait Community Conference 2017</a>, Memphis, Tennessee,
+USA.<br />
+<a href="https://github.com/prasunanand/resume/blob/master/CTC_2017_Poster_Faster_LMM_D.pdf">Poster</a></p>
+  </li>
+  <li>
+    <p>Poster on <strong>RbCUDA: CUDA Bindings for Ruby</strong> at <a href="http://25.ruby.or.jp/">Ruby 25th Event</a>, Tokyo, Japan.
+<br />
+<a href="https://github.com/prasunanand/resume/blob/master/rbcuda.pdf">Poster</a></p>
+  </li>
+</ol>
+
+<h1 id="awards">Awards</h1>
+
+<ol>
+  <li>Awarded <a href="https://www.ruby-lang.org/en/news/2017/12/27/fukuoka-ruby-award-2018/">Fukuoka Ruby Award 2018</a> for activity: <strong>Ruby for High Performance Scientific Computing using Arrayfire gem and RbCUDA gem</strong>.</li>
+  <li>Ruby Association Travel Grant 2017</li>
+</ol>
+
+<h1 id="achievements">Achievements</h1>
+
+<ol>
+  <li><a href="http://www.ruby.or.jp/en/news/20171206">Ruby Grant 2017</a></li>
+  <li><a href="https://summerofcode.withgoogle.com/archive/2017/projects/5200694831218688/">Google Summer of Code 2017</a></li>
+  <li><a href="https://summerofcode.withgoogle.com/archive/2016/projects/4640058522992640/">Google Summer of Code 2016</a></li>
+</ol>
+
+<h1 id="mentoring">Mentoring</h1>
+
+<ol>
+  <li><a href="https://summerofcode.withgoogle.com/archive/2019/organizations/6207728010133504/">Google Summer of Code 2019</a>:  Mentored one student on the project “Improving NMatrix: Adding features to NMatrix core”, with Ruby Science Foundation. Served as Org Admin and represented the organisation in Google Summer of Code Mentor Summit 2019, held in Munich, Germany.</li>
+  <li><a href="https://summerofcode.withgoogle.com/organizations/6467792971235328/">Google Summer of Code 2018</a>: Mentored two students on the development of “Ruby port of Matplotlib”, with Ruby Science Foundation. represented the organisation in Google Summer of Code Mentor Summit 2018, held in San Francisco, USA.</li>
+</ol>
+
+<h1 id="projects">Projects</h1>
+
+<ol>
+  <li><a href="https://github.com/prasunanand/rbcuda">RbCUDA</a></li>
+  <li><a href="https://github.com/arrayfire/arrayfire-rb">ArrayFire-rb</a></li>
+  <li><a href="https://github.com/sciruby/nmatrix">NMatrix</a></li>
+  <li><a href="https://github.com/arrayfire/arrayfire-d">ArrayFire-d</a></li>
+  <li><a href="https://github.com/prasunanand/faster_lmm_d">Faster_lmm_d</a></li>
+  <li><a href="https://github.com/prasunanand/gperftools_d">gperftools_d</a></li>
+  <li><a href="https://github.com/prasunanand/dmatrix">Dmatrix</a></li>
+  <li><a href="https://github.com/prasunanand/mitab/tree/lazyparse_pcows">Mitab parser</a></li>
+</ol>
+
+<h1 id="other-interests">Other interests</h1>
+
+<p>Swimming, Gaming, Travelling</p>
+:ET

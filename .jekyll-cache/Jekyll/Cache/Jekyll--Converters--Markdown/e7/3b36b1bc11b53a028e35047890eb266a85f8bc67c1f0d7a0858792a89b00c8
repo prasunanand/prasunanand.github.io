@@ -1,0 +1,4 @@
+I"ê<p>This post explains about the <code class="language-plaintext highlighter-rouge">Statistics</code> and <code class="language-plaintext highlighter-rouge">Random</code> class of <code class="language-plaintext highlighter-rouge">arrayfire</code> gem.
+<code class="language-plaintext highlighter-rouge">ArrayFire::Statistics</code> class consists of  methods that can be used to operate on <code class="language-plaintext highlighter-rouge">Af_Array</code> for statistical analysis. <code class="language-plaintext highlighter-rouge">ArrayFire::Random</code> class contains of methods to generate Random numbers and array of Random numbers
+on the GPU.</p>
+:ET

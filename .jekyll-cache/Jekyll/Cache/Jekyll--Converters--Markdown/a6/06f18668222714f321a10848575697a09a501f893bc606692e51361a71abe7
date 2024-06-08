@@ -1,0 +1,235 @@
+I"†ˆ<p>This post covers how I implemented the test-suite and <code class="language-plaintext highlighter-rouge">Algorithm</code> class for <code class="language-plaintext highlighter-rouge">ArrayFire-rb</code> using  ArrayFire C API, and
+how to use <code class="language-plaintext highlighter-rouge">Algorithm</code> class methods with <code class="language-plaintext highlighter-rouge">Af_Array</code>.</p>
+
+<h1 id="test-suite">Test suite</h1>
+
+<p>I have used <code class="language-plaintext highlighter-rouge">minitest</code> for writing the tests for <code class="language-plaintext highlighter-rouge">ArrayFire-rb</code>.</p>
+
+<p>To assert if two arrays are equal, I implemented <code class="language-plaintext highlighter-rouge">Af_Array#==</code> method. I used <code class="language-plaintext highlighter-rouge">af_eq</code> api for implementing <code class="language-plaintext highlighter-rouge">==</code>.
+However <code class="language-plaintext highlighter-rouge">af_eq</code> method checks for exact matches and thus
+doesnâ€™t work if the values are correct upto a certain number of decimal places. So, I canâ€™t use <code class="language-plaintext highlighter-rouge">==</code> to test the output
+of Trigonometric methods , for-example, <code class="language-plaintext highlighter-rouge">Af_Array#sin</code>. I implemented <code class="language-plaintext highlighter-rouge">Af_Array#approx_equal</code> that checks if the values are
+correct upto three decimal places.</p>
+
+<p>This is how <code class="language-plaintext highlighter-rouge">arith_test.rb</code> looks like:</p>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">class</span> <span class="nc">ArrayFire::ArithTest</span> <span class="o">&lt;</span> <span class="no">Minitest</span><span class="o">::</span><span class="no">Test</span>
+
+  <span class="k">def</span> <span class="nf">setup</span>
+    <span class="vi">@a</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+    <span class="vi">@b</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">8</span><span class="p">]</span>
+    <span class="vi">@elements</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="o">-</span><span class="mi">11</span><span class="p">,</span> <span class="mi">48</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">65</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">7</span><span class="p">,</span> <span class="mi">112</span><span class="p">]</span>
+    <span class="vi">@af_array</span> <span class="o">=</span>  <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="vi">@elements</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">test_addition</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">12</span><span class="p">]</span>
+    <span class="n">assert_equal</span> <span class="n">c</span><span class="p">,</span> <span class="vi">@a</span> <span class="o">+</span> <span class="vi">@b</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">test_subtraction</span>
+    <span class="n">assert_equal</span> <span class="vi">@a</span><span class="p">,</span> <span class="vi">@b</span> <span class="o">-</span> <span class="vi">@a</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">test_multiplication</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">18</span><span class="p">,</span><span class="mi">32</span><span class="p">]</span>
+    <span class="n">assert_equal</span> <span class="n">c</span><span class="p">,</span> <span class="vi">@b</span> <span class="o">*</span> <span class="vi">@a</span>
+  <span class="k">end</span>
+
+  <span class="k">def</span> <span class="nf">test_division</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">assert_equal</span> <span class="n">c</span><span class="p">,</span> <span class="vi">@b</span> <span class="o">/</span> <span class="vi">@a</span>
+  <span class="k">end</span>
+
+  <span class="p">[</span><span class="ss">:sin</span><span class="p">,</span> <span class="ss">:cos</span><span class="p">,</span> <span class="ss">:tan</span><span class="p">,</span> <span class="ss">:sinh</span><span class="p">,</span> <span class="ss">:cosh</span><span class="p">,</span> <span class="ss">:tanh</span><span class="p">].</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="nb">method</span><span class="o">|</span>
+    <span class="n">define_method</span><span class="p">(</span><span class="s2">"test_</span><span class="si">#{</span><span class="nb">method</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span> <span class="k">do</span>
+      <span class="n">x</span> <span class="o">=</span> <span class="vi">@elements</span><span class="p">.</span><span class="nf">map</span><span class="p">{</span> <span class="o">|</span><span class="n">e</span><span class="o">|</span> <span class="no">Math</span><span class="p">.</span><span class="nf">send</span><span class="p">(</span><span class="nb">method</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="p">}</span>
+      <span class="n">res_arr</span> <span class="o">=</span>  <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="n">x</span>
+      <span class="n">assert</span> <span class="n">res_arr</span><span class="p">.</span><span class="nf">approx_equal</span> <span class="vi">@af_array</span><span class="p">.</span><span class="nf">send</span> <span class="nb">method</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+
+</code></pre></div></div>
+
+<p>The implementation of <code class="language-plaintext highlighter-rouge">==</code> and <code class="language-plaintext highlighter-rouge">approx_equal</code> are as follows:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rb_define_method</span><span class="p">(</span><span class="n">Af_Array</span><span class="p">,</span> <span class="s">"=="</span><span class="p">,(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_eqeq</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<span class="n">rb_define_method</span><span class="p">(</span><span class="n">Af_Array</span><span class="p">,</span> <span class="s">"approx_equal"</span><span class="p">,(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_eqeq_approx</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_eqeq</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">left_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">right_val</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">left</span><span class="p">;</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">right</span><span class="p">;</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">result</span> <span class="o">=</span> <span class="n">ALLOC</span><span class="p">(</span><span class="n">afstruct</span><span class="p">);</span>
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">left_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">left</span><span class="p">);</span>
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">right_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+  <span class="n">af_eq</span><span class="p">(</span><span class="o">&amp;</span><span class="n">result</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span>  <span class="n">left</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">right</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="nb">true</span><span class="p">);</span>
+
+  <span class="n">dim_t</span> <span class="n">count</span><span class="p">;</span>
+  <span class="n">af_get_elements</span><span class="p">(</span><span class="o">&amp;</span><span class="n">count</span><span class="p">,</span> <span class="n">result</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+  <span class="n">bool</span><span class="o">*</span> <span class="n">data</span> <span class="o">=</span> <span class="p">(</span><span class="n">bool</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">count</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">bool</span><span class="p">));</span>
+  <span class="n">af_get_data_ptr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">result</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="n">dim_t</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">count</span><span class="p">;</span> <span class="n">index</span><span class="o">++</span><span class="p">){</span>
+    <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">]){</span>
+      <span class="k">return</span> <span class="n">Qfalse</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="n">Qtrue</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_eqeq_approx</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">left_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">right_val</span><span class="p">)</span> <span class="p">{</span>
+
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">left</span><span class="p">;</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">right</span><span class="p">;</span>
+
+  <span class="n">dim_t</span> <span class="n">left_count</span><span class="p">;</span>
+  <span class="n">dim_t</span> <span class="n">right_count</span><span class="p">;</span>
+
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">left_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">left</span><span class="p">);</span>
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">right_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">right</span><span class="p">);</span>
+
+  <span class="n">af_get_elements</span><span class="p">(</span><span class="o">&amp;</span><span class="n">left_count</span><span class="p">,</span> <span class="n">left</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+  <span class="n">af_get_elements</span><span class="p">(</span><span class="o">&amp;</span><span class="n">right_count</span><span class="p">,</span> <span class="n">right</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="k">if</span><span class="p">(</span><span class="n">left_count</span> <span class="o">!=</span> <span class="n">right_count</span><span class="p">){</span><span class="k">return</span> <span class="n">Qfalse</span><span class="p">;}</span>
+
+  <span class="kt">float</span><span class="o">*</span> <span class="n">left_arr</span> <span class="o">=</span> <span class="p">(</span><span class="kt">float</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">left_count</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">));</span>
+  <span class="n">af_get_data_ptr</span><span class="p">(</span><span class="n">left_arr</span><span class="p">,</span> <span class="n">left</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="kt">float</span><span class="o">*</span> <span class="n">right_arr</span> <span class="o">=</span> <span class="p">(</span><span class="kt">float</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">left_count</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="kt">float</span><span class="p">));</span>
+  <span class="n">af_get_data_ptr</span><span class="p">(</span><span class="n">right_arr</span><span class="p">,</span> <span class="n">right</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="k">for</span> <span class="p">(</span><span class="n">dim_t</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">left_count</span><span class="p">;</span> <span class="n">index</span><span class="o">++</span><span class="p">){</span>
+    <span class="kt">float</span> <span class="n">diff</span> <span class="o">=</span> <span class="n">left_arr</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">-</span> <span class="n">right_arr</span><span class="p">[</span><span class="n">index</span><span class="p">];</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">diff</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">){</span><span class="n">diff</span> <span class="o">*=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;}</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">diff</span> <span class="o">&gt;</span> <span class="mf">1e-3</span><span class="p">){</span>
+      <span class="k">return</span> <span class="n">Qfalse</span><span class="p">;</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="n">Qtrue</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<h1 id="algorithm-class">Algorithm class</h1>
+
+<p>The Algorithm class contains of reduction methods like <code class="language-plaintext highlighter-rouge">sum</code>, <code class="language-plaintext highlighter-rouge">product</code>, <code class="language-plaintext highlighter-rouge">max</code>.
+It contains singleton methods that takes an <code class="language-plaintext highlighter-rouge">Af_Array</code> as a parameter.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">Init_arrayfire</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">ArrayFire</span> <span class="o">=</span> <span class="n">rb_define_module</span><span class="p">(</span><span class="s">"ArrayFire"</span><span class="p">);</span>
+
+  <span class="n">Algorithm</span> <span class="o">=</span> <span class="n">rb_define_class_under</span><span class="p">(</span><span class="n">ArrayFire</span><span class="p">,</span> <span class="s">"Algorithm"</span><span class="p">,</span> <span class="n">rb_cObject</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">,</span> <span class="s">"sum"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_sum</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">,</span> <span class="s">"sum_nan"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_sum_nan</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">,</span> <span class="s">"product"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_product</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">,</span> <span class="s">"product_nan"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_product_nan</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">,</span> <span class="s">"min"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_min</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">,</span> <span class="s">"max"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_max</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">,</span> <span class="s">"all_true"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_all_true</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">,</span> <span class="s">"any_true"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_any_true</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">,</span> <span class="s">"count"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_count</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">,</span> <span class="s">"sum_all"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_sum_all</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">,</span> <span class="s">"sum_nan_all"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_sum_nan_all</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">,</span> <span class="s">"product_all"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_product_all</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">,</span> <span class="s">"product_nan_all"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_product_nan_all</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">,</span> <span class="s">"min_all"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_min_all</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Algorithm</span><span class="p">,</span> <span class="s">"max_all"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_max_all</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">Algorithm#sum</code> expects an <code class="language-plaintext highlighter-rouge">Af_Array</code> and <code class="language-plaintext highlighter-rouge">dimension</code> as a prameter. It finds the sum of
+all elements in the <code class="language-plaintext highlighter-rouge">Af_Array</code> along the specified <code class="language-plaintext highlighter-rouge">dimension</code>. However, <code class="language-plaintext highlighter-rouge">sum_all</code> finds the overall
+sum of elements in an <code class="language-plaintext highlighter-rouge">Af_Array</code>.</p>
+
+<p>If <code class="language-plaintext highlighter-rouge">NaN</code> is one of the element, we use <code class="language-plaintext highlighter-rouge">Af_Array#sum_nan</code> or <code class="language-plaintext highlighter-rouge">Af_Array#sum_nan_all</code> that just takes
+an additional value as an input which replaces <code class="language-plaintext highlighter-rouge">NaN</code>.</p>
+
+<p>So, now I can check if the bindings work successfully.</p>
+
+<p>The implementation of <code class="language-plaintext highlighter-rouge">Algorithm#sum</code> and <code class="language-plaintext highlighter-rouge">Algorith#sum_all</code> is as follows:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_sum</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">array_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">dim_val</span><span class="p">){</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">input</span><span class="p">;</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">output</span> <span class="o">=</span> <span class="n">ALLOC</span><span class="p">(</span><span class="n">afstruct</span><span class="p">);</span>
+
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">array_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
+
+  <span class="n">af_sum</span><span class="p">(</span><span class="o">&amp;</span><span class="n">output</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">input</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">FIX2INT</span><span class="p">(</span><span class="n">dim_val</span><span class="p">));</span>
+
+  <span class="k">return</span> <span class="n">Data_Wrap_Struct</span><span class="p">(</span><span class="n">CLASS_OF</span><span class="p">(</span><span class="n">array_val</span><span class="p">),</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">arf_free</span><span class="p">,</span> <span class="n">output</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_sum_all</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">array_val</span><span class="p">){</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">input</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">real_part</span><span class="p">,</span> <span class="n">imag_part</span><span class="p">;</span>
+
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">array_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
+
+  <span class="n">af_sum_all</span><span class="p">(</span><span class="o">&amp;</span><span class="n">real_part</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">imag_part</span><span class="p">,</span> <span class="n">input</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">DBL2NUM</span><span class="p">(</span><span class="n">real_part</span><span class="p">);</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">Data_Get_Struct</code> takes an <code class="language-plaintext highlighter-rouge">Af_Array</code> value and unwraps it to a <code class="language-plaintext highlighter-rouge">af_array</code> struct.
+Next, the ArrayFire C API <code class="language-plaintext highlighter-rouge">af_sum</code> or <code class="language-plaintext highlighter-rouge">af_sum_all</code> is called on the parameters. The
+result is returned by converting it into a Ruby <code class="language-plaintext highlighter-rouge">VALUE</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">rake</span> <span class="n">pry</span>
+<span class="n">pry</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'./lib/arrayfire.rb'</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">input</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="o">-</span><span class="mi">11</span><span class="p">,</span> <span class="mi">9</span> <span class="p">,</span> <span class="o">-</span><span class="mi">22</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">3</span> <span class="mi">3</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">4.0000</span>     <span class="mf">6.0000</span>   <span class="o">-</span><span class="mf">22.0000</span>
+    <span class="mf">1.0000</span>   <span class="o">-</span><span class="mf">11.0000</span>    <span class="mf">11.0000</span>
+    <span class="mf">5.0000</span>     <span class="mf">9.0000</span>     <span class="mf">1.0000</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x0000000176b938&gt;</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Algorithm</span><span class="p">.</span><span class="nf">sum</span><span class="p">(</span><span class="n">input</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x00000001810f50&gt;</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">result</span><span class="p">.</span><span class="nf">elements</span>
+<span class="o">=&gt;</span> <span class="p">[</span><span class="o">-</span><span class="mf">12.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">15.0</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">result</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Algorithm</span><span class="p">.</span><span class="nf">sum_all</span><span class="p">(</span><span class="n">input</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="mf">4.0</span>
+
+</code></pre></div></div>
+
+<p>Voila! It works.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p><strong>ArrayFire-rb</strong> has a test-suite and the Algorithm class. Some of the methods of <code class="language-plaintext highlighter-rouge">Algorithm</code> class
+are missing and will be added soon.</p>
+
+<p>In the next blog post, I will explain about the BLAS and LAPACK routines.</p>
+
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//prasunanandblog.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+:ET

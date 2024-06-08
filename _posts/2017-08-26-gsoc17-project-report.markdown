@@ -4,9 +4,16 @@ title:  "GSoC 2017: Creating the fastest math libraries for Ruby by using the GP
 date:   2017-08-28 08:10:41 +0530
 categories: arrayfire cuda opencl ruby
 comments: true
+author: Prasun Anand
+banner: /images/banner.png
 ---
 
 GSoC 2017 is about to end. This post summarises my work during the course of summer.
+todo:
+I have been working on "Port NMatrix to JRuby" as my GSoC project. I am pleased to announce that **JRuby is ready for Nmatrix users**.
+
+NMatrix, a linear algebra library wraps Apache Commons Maths for its core functionalities. By the end of GSoC, I have been able to implement NMatrix for dense matrices with double and object ( ruby objects ) data type. I have also worked on porting mixed-models gem to JRuby which heavily uses NMatrix at its core.
+
 
 # Application
 

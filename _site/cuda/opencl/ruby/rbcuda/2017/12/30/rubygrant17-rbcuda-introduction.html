@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"/>
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/animate.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/css/responsive.css">
+
+    <link rel="icon" href="images/zasper_logo.ico" type="image/gif" sizes="32x32">
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VRJB8WTXR1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-VRJB8WTXR1');
+    </script>
+
+    <title>Prasun's Blog</title>
+  </head>
+  <body>
+    <section id="header-home">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <a class="navbar-brand" href="/">
+            <!-- <img src="images/logo.svg" alt="#"> -->
+            Prasun's blog
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu">
+            <i class="fa fa-bars"></i>
+          </button>
+          <div class="navbar-collapse justify-content-center offcanvas offcanvas-top offcanvas-body" id="offcanvasMenu">
+            <button type="button" class="colse-btn" data-bs-dismiss="offcanvas">
+              <i class="fa fa-times"></i>
+            </button>
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link active-menu" href="/about">About</a>
+              </li>
+            </ul>
+            <div class="menu-right-btn mobile-menu-login-signup">
+              <a href="https://zasper.io/login" class="custom-btn btn-border hover-bg">Login</a>
+              <a href="https://zasper.io/signup" class="custom-btn btn-bg hover-bg">Signup</a>
+            </div>
+          </div>
+          <div class="menu-right-btn justify-content-end">
+            <a href="https://zasper.io/login" class="custom-btn btn-border hover-bg">Login</a>
+            <a href="https://zasper.io/signup" class="custom-btn btn-bg hover-bg">Signup</a>
+          </div>
+        </div>
+      </nav>
+    </section>
+
+
+
+    <section id="blog-sec">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-12 col-lg-9">
+            <div class="blog-details-wraper">
+              <div class="blog-main-image wow fadeInUp">
+                <img src="/images/banner.png" alt="#">
+              </div>
+
+              <div class="blog-title wow fadeInUp">
+                <h2>RbCUDA: CUDA bindings for Ruby</h2>
+              </div>
+
+              <div class="blog-published-info wow fadeInUp">
+                <span class="blog-post-date">30 December 2017 by</span>
+                <span class="blog-post-author">Prasun Anand</span>
+              </div>
+
+              <div class="blog-description wow fadeInUp">
+              	<p><p>I have been working on a new project called <strong>RbCUDA</strong>.</p>
+
+<p>In this project, I want to make it possible to combine the
+beauty of Ruby with transparent GPU processing with minimal overheads, so that software developers can easily use
+that power when available, and farm out computations transparently to GPU and CPU.</p>
+
+<p>Nvidia has been developing a lot of GPU accelerated libraries for linear algebra(CUDA, cuBLAS, cuSolver), Random Number
+Generation(cuRand), fast-fourier transform(cuFFT), Parallel Primitives and Data Structures(Thrust) and image processing
+(NVIDIA Performance Primitives Library). Many Python/Julia/C++ libraries are being built on top of these libraries.
+RbCUDA would fill this gap in the Ruby ecosystem making it a highly-preferable option for GPU computing.
+It will work on Nvidia hardware running on client computers and on servers that make use of TESLA’s.</p>
+
+<p>Recently, I was at Nvidia Developer Connect in my city. I was completely amazed by the new hardware launched by Nvidia this year. It
+makes me really confident about the great impact this project will create in the Ruby ecosystem.</p>
+
+<h1 id="previous-efforts">Previous Efforts</h1>
+
+<p><a href="https://github.com/xman/sgc-ruby-cuda">sgc-ruby-cuda</a> is an existing alternative for CUDA Ruby bindings. However, this library just helps in executing custom kernels.
+It also doesn’t have support cuBLAS, and other cuMath libraries.</p>
+
+<h1 id="objectives">Objectives</h1>
+
+<p>The main objectives of RbCUDA are:</p>
+
+<ol>
+  <li>Map all of CUDA into Ruby</li>
+  <li>Ready-made on-GPU linear algebra, reduction, scan using cuBLAS, cuMath, cuSolver libraries.</li>
+  <li>Random Numer generator using cuRand</li>
+  <li>Near-zero wrapping overhead.</li>
+  <li>CUDA profiler for Ruby.</li>
+</ol>
+
+<p>In the near future:</p>
+
+<ol>
+  <li>fast-fourier transform(cuFFT)</li>
+  <li>Parallel Primitives and Data Structures(Thrust)</li>
+  <li>Image processing (NVIDIA Performance Primitives Library).</li>
+  <li>Use CuDNN to power a Deep Learning Library written in Ruby.</li>
+</ol>
+
+<h1 id="codebase">Codebase</h1>
+
+<p><a href="https://github.com/prasunanand/rbcuda">https://github.com/prasunanand/rbcuda</a></p>
+
+<p>Contributions are welcome!</p>
+
+<h1 id="example">Example</h1>
+
+<p>Most of the times, when we want to use CUDA for accelerating our code, we end up optimizing matrix-multiplication.
+I wrote an <a href="https://github.com/prasunanand/rbcuda/blob/master/examples/matmul.rb">example</a> that showcases how RbCUDA
+is the most efficient Ruby library to be used for Number crunching.</p>
+
+<p>The example copies two matrices from CPU to GPU, runs matrix multiplication over it. Then the resulting matrix is copied
+back to the CPU from GPU.</p>
+
+<p>I benchmarked my code and compare it with other existing Ruby libraries.</p>
+
+<p><img src="https://github.com/prasunanand/resume/blob/master/img/rbcuda/rbcuda_gemm.png?raw=true" alt="rbcuda_gemm" title="Fig.1. Matrix Multiplication" /></p>
+
+<p>(Note: The above benchmarks have been done on an AMD FX 8350 octacore processor and Nvidia GTX 750Ti GPU.
+CUDA backend of ArrayFire was used with double floating points.)</p>
+
+<p><strong>RbCUDA is the fastest among all. Yay!</strong></p>
+
+<p>RbCUDA is the fastest of all the Ruby libraries. The time taken for matrix multiplication is 0.000017s on my machine. The plain C code
+takes me 0.000013s for this calculation.</p>
+
+<p>RbCUDA is 24x faster than ArrayFire for matrix multiplication, Most of the speed gain going straight to CUDA is probably from
+removing an interaction layer (and buffers) as well as how the data is organized and fed to the underlying architecture.</p>
+
+<p>Hence, an overhead of 0.000004s over plain C code makes, it highly efficient Maths library in Ruby.</p>
+
+<p>The great thing about this example is that the code is very Rubyish &lt;3.</p>
+
+<p>The Code Implementation of matrix multiplication will be discussed in my upcoming blog posts.</p>
+
+<h1 id="profiling-matrix-multiplication">Profiling matrix multiplication.</h1>
+
+<p>I have also created a profiler for RbCUDA . The profiling example can be found <a href="https://github.com/prasunanand/rbcuda/blob/master/examples/profiler.rb">here</a>.</p>
+
+<p>Output of the code.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">#</span><span class="w"> </span><span class="err">CUDA_PROFILE_LOG_VERSION</span><span class="w"> </span><span class="mf">2.0</span><span class="w">
+</span><span class="err">#</span><span class="w"> </span><span class="err">CUDA_DEVICE</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="err">GeForce</span><span class="w"> </span><span class="err">GTX</span><span class="w"> </span><span class="mi">750</span><span class="w"> </span><span class="err">Ti</span><span class="w">
+</span><span class="err">#</span><span class="w"> </span><span class="err">CUDA_CONTEXT</span><span class="w"> </span><span class="mi">1</span><span class="w">
+</span><span class="err">#</span><span class="w"> </span><span class="err">TIMESTAMPFACTOR</span><span class="w"> </span><span class="mi">14e96</span><span class="err">c</span><span class="mi">24317</span><span class="err">d</span><span class="mi">8324</span><span class="w">
+</span><span class="err">method,gputime,cputime,occupancy</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">memcpyHtoD</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">16.544</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">18.705</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">memcpyHtoD</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">16.288</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">22.089</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">memcpyHtoD</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">1.216</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">6.923</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">_Z</span><span class="mi">19</span><span class="err">gemm_kernel</span><span class="mi">2</span><span class="err">x</span><span class="mi">2</span><span class="err">_coreIdLb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">EEvPT_PKS</span><span class="mi">0</span><span class="err">_S</span><span class="mi">3</span><span class="err">_iiiiiiS</span><span class="mi">1</span><span class="err">_S</span><span class="mi">1</span><span class="err">_S</span><span class="mi">0</span><span class="err">_S</span><span class="mi">0</span><span class="err">_i</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">76.736</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">11.967</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">occupancy=</span><span class="p">[</span><span class="w"> </span><span class="mf">0.469</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">_Z</span><span class="mi">19</span><span class="err">gemm_kernel</span><span class="mi">2</span><span class="err">x</span><span class="mi">2</span><span class="err">_coreIdLb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">EEvPT_PKS</span><span class="mi">0</span><span class="err">_S</span><span class="mi">3</span><span class="err">_iiiiiiS</span><span class="mi">1</span><span class="err">_S</span><span class="mi">1</span><span class="err">_S</span><span class="mi">0</span><span class="err">_S</span><span class="mi">0</span><span class="err">_i</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">73.024</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">6.485</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">occupancy=</span><span class="p">[</span><span class="w"> </span><span class="mf">0.469</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">_Z</span><span class="mi">19</span><span class="err">gemm_kernel</span><span class="mi">2</span><span class="err">x</span><span class="mi">2</span><span class="err">_coreIdLb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">EEvPT_PKS</span><span class="mi">0</span><span class="err">_S</span><span class="mi">3</span><span class="err">_iiiiiiS</span><span class="mi">1</span><span class="err">_S</span><span class="mi">1</span><span class="err">_S</span><span class="mi">0</span><span class="err">_S</span><span class="mi">0</span><span class="err">_i</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">72.928</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">5.739</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">occupancy=</span><span class="p">[</span><span class="w"> </span><span class="mf">0.469</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">_Z</span><span class="mi">19</span><span class="err">gemm_kernel</span><span class="mi">2</span><span class="err">x</span><span class="mi">2</span><span class="err">_coreIdLb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">EEvPT_PKS</span><span class="mi">0</span><span class="err">_S</span><span class="mi">3</span><span class="err">_iiiiiiS</span><span class="mi">1</span><span class="err">_S</span><span class="mi">1</span><span class="err">_S</span><span class="mi">0</span><span class="err">_S</span><span class="mi">0</span><span class="err">_i</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">72.928</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">5.725</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">occupancy=</span><span class="p">[</span><span class="w"> </span><span class="mf">0.469</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span><span class="err">method=</span><span class="p">[</span><span class="w"> </span><span class="err">_Z</span><span class="mi">19</span><span class="err">gemm_kernel</span><span class="mi">2</span><span class="err">x</span><span class="mi">2</span><span class="err">_coreIdLb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">ELb</span><span class="mi">0</span><span class="err">EEvPT_PKS</span><span class="mi">0</span><span class="err">_S</span><span class="mi">3</span><span class="err">_iiiiiiS</span><span class="mi">1</span><span class="err">_S</span><span class="mi">1</span><span class="err">_S</span><span class="mi">0</span><span class="err">_S</span><span class="mi">0</span><span class="err">_i</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">gputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">72.896</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">cputime=</span><span class="p">[</span><span class="w"> </span><span class="mf">5.701</span><span class="w"> </span><span class="p">]</span><span class="w"> </span><span class="err">occupancy=</span><span class="p">[</span><span class="w"> </span><span class="mf">0.469</span><span class="w"> </span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+<p>(Note: The unit of time is microsecond).</p>
+
+<h1 id="ruby-grant-2017">Ruby Grant 2017</h1>
+
+<p>This project is funded by Ruby Association. I am very thankful to them for supporting this project.
+<a href="http://www.ruby.or.jp/en/news/20171206">Link</a>.</p>
+
+<h1 id="contributions-are-welcome">Contributions are welcome!</h1>
+
+<p>I request all the Rubyists if you have a Ruby code that you want to be accelerated by GPU, please try RbCUDA / ArrayFire. If you are
+into Deep learning, let me know if you want to use RbCUDA to power your neural nets for GPU acceleration.</p>
+
+<p>Feel free to open an issue!</p>
+
+<p>Stay tuned for more posts about GPU computing with Ruby.</p>
+
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//prasunanandblog.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+</p>
+              </div>
+            </div>
+
+            <div class="related-blog-wraper wow fadeInUp">
+              <h6>Related Blog</h6>
+
+              
+
+              <div class="related-blog-item latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                <a href="/cuda/opencl/ruby/rbcuda/2018/02/24/rubygrant17-rbcuda-installation-and-architecture.html.html">
+                  <div class="latest-post-item-image">
+                    <img src="/images/banner.png" alt="#">
+                  </div>
+                  <div class="latest-post-item-content">
+                    <h2>RbCUDA: Installation and Architecture</h2>
+                    <span>24 February 2018</span>
+                  </div>
+                </a>
+              </div>
+              
+
+              <div class="related-blog-item latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                <a href="/cuda/opencl/ruby/rbcuda/2017/12/30/rubygrant17-rbcuda-introduction.html.html">
+                  <div class="latest-post-item-image">
+                    <img src="/images/banner.png" alt="#">
+                  </div>
+                  <div class="latest-post-item-content">
+                    <h2>RbCUDA: CUDA bindings for Ruby</h2>
+                    <span>30 December 2017</span>
+                  </div>
+                </a>
+              </div>
+              
+
+            </div>
+          </div>
+          
+
+          <div class="col-12 col-md-12 col-lg-3">
+            <div class="blog-page-right-wraper">
+              <div class="search-wraper wow fadeInUp" data-wow-delay="0.2s">
+                <h6>Search</h6>
+                <div class="search-form-wraper">
+                  <form action="/search.html" method="GET">
+                    <input type="text" name="query" id="search-box" placeholder="Search">
+                    <button class="btn-bg"><img src="/images/icons/search.svg" alt="#"></button>
+                  </form>
+                </div>
+              </div>
+
+              <div class="latest-post-wraper wow fadeInUp" data-wow-delay="0.3s">
+                <h6>Latest Post</h6>
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/cuda/opencl/ruby/rbcuda/2018/02/24/rubygrant17-rbcuda-installation-and-architecture.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>RbCUDA: Installation and Architecture</h2>
+                      <span>24 February 2018</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/cuda/opencl/ruby/rbcuda/2017/12/30/rubygrant17-rbcuda-introduction.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>RbCUDA: CUDA bindings for Ruby</h2>
+                      <span>30 December 2017</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/arrayfire/cuda/opencl/ruby/2017/08/28/gsoc17-project-report.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>GSoC 2017: Creating the fastest math libraries for Ruby by using the GPU through OpenCL and ArrayFire.</h2>
+                      <span>28 August 2017</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+              </div>
+
+              <div class="tags-wraper wow fadeInUp" data-wow-delay="0.4s">
+                <h6>Tag Clouds</h6>
+                <div class="tag-clouds">
+                  <a href="#">Engineering</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Future</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Future</a>
+                  <a href="#">Engineering</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Engineering</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Future</a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+
+
+        </div>
+      </div>
+    </section>
+
+    <section id="updates">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="updates-wraper">
+              <div class="updates-image wow fadeInUp" data-wow-delay="0.2s">
+                <img src="/images/image2.svg" alt="#">
+              </div>
+              <div class="updates-form header-form wow fadeInUp" data-wow-delay="0.2s">
+                <h5 class="font-h5">Subscribe for exclusive</h5>
+                <h3 class="font-h3">news and updates!</h3>
+                <form action="https://zasper.io/newsletter" method="POST">
+                  <div class="form-group">
+                    <input type="email" name="email" placeholder="Enter your email">
+                    <button type="submit" class="btn-bg hover-bg">Subscribe</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-4">
+            <div class="footer-info wow fadeInUp" data-wow-delay="0.2s">
+              <div class="footer-image wow fadeInUp" data-wow-delay="0.1s">
+                <img src="/images/logo.svg" alt="#">
+              </div>
+              <div class="footer-content wow fadeInUp" data-wow-delay="0.2s">
+                <p>Zasper strives to be at the forefront of the AI Revolution that is taking place around the world. We want to ease the pain of Data teams by enabling them to develop and deploy their AI solutions right from rapid prototyping to shipping into production.</p>
+              </div>
+              <div class="footer-social wow fadeInUp" data-wow-delay="0.3s">
+                <a href="https://www.linkedin.com/company/zasper"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+                <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+                <a href="https://github.com/zasperio"><i class="fa fa-github" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-8">
+            <div class="footer-menu-wraper wow fadeInUp" data-wow-delay="0.4s">
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.1s">
+                  <h6>Company</h6>
+                  <a href="https://zasper.io/product">Product</a>
+                  <a href="https://zasper.io/pricing">Pricing</a>
+                  <a href="https://zasper.io/partners">Partners</a>
+                  <a href="https://zasper.io/careers">Careers</a>
+                  <a href="https://zasper.io/support">Support</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.3s">
+                  <h6>Solutions</h6>
+                  <a href="https://zasper.io/solutions/banking">Banking</a>
+                  <a href="https://zasper.io/solutions/telecom">Telecom</a>
+                  <a href="https://zasper.io/solutions/oil-and-gas">Oil and Gas</a>
+                  <a href="https://zasper.io/solutions/healthcare">Healthcare</a>
+                  <a href="https://zasper.io/solutions/">View More</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.5s">
+                  <h6>Community</h6>
+                  <a href="/">Blog</a>
+                  <a href="https://docs.zasper.io">Docs</a>
+                  <a href="https://zasper.io/contact-us">Contact Us</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.6s">
+                  <h6>Legal</h6>
+                  <a href="https://zasper.io/terms-and-conditions">Terms and Conditions</a>
+                  <a href="https://zasper.io/privacy">Privacy Policy</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="copyright">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="copyright-text wow fadeInUp" data-wow-delay="0.2s">
+              <p>©2021 zasper ai labs pvt ltd | All rights reserved.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JavaScripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/wow.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/main.js"></script>
+
+  </body>
+</html>
+

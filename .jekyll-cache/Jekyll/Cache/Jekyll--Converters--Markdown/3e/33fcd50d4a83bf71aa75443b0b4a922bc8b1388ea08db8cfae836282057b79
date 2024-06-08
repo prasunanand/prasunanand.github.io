@@ -1,0 +1,282 @@
+I"͹<p>This post explains about the <code class="language-plaintext highlighter-rouge">Statistics</code> and <code class="language-plaintext highlighter-rouge">Random</code> class of <code class="language-plaintext highlighter-rouge">arrayfire</code> gem.
+<code class="language-plaintext highlighter-rouge">ArrayFire::Statistics</code> class consists of  methods that can be used to operate on <code class="language-plaintext highlighter-rouge">Af_Array</code> for statistical analysis. <code class="language-plaintext highlighter-rouge">ArrayFire::Random</code> class contains of methods to generate Random numbers and array of Random numbers
+on the GPU.</p>
+
+<h1 id="statistics-class">Statistics Class</h1>
+
+<p>The <code class="language-plaintext highlighter-rouge">Statistics</code> class contains of singleton methods like <code class="language-plaintext highlighter-rouge">mean</code>, <code class="language-plaintext highlighter-rouge">var</code>, <code class="language-plaintext highlighter-rouge">median</code>, <code class="language-plaintext highlighter-rouge">stddev</code>, etc.
+Let us take a look at the implementation.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">Init_arrayfire</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">ArrayFire</span> <span class="o">=</span> <span class="n">rb_define_module</span><span class="p">(</span><span class="s">"ArrayFire"</span><span class="p">);</span>
+
+  <span class="n">Statistics</span> <span class="o">=</span> <span class="n">rb_define_class_under</span><span class="p">(</span><span class="n">ArrayFire</span><span class="p">,</span> <span class="s">"Statistics"</span><span class="p">,</span> <span class="n">rb_cObject</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Statistics</span><span class="p">,</span> <span class="s">"mean"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_mean</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Statistics</span><span class="p">,</span> <span class="s">"mean_weighted"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_mean_weighted</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Statistics</span><span class="p">,</span> <span class="s">"var"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_var</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Statistics</span><span class="p">,</span> <span class="s">"var_weighted"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_var_weighted</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Statistics</span><span class="p">,</span> <span class="s">"stdev"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_stdev</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Statistics</span><span class="p">,</span> <span class="s">"cov"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_cov</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Statistics</span><span class="p">,</span> <span class="s">"median"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_median</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Statistics</span><span class="p">,</span> <span class="s">"mean_all"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_mean_all</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Statistics</span><span class="p">,</span> <span class="s">"mean_all_weighted"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_mean_all_weighted</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Statistics</span><span class="p">,</span> <span class="s">"var_all"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_var_all</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Statistics</span><span class="p">,</span> <span class="s">"var_all_weighted"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_var_all_weighted</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Statistics</span><span class="p">,</span> <span class="s">"stdev_all"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_stdev_all</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Statistics</span><span class="p">,</span> <span class="s">"median_all"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_median_all</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Statistics</span><span class="p">,</span> <span class="s">"corrcoef"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_corrcoef</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">ArrayFire</code> provides four different methods to calculate the means namely,
+<code class="language-plaintext highlighter-rouge">mean</code>, <code class="language-plaintext highlighter-rouge">mean_weighted</code>, <code class="language-plaintext highlighter-rouge">mean_all</code>, <code class="language-plaintext highlighter-rouge">mean_all_weighted</code>. The implementation
+is given below.</p>
+
+<p><code class="language-plaintext highlighter-rouge">mean</code> and <code class="language-plaintext highlighter-rouge">mean_weighted</code> calculate the mean and weighted mean along the dimnension
+specified. However, <code class="language-plaintext highlighter-rouge">mean_all</code> and <code class="language-plaintext highlighter-rouge">mean_weighted_all</code> calculate the mean and weighted
+mean over all the elements in an array.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_mean</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">array_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">dim_val</span><span class="p">){</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">input</span><span class="p">;</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">output</span> <span class="o">=</span> <span class="n">ALLOC</span><span class="p">(</span><span class="n">afstruct</span><span class="p">);</span>
+
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">array_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
+
+  <span class="n">af_mean</span><span class="p">(</span><span class="o">&amp;</span><span class="n">output</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">input</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">NUM2UINT</span><span class="p">(</span><span class="n">dim_val</span><span class="p">));</span>
+  <span class="n">af_print_array</span><span class="p">(</span><span class="n">output</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">Data_Wrap_Struct</span><span class="p">(</span><span class="n">Af_Array</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">arf_free</span><span class="p">,</span> <span class="n">output</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_mean_weighted</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">array_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">weighted_array_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">dim_val</span><span class="p">){</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">input</span><span class="p">;</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">weighted_array</span><span class="p">;</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">output</span> <span class="o">=</span> <span class="n">ALLOC</span><span class="p">(</span><span class="n">afstruct</span><span class="p">);</span>
+
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">array_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">weighted_array_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">weighted_array</span><span class="p">);</span>
+
+  <span class="n">af_mean_weighted</span><span class="p">(</span><span class="o">&amp;</span><span class="n">output</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">input</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">weighted_array</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">NUM2UINT</span><span class="p">(</span><span class="n">dim_val</span><span class="p">));</span>
+  <span class="n">af_print_array</span><span class="p">(</span><span class="n">output</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">Data_Wrap_Struct</span><span class="p">(</span><span class="n">Af_Array</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">arf_free</span><span class="p">,</span> <span class="n">output</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_mean_all</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">array_val</span><span class="p">){</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">input</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">real_part</span><span class="p">,</span> <span class="n">imag_part</span><span class="p">;</span>
+
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">array_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
+
+  <span class="n">af_mean_all</span><span class="p">(</span><span class="o">&amp;</span><span class="n">real_part</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">imag_part</span><span class="p">,</span> <span class="n">input</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">DBL2NUM</span><span class="p">(</span><span class="n">real_part</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_mean_all_weighted</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">array_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">weighted_array_val</span><span class="p">){</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">input</span><span class="p">;</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">weighted_array</span><span class="p">;</span>
+  <span class="kt">double</span> <span class="n">real_part</span><span class="p">,</span> <span class="n">imag_part</span><span class="p">;</span>
+
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">array_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">weighted_array_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">weighted_array</span><span class="p">);</span>
+
+  <span class="n">af_mean_all_weighted</span><span class="p">(</span><span class="o">&amp;</span><span class="n">real_part</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">imag_part</span><span class="p">,</span> <span class="n">input</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">weighted_array</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">DBL2NUM</span><span class="p">(</span><span class="n">real_part</span><span class="p">);</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+<p>I check the bindings using <code class="language-plaintext highlighter-rouge">pry</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">rake</span> <span class="n">pry</span>
+<span class="n">pry</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'./lib/arrayfire.rb'</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">arr</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Random</span><span class="p">.</span><span class="nf">randu</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span><span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x0000000308fb08&gt;</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Util</span><span class="p">.</span><span class="nf">print_array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">4</span> <span class="mi">4</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">0.3990</span>     <span class="mf">0.7353</span>     <span class="mf">0.9455</span>     <span class="mf">0.7089</span>
+    <span class="mf">0.6720</span>     <span class="mf">0.5160</span>     <span class="mf">0.1587</span>     <span class="mf">0.9434</span>
+    <span class="mf">0.5339</span>     <span class="mf">0.3932</span>     <span class="mf">0.8831</span>     <span class="mf">0.1227</span>
+    <span class="mf">0.1386</span>     <span class="mf">0.2706</span>     <span class="mf">0.0621</span>     <span class="mf">0.9107</span>
+
+<span class="o">=&gt;</span> <span class="kp">true</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">weighted_array</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span> <span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">4</span> <span class="mi">4</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">1.0000</span>    <span class="o">-</span><span class="mf">2.0000</span>     <span class="mf">1.0000</span>     <span class="mf">0.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">2.0000</span>     <span class="mf">4.0000</span>    <span class="o">-</span><span class="mf">3.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">1.0000</span>     <span class="mf">3.0000</span>     <span class="mf">2.0000</span>
+    <span class="mf">0.0000</span>     <span class="mf">3.0000</span>     <span class="mf">1.0000</span>     <span class="mf">9.0000</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x0000000316c008&gt;</span>
+<span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">mean</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Statistics</span><span class="p">.</span><span class="nf">mean</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">4</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">0.6972</span>
+    <span class="mf">0.5725</span>
+    <span class="mf">0.4832</span>
+    <span class="mf">0.3455</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x00000003212138&gt;</span>
+<span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">mean_weighted</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Statistics</span><span class="p">.</span><span class="nf">mean_weighted</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">weighted_array</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">4</span> <span class="mi">4</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">0.3990</span>     <span class="mf">0.7353</span>     <span class="mf">0.9455</span>        <span class="n">nan</span>
+    <span class="mf">0.6720</span>     <span class="mf">0.5160</span>     <span class="mf">0.1587</span>     <span class="mf">0.9434</span>
+    <span class="mf">0.5339</span>     <span class="mf">0.3932</span>     <span class="mf">0.8831</span>     <span class="mf">0.1227</span>
+       <span class="n">nan</span>     <span class="mf">0.2706</span>     <span class="mf">0.0621</span>     <span class="mf">0.9107</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x000000031d2588&gt;</span>
+<span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">mean_all</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Statistics</span><span class="p">.</span><span class="nf">mean_all</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span><span class="o">=&gt;</span> <span class="mf">0.5246008634567261</span>
+<span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">mean_all_weighted</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Statistics</span><span class="p">.</span><span class="nf">mean_all_weighted</span><span class="p">(</span><span class="n">arr</span><span class="p">,</span> <span class="n">weighted_array</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="mf">0.5184718370437622</span>
+</code></pre></div></div>
+
+<h1 id="random-class">Random Class</h1>
+
+<p>ArrayFire supports three types of random engines: <code class="language-plaintext highlighter-rouge">:AF_RANDOM_ENGINE_PHILOX_4X32_10</code>,
+<code class="language-plaintext highlighter-rouge">:AF_RANDOM_ENGINE_THREEFRY_2X32_16</code> and <code class="language-plaintext highlighter-rouge">:AF_RANDOM_ENGINE_MERSENNE_GP11213</code> which can be
+passed as a type.</p>
+
+<p>The default randon engine is <code class="language-plaintext highlighter-rouge">:AF_RANDOM_ENGINE_PHILOX_4X32_10</code>. Random class helps  in creating
+an engine by specifying the type and seed. A programmer can set the seed on the fly and also create
+arrays with randomly generated values.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">Init_arrayfire</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">ArrayFire</span> <span class="o">=</span> <span class="n">rb_define_module</span><span class="p">(</span><span class="s">"ArrayFire"</span><span class="p">);</span>
+
+  <span class="n">Random</span> <span class="o">=</span> <span class="n">rb_define_class_under</span><span class="p">(</span><span class="n">ArrayFire</span><span class="p">,</span> <span class="s">"Random"</span><span class="p">,</span> <span class="n">rb_cObject</span><span class="p">);</span>
+  <span class="n">rb_define_alloc_func</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="n">arf_engine_alloc</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="s">"create_random_engine"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_create_random_engine</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="s">"retain_random_engine"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_retain_random_engine</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="s">"random_engine_set_type"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_random_engine_set_type</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="s">"random_engine_get_type"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_random_engine_get_type</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="s">"random_uniform"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_random_uniform</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="s">"random_normal"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_random_normal</span><span class="p">,</span> <span class="mi">3</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="s">"random_engine_set_seed"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_random_engine_set_seed</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="s">"get_default_random_engine"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_get_default_random_engine</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="s">"set_default_random_engine_type"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_set_default_random_engine_type</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="s">"random_engine_get_seed"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_random_engine_get_seed</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="s">"release_random_engine"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_release_random_engine</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="s">"randu"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_randu</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="s">"randn"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_randn</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="s">"set_seed"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_set_seed</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="s">"get_seed"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_get_seed</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>A Random enigne must be created so I write the ruby bindings to alloc memory
+and dealloc memory to a <code class="language-plaintext highlighter-rouge">af_random_engine</code> using <code class="language-plaintext highlighter-rouge">arf_engine_alloc</code> and <code class="language-plaintext highlighter-rouge">arf_engine_free</code>
+respectively. The rest is similar to how I created bindings in previous blog posts.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="n">RANDOM_ENGINE_STRUCT</span>
+<span class="p">{</span>
+  <span class="n">af_random_engine</span> <span class="n">cengine</span><span class="p">;</span>
+<span class="p">}</span><span class="n">afrandomenginestruct</span><span class="p">;</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_engine_alloc</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">klass</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="cm">/* allocate */</span>
+  <span class="n">afrandomenginestruct</span><span class="o">*</span> <span class="n">afrandomengine</span> <span class="o">=</span> <span class="n">ALLOC</span><span class="p">(</span><span class="n">afrandomenginestruct</span><span class="p">);</span>
+  <span class="cm">/* wrap */</span>
+  <span class="k">return</span> <span class="n">Data_Wrap_Struct</span><span class="p">(</span><span class="n">klass</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">arf_engine_free</span><span class="p">,</span> <span class="n">afrandomengine</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">arf_engine_free</span><span class="p">(</span><span class="n">afrandomenginestruct</span><span class="o">*</span> <span class="n">afrandomengine</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">free</span><span class="p">(</span><span class="n">afrandomengine</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_create_random_engine</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">type_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">seed_val</span><span class="p">){</span>
+  <span class="n">afrandomenginestruct</span><span class="o">*</span> <span class="n">output</span> <span class="o">=</span> <span class="n">ALLOC</span><span class="p">(</span><span class="n">afrandomenginestruct</span><span class="p">);</span>
+  <span class="n">af_random_engine_type</span> <span class="n">rtype</span> <span class="o">=</span> <span class="n">arf_randome_engine_type_from_rbsymbol</span><span class="p">(</span><span class="n">type_val</span><span class="p">);</span>
+
+  <span class="n">af_create_random_engine</span><span class="p">(</span><span class="o">&amp;</span><span class="n">output</span><span class="o">-&gt;</span><span class="n">cengine</span><span class="p">,</span> <span class="n">AF_RANDOM_ENGINE_DEFAULT</span><span class="p">,</span> <span class="n">NUM2ULL</span><span class="p">(</span><span class="n">seed_val</span><span class="p">)</span> <span class="p">)</span> <span class="p">;</span>
+
+  <span class="k">return</span> <span class="n">Data_Wrap_Struct</span><span class="p">(</span><span class="n">Random</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">arf_engine_free</span><span class="p">,</span> <span class="n">output</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_randu</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">ndims_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">dim_val</span><span class="p">){</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">out_array</span> <span class="o">=</span> <span class="n">ALLOC</span><span class="p">(</span><span class="n">afstruct</span><span class="p">);</span>
+
+  <span class="n">dim_t</span> <span class="n">ndims</span> <span class="o">=</span> <span class="p">(</span><span class="n">dim_t</span><span class="p">)</span><span class="n">FIX2LONG</span><span class="p">(</span><span class="n">ndims_val</span><span class="p">);</span>
+  <span class="n">dim_t</span><span class="o">*</span> <span class="n">dimensions</span> <span class="o">=</span> <span class="p">(</span><span class="n">dim_t</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="n">ndims</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">dim_t</span><span class="p">));</span>
+  <span class="n">dim_t</span> <span class="n">count</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="k">for</span> <span class="p">(</span><span class="n">dim_t</span> <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="n">ndims</span><span class="p">;</span> <span class="n">index</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">dimensions</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">dim_t</span><span class="p">)</span><span class="n">FIX2LONG</span><span class="p">(</span><span class="n">RARRAY_AREF</span><span class="p">(</span><span class="n">dim_val</span><span class="p">,</span> <span class="n">index</span><span class="p">));</span>
+    <span class="n">count</span> <span class="o">*=</span> <span class="n">dimensions</span><span class="p">[</span><span class="n">index</span><span class="p">];</span>
+  <span class="p">}</span>
+  <span class="n">af_randu</span><span class="p">(</span><span class="o">&amp;</span><span class="n">out_array</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">ndims</span><span class="p">,</span> <span class="n">dimensions</span><span class="p">,</span><span class="n">f64</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">Data_Wrap_Struct</span><span class="p">(</span><span class="n">Af_Array</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">arf_free</span><span class="p">,</span> <span class="n">out_array</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Now, we have the bindings ready, we can check it using <code class="language-plaintext highlighter-rouge">pry</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">rake</span> <span class="n">pry</span>
+<span class="n">pry</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'./lib/arrayfire.rb'</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">engine</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Random</span><span class="p">.</span><span class="nf">create_random_engine</span><span class="p">(</span><span class="ss">:AF_RANDOM_ENGINE_PHILOX_4X32_10</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Random:0x00000002a41350&gt;</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Random</span><span class="p">.</span><span class="nf">random_engine_get_seed</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="mi">100</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Random</span><span class="p">.</span><span class="nf">random_engine_set_seed</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="mi">123</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Random:0x00000002cfbd98&gt;</span>
+<span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Random</span><span class="p">.</span><span class="nf">random_engine_get_seed</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="mi">123</span>
+<span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Random</span><span class="p">.</span><span class="nf">random_engine_get_type</span> <span class="n">engine</span>
+<span class="o">=&gt;</span> <span class="s2">"AF_RANDOM_ENGINE_PHILOX_4X32_10"</span>
+<span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">arr</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Random</span><span class="p">.</span><span class="nf">randu</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x00000002b185f8&gt;</span>
+<span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Util</span><span class="p">.</span><span class="nf">print_array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">4</span> <span class="mi">4</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">0.3990</span>     <span class="mf">0.7353</span>     <span class="mf">0.9455</span>     <span class="mf">0.7089</span>
+    <span class="mf">0.6720</span>     <span class="mf">0.5160</span>     <span class="mf">0.1587</span>     <span class="mf">0.9434</span>
+    <span class="mf">0.5339</span>     <span class="mf">0.3932</span>     <span class="mf">0.8831</span>     <span class="mf">0.1227</span>
+    <span class="mf">0.1386</span>     <span class="mf">0.2706</span>     <span class="mf">0.0621</span>     <span class="mf">0.9107</span>
+
+<span class="o">=&gt;</span> <span class="kp">true</span>
+<span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">arr2</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Random</span><span class="p">.</span><span class="nf">randn</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x000000029fd4c0&gt;</span>
+<span class="p">[</span><span class="mi">9</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Util</span><span class="p">.</span><span class="nf">print_array</span><span class="p">(</span><span class="n">arr2</span><span class="p">)</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">4</span> <span class="mi">4</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">0.2985</span>    <span class="o">-</span><span class="mf">0.8873</span>    <span class="o">-</span><span class="mf">1.0309</span>     <span class="mf">0.5312</span>
+   <span class="o">-</span><span class="mf">2.7126</span>    <span class="o">-</span><span class="mf">0.3550</span>    <span class="o">-</span><span class="mf">1.4627</span>    <span class="o">-</span><span class="mf">1.7783</span>
+    <span class="mf">0.4584</span>     <span class="mf">1.9841</span>     <span class="mf">0.0075</span>    <span class="o">-</span><span class="mf">0.5459</span>
+    <span class="mf">1.5579</span>    <span class="o">-</span><span class="mf">0.9308</span>    <span class="o">-</span><span class="mf">1.0512</span>     <span class="mf">0.4640</span>
+
+<span class="o">=&gt;</span> <span class="kp">true</span>
+</code></pre></div></div>
+
+<p>we have the <code class="language-plaintext highlighter-rouge">Random</code> support ready for <code class="language-plaintext highlighter-rouge">ArrayFire-rb</code></p>
+
+<p>Hence, Ruby bindings for Statistics and Random methods have been successfully implemented.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>We can now use <code class="language-plaintext highlighter-rouge">ArrayFire-rb</code> for statistical analysis on data. Since, the calculations would be
+on GPU, we can feed it large amount of data from real world.</p>
+
+<p>Random engine can help in creating large arrays with randomly generated values in seconds.</p>
+
+<p>In the next blog, I will explain about using the <code class="language-plaintext highlighter-rouge">Device</code> and <code class="language-plaintext highlighter-rouge">Util</code> class to manage GPU devices
+and device memory and other utilities like saving an <code class="language-plaintext highlighter-rouge">Af_Array</code> to file.</p>
+
+<div id="disqus_thread"></div>
+<script>
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//prasunanandblog.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+:ET

@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"/>
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/animate.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/css/responsive.css">
+
+    <link rel="icon" href="images/zasper_logo.ico" type="image/gif" sizes="32x32">
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VRJB8WTXR1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-VRJB8WTXR1');
+    </script>
+
+    <title>Prasun's Blog</title>
+  </head>
+  <body>
+    <section id="header-home">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <a class="navbar-brand" href="/">
+            <!-- <img src="images/logo.svg" alt="#"> -->
+            Prasun's blog
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu">
+            <i class="fa fa-bars"></i>
+          </button>
+          <div class="navbar-collapse justify-content-center offcanvas offcanvas-top offcanvas-body" id="offcanvasMenu">
+            <button type="button" class="colse-btn" data-bs-dismiss="offcanvas">
+              <i class="fa fa-times"></i>
+            </button>
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link active-menu" href="/about">About</a>
+              </li>
+            </ul>
+            <div class="menu-right-btn mobile-menu-login-signup">
+              <a href="https://zasper.io/login" class="custom-btn btn-border hover-bg">Login</a>
+              <a href="https://zasper.io/signup" class="custom-btn btn-bg hover-bg">Signup</a>
+            </div>
+          </div>
+          <div class="menu-right-btn justify-content-end">
+            <a href="https://zasper.io/login" class="custom-btn btn-border hover-bg">Login</a>
+            <a href="https://zasper.io/signup" class="custom-btn btn-bg hover-bg">Signup</a>
+          </div>
+        </div>
+      </nav>
+    </section>
+
+
+
+    <section id="blog-sec">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-12 col-lg-9">
+            <div class="blog-details-wraper">
+              <div class="blog-main-image wow fadeInUp">
+                <img src="/images/banner.png" alt="#">
+              </div>
+
+              <div class="blog-title wow fadeInUp">
+                <h2>JRuby Port of Mixed-Models</h2>
+              </div>
+
+              <div class="blog-published-info wow fadeInUp">
+                <span class="blog-post-date">9 July 2016 by</span>
+                <span class="blog-post-author">Prasun Anand</span>
+              </div>
+
+              <div class="blog-description wow fadeInUp">
+              	<p><h2 id="introduction"><strong>Introduction</strong></h2>
+<p>For my GSoC 2016 project of JRuby port of NMatrix, we worked on testing NMatrix-JRuby with real-life data. We started with <strong>mixed-models</strong> gem.</p>
+
+<p>Mixed models are statistical models which predict the value of a response variable as a result of fixed and random effects. All matrix calculations are performed using the gem <strong>nmatrix</strong>, which has a quite intuitive syntax and contributes to the overall code readability as well.</p>
+
+<h2 id="mixed-models"><strong>Mixed Models</strong></h2>
+
+<p>The real motivation for working with JRuby port of Mixed-Models was to work with real-world data. We ran the code from this <a href="http://sciruby.com/blog/2015/08/19/gsoc-2015-mixed-models/">blog</a> by Alexej Gossman, the author of ‘mixed-models’ gem which explains using <em>mixed-models</em> with some examples, using JRuby. We then compared the results for Ruby-MRI and JRuby.</p>
+
+<h4 id="example1--lmm"><strong>Example1 : LMM</strong></h4>
+
+<p>I started running example <a href="https://github.com/agisga/mixed_models/blob/master/examples/LMM.rb"><strong><em>LMM.rb</em></strong></a>. Alexej wrote a blog explaining this example and it can be found <a href="http://www.alexejgossmann.com/First-linear-mixed-model-fit/">here</a>. I ran the example using both ruby and jruby and compared output at every stage. Here I found these issues.</p>
+
+<p><strong>Rank of a matrix</strong></p>
+
+<p>One of the most important part of NMatrix was indexing. NMatrix stores multi-dimensional arrays as flat arrays and the indexing and slicing of elements is done using the shape, dimension, stride and offset of NMatrix. It would not be justice with NMatrix if I don’t discuss about slicing and enumerators in NMatrix; so in my next blog I will discuss about slicing and also enumerators.</p>
+
+<p>While working with LMM, there was an issue with getting the rank of a matrix. The rank couldn’t be recursively accessed as the new matrix returned was not assigned dimension. This was a small bug but too tough to detect it.</p>
+
+<p><strong>Cholesky/LUD Decomposition to solve a matrix when constants are a n x p matrix</strong></p>
+
+<p>Given we need to solved a system of linear equations</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                    AX = B
+</code></pre></div></div>
+
+<p>where A is an m×n matrix, B and X are n×p matrices, we needed to solve this equation by iterating through B.</p>
+
+<p>Initially, for NMatrix-jruby we considered that X and B are column vectors. So, we got an exception ‘dimension error’. There was a similar issue with NMatrix -MRI : <a href="https://github.com/SciRuby/nmatrix/issues/374">issue</a>.</p>
+
+<p>We solved this issue by implementing NMatrix#matrix_solve that is called by method triangular_solve when using JRuby.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="k">def</span> <span class="nf">matrix_solve</span> <span class="n">b</span>
+    <span class="k">if</span> <span class="n">b</span><span class="p">.</span><span class="nf">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span>
+      <span class="n">nmatrix</span> <span class="o">=</span> <span class="no">NMatrix</span><span class="p">.</span><span class="nf">new</span> <span class="ss">:copy</span>
+      <span class="n">nmatrix</span><span class="p">.</span><span class="nf">shape</span> <span class="o">=</span> <span class="n">b</span><span class="p">.</span><span class="nf">shape</span>
+      <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+      <span class="p">(</span><span class="mi">0</span><span class="o">...</span><span class="n">b</span><span class="p">.</span><span class="nf">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]).</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+        <span class="n">res</span> <span class="o">&lt;&lt;</span> <span class="nb">self</span><span class="p">.</span><span class="nf">solve</span><span class="p">(</span><span class="n">b</span><span class="p">.</span><span class="nf">col</span><span class="p">(</span><span class="n">i</span><span class="p">)).</span><span class="nf">s</span><span class="p">.</span><span class="nf">toArray</span><span class="p">.</span><span class="nf">to_a</span>
+      <span class="k">end</span>
+      <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+      <span class="p">(</span><span class="mi">0</span><span class="o">...</span><span class="n">b</span><span class="p">.</span><span class="nf">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]).</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">i</span><span class="o">|</span>
+        <span class="p">(</span><span class="mi">0</span><span class="o">...</span><span class="n">b</span><span class="p">.</span><span class="nf">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]).</span><span class="nf">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">j</span><span class="o">|</span>
+          <span class="n">result</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+          <span class="n">index</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">end</span>
+      <span class="k">end</span>
+      <span class="n">nmatrix</span><span class="p">.</span><span class="nf">s</span> <span class="o">=</span> <span class="no">ArrayRealVector</span><span class="p">.</span><span class="nf">new</span> <span class="n">result</span><span class="p">.</span><span class="nf">to_java</span> <span class="ss">:double</span>
+      <span class="n">nmatrix</span><span class="p">.</span><span class="nf">twoDMat</span> <span class="o">=</span>  <span class="no">MatrixUtils</span><span class="p">.</span><span class="nf">createRealMatrix</span> <span class="n">get_twoDArray</span><span class="p">(</span><span class="n">b</span><span class="p">.</span><span class="nf">shape</span><span class="p">,</span> <span class="n">result</span><span class="p">)</span>
+      
+      <span class="k">return</span> <span class="n">nmatrix</span>
+    <span class="k">else</span>
+      <span class="k">return</span> <span class="nb">self</span><span class="p">.</span><span class="nf">solve</span> <span class="n">b</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+</code></pre></div></div>
+
+<p><strong>Dot product</strong></p>
+
+<p>I was stuck at another issue in model_fit. Triangular solve method which calls cholesky to solve linear equations threw <em>singular matrix exception</em>.  I wasn’t unable to figure out what was wrong.  I started comparing the output of LMM.rb using ruby and jruby at each stage. y vector is critical for <em>model fit</em>. Apparently, the elements of y were different in the two cases. Looking closely, I found z.dot b to be returning a matrix with all the elements 0.  This is what was happening:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">...</span>
+
+<span class="c1"># Generate the response vector</span>
+<span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="nf">dot</span> <span class="n">beta</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">z</span><span class="p">.</span><span class="nf">dot</span> <span class="n">b</span><span class="p">)</span> <span class="o">+</span> <span class="n">epsilon</span>
+
+<span class="c1"># Set up the covariance parameters</span>
+<span class="n">parametrization</span> <span class="o">=</span> <span class="no">Proc</span><span class="p">.</span><span class="nf">new</span> <span class="k">do</span> <span class="o">|</span><span class="n">th</span><span class="o">|</span> 
+  <span class="n">diag_blocks</span> <span class="o">=</span> <span class="no">Array</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="p">{</span> <span class="no">NMatrix</span><span class="p">.</span><span class="nf">new</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="n">th</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="n">th</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">0</span><span class="p">,</span><span class="n">th</span><span class="p">[</span><span class="mi">2</span><span class="p">]],</span> <span class="ss">dtype: :float64</span><span class="p">)</span> <span class="p">}</span>
+  <span class="no">NMatrix</span><span class="p">.</span><span class="nf">block_diagonal</span><span class="p">(</span><span class="o">*</span><span class="n">diag_blocks</span><span class="p">,</span> <span class="ss">dtype: :float64</span><span class="p">)</span> 
+<span class="k">end</span>
+
+<span class="c1"># Fit the model</span>
+<span class="n">model_fit</span> <span class="o">=</span> <span class="no">LMM</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">x: </span><span class="n">x</span><span class="p">,</span> <span class="ss">y: </span><span class="n">y</span><span class="p">,</span> <span class="ss">zt: </span><span class="n">z</span><span class="p">.</span><span class="nf">transpose</span><span class="p">,</span>
+                    <span class="ss">start_point: </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> 
+                    <span class="ss">lower_bound: </span><span class="no">Array</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="no">Float</span><span class="o">::</span><span class="no">INFINITY</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="o">&amp;</span><span class="n">parametrization</span><span class="p">)</span> 
+<span class="o">...</span>
+</code></pre></div></div>
+
+<table>
+  <tbody>
+    <tr>
+      <td>When we take dot product of two matrices C = A.dot B. If Aij or Bij are smaller than</td>
+      <td>1</td>
+      <td>we get Cij = 0 . So, yeah its autoboxing.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Currently, I solved this by using</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">y</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="nf">dot</span> <span class="n">beta</span><span class="p">)</span> <span class="o">+</span> <span class="p">((</span><span class="n">z</span> <span class="o">*</span> <span class="mi">5</span><span class="p">).</span><span class="nf">dot</span> <span class="n">b</span><span class="p">)</span><span class="o">/</span><span class="mi">5</span> <span class="o">+</span> <span class="n">epsilon</span>
+</code></pre></div></div>
+
+<p>Thus, we get the value of y vector same for both cases.</p>
+
+<p><strong>Cholesky solve throws “singular matrix exception”</strong></p>
+
+<p>When LMM does optimisation line [5] it calls NelderMead.minimize that uses deviation; and autoboxing leads to 0 as element output. Therefore a diagonal matrix gets reduced to a singular matrix and Cholesky solve throws “singular matrix” error [6].</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">...</span>
+<span class="n">model_fit</span> <span class="o">=</span> <span class="no">LMM</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">x: </span><span class="n">x</span><span class="p">,</span> <span class="ss">y: </span><span class="n">y</span><span class="p">,</span> <span class="ss">zt: </span><span class="n">z</span><span class="p">.</span><span class="nf">transpose</span><span class="p">,</span>
+                    <span class="ss">start_point: </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> 
+                    <span class="ss">lower_bound: </span><span class="no">Array</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="no">Float</span><span class="o">::</span><span class="no">INFINITY</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="o">&amp;</span><span class="n">parametrization</span><span class="p">)</span> 
+<span class="o">...</span>
+</code></pre></div></div>
+
+<p>Here z.transpose is wrong due to boxing. So, we used</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">zt</span> <span class="o">=</span> <span class="p">(</span><span class="n">z</span><span class="o">*</span><span class="mi">5</span><span class="p">).</span><span class="nf">transpose</span><span class="o">/</span><span class="mi">5</span>
+</code></pre></div></div>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model_fit</span> <span class="o">=</span> <span class="no">LMM</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">x: </span><span class="n">x</span><span class="p">,</span> <span class="ss">y: </span><span class="n">y</span><span class="p">,</span> <span class="ss">zt: </span><span class="n">zt</span><span class="p">,</span>
+                    <span class="ss">start_point: </span><span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">],</span> 
+                    <span class="ss">lower_bound: </span><span class="no">Array</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="o">-</span><span class="no">Float</span><span class="o">::</span><span class="no">INFINITY</span><span class="p">,</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="o">&amp;</span><span class="n">parametrization</span><span class="p">)</span> 
+</code></pre></div></div>
+
+<p>This error is not always replicated.</p>
+
+<p><strong>Result</strong></p>
+
+<p>MIxed-models using Ruby-MRI</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="no">Model</span> <span class="n">fit</span>
+<span class="no">Optimal</span> <span class="ss">theta:  </span><span class="p">[</span><span class="mf">4.761283990026765</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.12007961616262416</span><span class="p">,</span> <span class="mf">0.5005024020787956</span><span class="p">]</span>
+<span class="no">REML</span> <span class="ss">criterion:   </span><span class="mf">162.90752516637906</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="no">Fixed</span> <span class="n">effects</span>
+<span class="no">Intercept</span><span class="p">:</span>  
+<span class="no">Slope</span><span class="p">:</span>  
+<span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="no">Random</span> <span class="n">effects</span>
+<span class="no">Random</span> <span class="n">intercept</span> <span class="ss">sd:  </span><span class="mf">3.929341245265398</span>
+<span class="no">Random</span> <span class="n">slope</span> <span class="ss">sd:  </span><span class="mf">0.42437637915866583</span>
+<span class="no">Correlation</span> <span class="n">of</span> <span class="n">random</span> <span class="n">intercept</span> <span class="n">and</span> <span class="ss">slope:  </span><span class="o">-</span><span class="mf">0.23341842320756737</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="no">Residuals</span>
+<span class="no">Variance</span><span class="p">:</span>   <span class="mf">0.6800937307812478</span>
+<span class="no">Standard</span> <span class="ss">deviantion:  </span><span class="mf">0.824677955799261</span>
+</code></pre></div></div>
+
+<p>MIxed-models using JRuby initially gave the following result.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="no">Model</span> <span class="n">fit</span>
+<span class="no">Optimal</span> <span class="ss">theta:  </span><span class="p">[</span><span class="mf">0.0056475944592377265</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.661316609380864e-05</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]</span>
+<span class="no">REML</span> <span class="ss">criterion:   </span><span class="mf">379.0971583367289</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="no">Fixed</span> <span class="n">effects</span>
+<span class="no">Intercept</span><span class="p">:</span>  
+<span class="no">Slope</span><span class="p">:</span>  
+<span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="no">Random</span> <span class="n">effects</span>
+<span class="no">Random</span> <span class="n">intercept</span> <span class="ss">sd:  </span><span class="mf">0.06041274692971716</span>
+<span class="no">Random</span> <span class="n">slope</span> <span class="ss">sd:  </span><span class="mf">0.0006062864584118943</span>
+<span class="no">Correlation</span> <span class="n">of</span> <span class="n">random</span> <span class="n">intercept</span> <span class="n">and</span> <span class="ss">slope:  </span><span class="o">-</span><span class="mf">1.0</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="no">Residuals</span>
+<span class="no">Variance</span><span class="p">:</span>   <span class="mf">114.11688631756937</span>
+<span class="no">Standard</span> <span class="ss">deviantion:  </span><span class="mf">10.682550553007898</span>
+</code></pre></div></div>
+
+<p>There was an error in NMatrix#matrix_solve. After correcting it, we get the correct result.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="no">Model</span> <span class="n">fit</span>
+<span class="no">Optimal</span> <span class="ss">theta:  </span><span class="p">[</span><span class="mf">4.761283990026765</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.12007961616262416</span><span class="p">,</span> <span class="mf">0.5005024020787956</span><span class="p">]</span>
+<span class="no">REML</span> <span class="ss">criterion:   </span><span class="mf">162.9075251663791</span>
+<span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="no">Fixed</span> <span class="n">effects</span>
+<span class="no">Intercept</span><span class="p">:</span>  
+<span class="no">Slope</span><span class="p">:</span>  
+<span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="no">Random</span> <span class="n">effects</span>
+<span class="no">Random</span> <span class="n">intercept</span> <span class="ss">sd:  </span><span class="mf">3.929341245265402</span>
+<span class="no">Random</span> <span class="n">slope</span> <span class="ss">sd:  </span><span class="mf">0.4243763791586663</span>
+<span class="no">Correlation</span> <span class="n">of</span> <span class="n">random</span> <span class="n">intercept</span> <span class="n">and</span> <span class="ss">slope:  </span><span class="o">-</span><span class="mf">0.2334184232075674</span>
+<span class="p">(</span><span class="mi">4</span><span class="p">)</span> <span class="no">Residuals</span>
+<span class="no">Variance</span><span class="p">:</span>   <span class="mf">0.6800937307812492</span>
+<span class="no">Standard</span> <span class="ss">deviantion:  </span><span class="mf">0.8246779557992618</span>
+</code></pre></div></div>
+
+<p>Next, we ran other examples and we got the correct results as we expected.</p>
+
+<h4 id="example2--blog_data"><strong>Example2 : Blog_data</strong></h4>
+
+<p>Blog_data example deals with real data. Initially, mixed_models was not supported by latest <a href="https://github.com/agisga/mixed_models/issues/4 .">daru</a>. This issue has been resolved by Alexej.</p>
+
+<p>Currently NMatrix-JRuby has not been optimized. It is not memory efficient. Running blog_data.rb results in <strong>OutOfMemoryError</strong> even when 12GB of heap-size is alloted to JVM.</p>
+
+<p>This is a <strong>work in progress</strong>.</p>
+
+<h3 id="test-report"><strong>Test Report</strong></h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Spec file</th>
+      <th style="text-align: center">Total Test</th>
+      <th style="text-align: center">Success</th>
+      <th style="text-align: center">Failure</th>
+      <th style="text-align: center">Pending</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Deviance_spec</td>
+      <td style="text-align: center">04</td>
+      <td style="text-align: center">04</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+    </tr>
+    <tr>
+      <td>LMM_spec</td>
+      <td style="text-align: center">195</td>
+      <td style="text-align: center">195</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+    </tr>
+    <tr>
+      <td>LMM_categorical_data_spec.rb</td>
+      <td style="text-align: center">48</td>
+      <td style="text-align: center">45</td>
+      <td style="text-align: center">3</td>
+      <td style="text-align: center">0</td>
+    </tr>
+    <tr>
+      <td>LMMFormula_spec.rb</td>
+      <td style="text-align: center">05</td>
+      <td style="text-align: center">05</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+    </tr>
+    <tr>
+      <td>LMM_interaction_effects_spec.rb</td>
+      <td style="text-align: center">82</td>
+      <td style="text-align: center">82</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+    </tr>
+    <tr>
+      <td>LMM_nested_effects_spec.rb</td>
+      <td style="text-align: center">40</td>
+      <td style="text-align: center">40</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+    </tr>
+    <tr>
+      <td>matrix_methods_spec.rb</td>
+      <td style="text-align: center">52</td>
+      <td style="text-align: center">48</td>
+      <td style="text-align: center">4</td>
+      <td style="text-align: center">0</td>
+    </tr>
+    <tr>
+      <td>ModelSpecification_spec.rb</td>
+      <td style="text-align: center">07</td>
+      <td style="text-align: center">07</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+    </tr>
+    <tr>
+      <td>NelderMeadWithConstraints_spec.rb</td>
+      <td style="text-align: center">08</td>
+      <td style="text-align: center">08</td>
+      <td style="text-align: center">0</td>
+      <td style="text-align: center">0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br /></p>
+
+<h3 id="features-not-supported"><strong>Features not Supported</strong></h3>
+
+<ol>
+  <li><strong>Parallel Gem:</strong> Currently Parallel gem is not supported by JRuby. So, we can’t use parallel processing to utilize multiple CPU cores. /example/bootstrap.rb can’t be run with parallelism.</li>
+  <li><strong>ArrayStoreException:</strong> We are not exactly sure why this occurs currently. We guess it’s due to a lot of memory used by arrays. We believe it can be overcome once we optimize NMatrix-JRuby. This issue was previously reported on JRuby <a href="https://github.com/jruby/jruby/issues/2615">issues</a> page.</li>
+  <li><strong>Process.fork not supported:</strong> JRuby currently doesn’t support fork. So, we had to run some tests individually which failed while running the entire test file.</li>
+</ol>
+
+<p><br /></p>
+
+<h2 id="conclusion"><strong>Conclusion:</strong></h2>
+
+<p>We have successfully ported mixed_models gem to JRuby. All examples (except blog_data.rb and bootstrap.rb) produce correct results. Now we need to optimize the performance of mixed_models gem which will mostly involve optimizing NMatrix-JRuby as blog_example which deals with real data, runs out of memory.</p>
+
+<p>Next, we will implement ruby-objects as dtype and clear a few tests still remaining for NMatrix-JRuby.</p>
+
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//prasunanandblog.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</p>
+              </div>
+            </div>
+
+            <div class="related-blog-wraper wow fadeInUp">
+              <h6>Related Blog</h6>
+
+              
+
+              <div class="related-blog-item latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                <a href="/cuda/opencl/ruby/rbcuda/2018/02/24/rubygrant17-rbcuda-installation-and-architecture.html.html">
+                  <div class="latest-post-item-image">
+                    <img src="/images/banner.png" alt="#">
+                  </div>
+                  <div class="latest-post-item-content">
+                    <h2>RbCUDA: Installation and Architecture</h2>
+                    <span>24 February 2018</span>
+                  </div>
+                </a>
+              </div>
+              
+
+              <div class="related-blog-item latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                <a href="/cuda/opencl/ruby/rbcuda/2017/12/30/rubygrant17-rbcuda-introduction.html.html">
+                  <div class="latest-post-item-image">
+                    <img src="/images/banner.png" alt="#">
+                  </div>
+                  <div class="latest-post-item-content">
+                    <h2>RbCUDA: CUDA bindings for Ruby</h2>
+                    <span>30 December 2017</span>
+                  </div>
+                </a>
+              </div>
+              
+
+            </div>
+          </div>
+          
+
+          <div class="col-12 col-md-12 col-lg-3">
+            <div class="blog-page-right-wraper">
+              <div class="search-wraper wow fadeInUp" data-wow-delay="0.2s">
+                <h6>Search</h6>
+                <div class="search-form-wraper">
+                  <form action="/search.html" method="GET">
+                    <input type="text" name="query" id="search-box" placeholder="Search">
+                    <button class="btn-bg"><img src="/images/icons/search.svg" alt="#"></button>
+                  </form>
+                </div>
+              </div>
+
+              <div class="latest-post-wraper wow fadeInUp" data-wow-delay="0.3s">
+                <h6>Latest Post</h6>
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/cuda/opencl/ruby/rbcuda/2018/02/24/rubygrant17-rbcuda-installation-and-architecture.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>RbCUDA: Installation and Architecture</h2>
+                      <span>24 February 2018</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/cuda/opencl/ruby/rbcuda/2017/12/30/rubygrant17-rbcuda-introduction.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>RbCUDA: CUDA bindings for Ruby</h2>
+                      <span>30 December 2017</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/arrayfire/cuda/opencl/ruby/2017/08/28/gsoc17-project-report.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>GSoC 2017: Creating the fastest math libraries for Ruby by using the GPU through OpenCL and ArrayFire.</h2>
+                      <span>28 August 2017</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+              </div>
+
+              <div class="tags-wraper wow fadeInUp" data-wow-delay="0.4s">
+                <h6>Tag Clouds</h6>
+                <div class="tag-clouds">
+                  <a href="#">Engineering</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Future</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Future</a>
+                  <a href="#">Engineering</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Engineering</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Future</a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+
+
+        </div>
+      </div>
+    </section>
+
+    <section id="updates">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="updates-wraper">
+              <div class="updates-image wow fadeInUp" data-wow-delay="0.2s">
+                <img src="/images/image2.svg" alt="#">
+              </div>
+              <div class="updates-form header-form wow fadeInUp" data-wow-delay="0.2s">
+                <h5 class="font-h5">Subscribe for exclusive</h5>
+                <h3 class="font-h3">news and updates!</h3>
+                <form action="https://zasper.io/newsletter" method="POST">
+                  <div class="form-group">
+                    <input type="email" name="email" placeholder="Enter your email">
+                    <button type="submit" class="btn-bg hover-bg">Subscribe</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-4">
+            <div class="footer-info wow fadeInUp" data-wow-delay="0.2s">
+              <div class="footer-image wow fadeInUp" data-wow-delay="0.1s">
+                <img src="/images/logo.svg" alt="#">
+              </div>
+              <div class="footer-content wow fadeInUp" data-wow-delay="0.2s">
+                <p>Zasper strives to be at the forefront of the AI Revolution that is taking place around the world. We want to ease the pain of Data teams by enabling them to develop and deploy their AI solutions right from rapid prototyping to shipping into production.</p>
+              </div>
+              <div class="footer-social wow fadeInUp" data-wow-delay="0.3s">
+                <a href="https://www.linkedin.com/company/zasper"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+                <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+                <a href="https://github.com/zasperio"><i class="fa fa-github" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-8">
+            <div class="footer-menu-wraper wow fadeInUp" data-wow-delay="0.4s">
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.1s">
+                  <h6>Company</h6>
+                  <a href="https://zasper.io/product">Product</a>
+                  <a href="https://zasper.io/pricing">Pricing</a>
+                  <a href="https://zasper.io/partners">Partners</a>
+                  <a href="https://zasper.io/careers">Careers</a>
+                  <a href="https://zasper.io/support">Support</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.3s">
+                  <h6>Solutions</h6>
+                  <a href="https://zasper.io/solutions/banking">Banking</a>
+                  <a href="https://zasper.io/solutions/telecom">Telecom</a>
+                  <a href="https://zasper.io/solutions/oil-and-gas">Oil and Gas</a>
+                  <a href="https://zasper.io/solutions/healthcare">Healthcare</a>
+                  <a href="https://zasper.io/solutions/">View More</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.5s">
+                  <h6>Community</h6>
+                  <a href="/">Blog</a>
+                  <a href="https://docs.zasper.io">Docs</a>
+                  <a href="https://zasper.io/contact-us">Contact Us</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.6s">
+                  <h6>Legal</h6>
+                  <a href="https://zasper.io/terms-and-conditions">Terms and Conditions</a>
+                  <a href="https://zasper.io/privacy">Privacy Policy</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="copyright">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="copyright-text wow fadeInUp" data-wow-delay="0.2s">
+              <p>©2021 zasper ai labs pvt ltd | All rights reserved.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JavaScripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/wow.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/main.js"></script>
+
+  </body>
+</html>
+

@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"/>
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/animate.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/css/responsive.css">
+
+    <link rel="icon" href="images/zasper_logo.ico" type="image/gif" sizes="32x32">
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VRJB8WTXR1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-VRJB8WTXR1');
+    </script>
+
+    <title>Prasun's Blog</title>
+  </head>
+  <body>
+    <section id="header-home">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <a class="navbar-brand" href="/">
+            <!-- <img src="images/logo.svg" alt="#"> -->
+            Prasun's blog
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu">
+            <i class="fa fa-bars"></i>
+          </button>
+          <div class="navbar-collapse justify-content-center offcanvas offcanvas-top offcanvas-body" id="offcanvasMenu">
+            <button type="button" class="colse-btn" data-bs-dismiss="offcanvas">
+              <i class="fa fa-times"></i>
+            </button>
+            <ul class="navbar-nav">
+              <li class="nav-item">
+                <a class="nav-link active-menu" href="/about">About</a>
+              </li>
+            </ul>
+            <div class="menu-right-btn mobile-menu-login-signup">
+              <a href="https://zasper.io/login" class="custom-btn btn-border hover-bg">Login</a>
+              <a href="https://zasper.io/signup" class="custom-btn btn-bg hover-bg">Signup</a>
+            </div>
+          </div>
+          <div class="menu-right-btn justify-content-end">
+            <a href="https://zasper.io/login" class="custom-btn btn-border hover-bg">Login</a>
+            <a href="https://zasper.io/signup" class="custom-btn btn-bg hover-bg">Signup</a>
+          </div>
+        </div>
+      </nav>
+    </section>
+
+
+
+    <section id="blog-sec">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-12 col-lg-9">
+            <div class="blog-details-wraper">
+              <div class="blog-main-image wow fadeInUp">
+                <img src="/images/banner.png" alt="#">
+              </div>
+
+              <div class="blog-title wow fadeInUp">
+                <h2>RbCUDA: Installation and Architecture</h2>
+              </div>
+
+              <div class="blog-published-info wow fadeInUp">
+                <span class="blog-post-date">24 February 2018 by</span>
+                <span class="blog-post-author">Prasun Anand</span>
+              </div>
+
+              <div class="blog-description wow fadeInUp">
+              	<p><p>This post explains the architecture of <code class="language-plaintext highlighter-rouge">RbCUDA</code> and how you can install it on your machine.</p>
+
+<p>todo:
+I have been working on “Port NMatrix to JRuby” as my GSoC project. I am pleased to announce that <strong>JRuby is ready for Nmatrix users</strong>.</p>
+
+<p>NMatrix, a linear algebra library wraps Apache Commons Maths for its core functionalities. By the end of GSoC, I have been able to implement NMatrix for dense matrices with double and object ( ruby objects ) data type. I have also worked on porting mixed-models gem to JRuby which heavily uses NMatrix at its core.</p>
+
+<h1 id="installation">Installation</h1>
+
+<p>Install <code class="language-plaintext highlighter-rouge">CUDA</code> on your machine.</p>
+
+<h3 id="building-rbcuda-from-source">Building <code class="language-plaintext highlighter-rouge">RbCUDA</code> from source.</h3>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/prasunanand/rbcuda
+<span class="nb">cd </span>rbcuda
+bundle <span class="nb">install
+</span>rake compile
+</code></pre></div></div>
+
+<h3 id="installing-the-gem">Installing the gem</h3>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gem build rbcuda.gemspec
+gem <span class="nb">install </span>rbcuda-0.0.0.gem
+</code></pre></div></div>
+
+<p>To check if installation was successful, run pry.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">rake</span> <span class="n">pry</span>
+<span class="n">pry</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'./lib/rbcuda.rb'</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">RbCUDA</span><span class="o">::</span><span class="no">CUDA</span><span class="p">.</span><span class="nf">cuInit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">device</span> <span class="o">=</span> <span class="no">RbCUDA</span><span class="o">::</span><span class="no">CUDA</span><span class="p">.</span><span class="nf">cuDeviceGet</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="nb">puts</span> <span class="n">device</span>
+<span class="c1">#&lt;RbCUDA::RbCuDevice:0x00000001a9a2d0&gt;</span>
+<span class="o">=&gt;</span> <span class="kp">nil</span>
+<span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="nb">puts</span> <span class="no">RbCUDA</span><span class="o">::</span><span class="no">CUDA</span><span class="p">.</span><span class="nf">cuDeviceGetName</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">device</span><span class="p">);</span>
+<span class="no">GeForce</span> <span class="no">GTX</span> <span class="mi">750</span> <span class="no">Ti</span>
+</code></pre></div></div>
+<p>If you are successfully able to retrive the name of GPU card, you are all set.</p>
+
+<h1 id="code-organisation">Code organisation</h1>
+
+<p><code class="language-plaintext highlighter-rouge">extconf.rb</code> that helps in building the shared object file can be found <a href="https://github.com/prasunanand/rbcuda/blob/master/ext/rbcuda/extconf.rb">here</a>.</p>
+
+<p><code class="language-plaintext highlighter-rouge">rbcuda.h</code> defines all the Ruby structs that correspond to CUDA types. In the following code <code class="language-plaintext highlighter-rouge">CUfunction</code> type can be represented as <code class="language-plaintext highlighter-rouge">function_ptr</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">typedef</span> <span class="n">struct</span> <span class="no">FUNCTION_PTR</span>
+<span class="p">{</span>
+  <span class="no">CUfunction</span> <span class="n">function</span><span class="p">;</span>
+<span class="p">}</span><span class="n">function_ptr</span><span class="p">;</span>
+
+<span class="n">typedef</span> <span class="n">struct</span> <span class="no">DEVICE_PTR</span>
+<span class="p">{</span>
+  <span class="no">CUdevice</span> <span class="n">device</span><span class="p">;</span>
+<span class="p">}</span><span class="n">device_ptr</span><span class="p">;</span>
+
+</code></pre></div></div>
+<p>The struct <code class="language-plaintext highlighter-rouge">fuction_ptr</code> is then wrapped by a Ruby object called <code class="language-plaintext highlighter-rouge">RbCuFunction</code> in the file <code class="language-plaintext highlighter-rouge">ruby_rbcuda.c</code>.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">RbCUDA</span> <span class="o">=</span> <span class="n">rb_define_module</span><span class="p">(</span><span class="s2">"RbCUDA"</span><span class="p">);</span>
+
+<span class="no">VALUE</span> <span class="no">RbCuDevice</span> <span class="o">=</span> <span class="no">Qnil</span><span class="p">;</span>
+<span class="no">VALUE</span> <span class="no">RbCuFunction</span> <span class="o">=</span> <span class="no">Qnil</span><span class="p">;</span>
+
+<span class="no">RbCuDevice</span>    <span class="o">=</span> <span class="n">rb_define_class_under</span><span class="p">(</span><span class="no">RbCUDA</span><span class="p">,</span> <span class="s2">"RbCuDevice"</span><span class="p">,</span>    <span class="n">rb_cObject</span><span class="p">);</span>
+<span class="no">RbCuFunction</span>  <span class="o">=</span> <span class="n">rb_define_class_under</span><span class="p">(</span><span class="no">RbCUDA</span><span class="p">,</span> <span class="s2">"RbCuFunction"</span><span class="p">,</span>  <span class="n">rb_cObject</span><span class="p">);</span>
+
+</code></pre></div></div>
+
+<h1 id="dev-array">Dev Array</h1>
+
+<p>An array in RbCUDA is handled using Dev_Array class. Implementation is as follows:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>typedef struct DEV_PTR
+{
+  double* carray;
+}dev_ptr;
+
+Dev_Array = rb_define_class_under(RbCUDA, "Dev_Array", rb_cObject);
+
+</code></pre></div></div>
+<p>A Dev Array stores the pointer to the array data stored on the GPU. The usage will be explained in the next blog.</p>
+
+<h1 id="functionalities">Functionalities</h1>
+
+<p>RbCUDA has the following modules:</p>
+<ol>
+  <li>CUDA : It consists of low-level APIs called the CUDA driver APIs.</li>
+  <li>Runtime : It consists of higher-level APIs called the CUDA runtime APIs that are implemented on top of the CUDA driver APIs.</li>
+  <li>CuBLAS : It consists of BLAS APIs provided by cuBLAS library.</li>
+  <li>CuSolver : It consists of APIs provided by cuSolver library.</li>
+  <li>CuRand : It consists APIs provided by cuRand library.</li>
+  <li>Profiler : It consists of APIs for profiling CUDA code.</li>
+</ol>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>I have explained how the underlying architecture looks like.</p>
+
+<p>We have got <code class="language-plaintext highlighter-rouge">RbCUDA</code> successfully installed on our system. In the next blog I will talk about implementing Runtime APIs.</p>
+
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//prasunanandblog.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+</p>
+              </div>
+            </div>
+
+            <div class="related-blog-wraper wow fadeInUp">
+              <h6>Related Blog</h6>
+
+              
+
+              <div class="related-blog-item latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                <a href="/cuda/opencl/ruby/rbcuda/2018/02/24/rubygrant17-rbcuda-installation-and-architecture.html.html">
+                  <div class="latest-post-item-image">
+                    <img src="/images/banner.png" alt="#">
+                  </div>
+                  <div class="latest-post-item-content">
+                    <h2>RbCUDA: Installation and Architecture</h2>
+                    <span>24 February 2018</span>
+                  </div>
+                </a>
+              </div>
+              
+
+              <div class="related-blog-item latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                <a href="/cuda/opencl/ruby/rbcuda/2017/12/30/rubygrant17-rbcuda-introduction.html.html">
+                  <div class="latest-post-item-image">
+                    <img src="/images/banner.png" alt="#">
+                  </div>
+                  <div class="latest-post-item-content">
+                    <h2>RbCUDA: CUDA bindings for Ruby</h2>
+                    <span>30 December 2017</span>
+                  </div>
+                </a>
+              </div>
+              
+
+            </div>
+          </div>
+          
+
+          <div class="col-12 col-md-12 col-lg-3">
+            <div class="blog-page-right-wraper">
+              <div class="search-wraper wow fadeInUp" data-wow-delay="0.2s">
+                <h6>Search</h6>
+                <div class="search-form-wraper">
+                  <form action="/search.html" method="GET">
+                    <input type="text" name="query" id="search-box" placeholder="Search">
+                    <button class="btn-bg"><img src="/images/icons/search.svg" alt="#"></button>
+                  </form>
+                </div>
+              </div>
+
+              <div class="latest-post-wraper wow fadeInUp" data-wow-delay="0.3s">
+                <h6>Latest Post</h6>
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/cuda/opencl/ruby/rbcuda/2018/02/24/rubygrant17-rbcuda-installation-and-architecture.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>RbCUDA: Installation and Architecture</h2>
+                      <span>24 February 2018</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/cuda/opencl/ruby/rbcuda/2017/12/30/rubygrant17-rbcuda-introduction.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>RbCUDA: CUDA bindings for Ruby</h2>
+                      <span>30 December 2017</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/arrayfire/cuda/opencl/ruby/2017/08/28/gsoc17-project-report.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>GSoC 2017: Creating the fastest math libraries for Ruby by using the GPU through OpenCL and ArrayFire.</h2>
+                      <span>28 August 2017</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+              </div>
+
+              <div class="tags-wraper wow fadeInUp" data-wow-delay="0.4s">
+                <h6>Tag Clouds</h6>
+                <div class="tag-clouds">
+                  <a href="#">Engineering</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Future</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Future</a>
+                  <a href="#">Engineering</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Engineering</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Future</a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+
+
+        </div>
+      </div>
+    </section>
+
+    <section id="updates">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="updates-wraper">
+              <div class="updates-image wow fadeInUp" data-wow-delay="0.2s">
+                <img src="/images/image2.svg" alt="#">
+              </div>
+              <div class="updates-form header-form wow fadeInUp" data-wow-delay="0.2s">
+                <h5 class="font-h5">Subscribe for exclusive</h5>
+                <h3 class="font-h3">news and updates!</h3>
+                <form action="https://zasper.io/newsletter" method="POST">
+                  <div class="form-group">
+                    <input type="email" name="email" placeholder="Enter your email">
+                    <button type="submit" class="btn-bg hover-bg">Subscribe</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-4">
+            <div class="footer-info wow fadeInUp" data-wow-delay="0.2s">
+              <div class="footer-image wow fadeInUp" data-wow-delay="0.1s">
+                <img src="/images/logo.svg" alt="#">
+              </div>
+              <div class="footer-content wow fadeInUp" data-wow-delay="0.2s">
+                <p>Zasper strives to be at the forefront of the AI Revolution that is taking place around the world. We want to ease the pain of Data teams by enabling them to develop and deploy their AI solutions right from rapid prototyping to shipping into production.</p>
+              </div>
+              <div class="footer-social wow fadeInUp" data-wow-delay="0.3s">
+                <a href="https://www.linkedin.com/company/zasper"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+                <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+                <a href="https://github.com/zasperio"><i class="fa fa-github" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-8">
+            <div class="footer-menu-wraper wow fadeInUp" data-wow-delay="0.4s">
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.1s">
+                  <h6>Company</h6>
+                  <a href="https://zasper.io/product">Product</a>
+                  <a href="https://zasper.io/pricing">Pricing</a>
+                  <a href="https://zasper.io/partners">Partners</a>
+                  <a href="https://zasper.io/careers">Careers</a>
+                  <a href="https://zasper.io/support">Support</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.3s">
+                  <h6>Solutions</h6>
+                  <a href="https://zasper.io/solutions/banking">Banking</a>
+                  <a href="https://zasper.io/solutions/telecom">Telecom</a>
+                  <a href="https://zasper.io/solutions/oil-and-gas">Oil and Gas</a>
+                  <a href="https://zasper.io/solutions/healthcare">Healthcare</a>
+                  <a href="https://zasper.io/solutions/">View More</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.5s">
+                  <h6>Community</h6>
+                  <a href="/">Blog</a>
+                  <a href="https://docs.zasper.io">Docs</a>
+                  <a href="https://zasper.io/contact-us">Contact Us</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.6s">
+                  <h6>Legal</h6>
+                  <a href="https://zasper.io/terms-and-conditions">Terms and Conditions</a>
+                  <a href="https://zasper.io/privacy">Privacy Policy</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="copyright">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="copyright-text wow fadeInUp" data-wow-delay="0.2s">
+              <p>©2021 zasper ai labs pvt ltd | All rights reserved.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JavaScripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/wow.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/main.js"></script>
+
+  </body>
+</html>
+
