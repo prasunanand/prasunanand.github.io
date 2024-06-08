@@ -4,6 +4,8 @@ title:  "GSoC 2016: Port NMatrix to JRuby"
 date:   2016-08-22 20:10:41 +0530
 categories: jruby
 comments: true
+author: Prasun Anand
+banner: /images/banner.png
 ---
 
 ## **Introduction**

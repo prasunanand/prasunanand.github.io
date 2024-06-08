@@ -1,0 +1,52 @@
+
+
+          <div class="col-12 col-md-12 col-lg-3">
+            <div class="blog-page-right-wraper">
+              <div class="search-wraper wow fadeInUp" data-wow-delay="0.2s">
+                <h6>Search</h6>
+                <div class="search-form-wraper">
+                  <form action="/search.html" method="GET">
+                    <input type="text" name="query" id="search-box" placeholder="Search">
+                    <button class="btn-bg"><img src="/images/icons/search.svg" alt="#"></button>
+                  </form>
+                </div>
+              </div>
+
+              <div class="latest-post-wraper wow fadeInUp" data-wow-delay="0.3s">
+                <h6>Latest Post</h6>
+                {% for post in site.posts limit:3 %}
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="{{ post.url }}">
+                    <div class="latest-post-item-image">
+                      <img src="{{ post.banner }}" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>{{ post.title }}</h2>
+                      <span>{{ post.date | date: "%-d %B %Y"}}</span>
+                    </div>
+                  </a>
+                </div>
+
+                {% endfor %}
+              </div>
+
+              <div class="tags-wraper wow fadeInUp" data-wow-delay="0.4s">
+                <h6>Tag Clouds</h6>
+                <div class="tag-clouds">
+                  <a href="#">Engineering</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Future</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Future</a>
+                  <a href="#">Engineering</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Engineering</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Future</a>
+                </div>
+              </div>
+
+            </div>
+          </div>

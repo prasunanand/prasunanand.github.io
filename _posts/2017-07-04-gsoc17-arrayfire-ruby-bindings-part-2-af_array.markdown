@@ -4,6 +4,8 @@ title:  "ArrayFire Ruby Bindings<br>(Part II : Af_Array)"
 date:   2017-07-04 12:15:00 +0530
 categories: arrayfire
 comments: true
+author: Prasun Anand
+banner: /images/banner.png
 ---
 
 This post covers how to create arrays using `arrayfire-rb`, perform elementwise

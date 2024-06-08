@@ -1,15 +1,54 @@
----
-layout: default
----
-<article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+{% include header.html %}
 
-  <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">{{ page.title }}</h1>
-    <p class="post-meta"><time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">{{ page.date | date: "%b %-d, %Y" }}</time>{% if page.author %} • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">{{ page.author }}</span></span>{% endif %}</p>
-  </header>
 
-  <div class="post-content" itemprop="articleBody">
-    {{ content }}
-  </div>
+    <section id="blog-sec">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-12 col-lg-9">
+            <div class="blog-details-wraper">
+              <div class="blog-main-image wow fadeInUp">
+                <img src="{{ page.banner }}" alt="#">
+              </div>
 
-</article>
+              <div class="blog-title wow fadeInUp">
+                <h2>{{ page.title }}</h2>
+              </div>
+
+              <div class="blog-published-info wow fadeInUp">
+                <span class="blog-post-date">{{ page.date | date: "%-d %B %Y" }} by</span>
+                <span class="blog-post-author">{{ page.author }}</span>
+              </div>
+
+              <div class="blog-description wow fadeInUp">
+              	<p>{{ page.content }}</p>
+              </div>
+            </div>
+
+            <div class="related-blog-wraper wow fadeInUp">
+              <h6>Related Blog</h6>
+
+              {% for post in site.posts limit:2 %}
+
+              <div class="related-blog-item latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                <a href="{{ post.url }}.html">
+                  <div class="latest-post-item-image">
+                    <img src="{{ post.banner }}" alt="#">
+                  </div>
+                  <div class="latest-post-item-content">
+                    <h2>{{ post.title }}</h2>
+                    <span>{{ post.date | date: "%-d %B %Y"}}</span>
+                  </div>
+                </a>
+              </div>
+              {% endfor %}
+
+            </div>
+          </div>
+          {% include search.html %}
+
+
+        </div>
+      </div>
+    </section>
+
+{% include footer.html %}

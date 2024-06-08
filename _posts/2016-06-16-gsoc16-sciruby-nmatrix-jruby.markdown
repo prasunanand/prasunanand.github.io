@@ -4,6 +4,8 @@ title:  "JRuby Port of NMatrix"
 date:   2016-06-16 18:18:41 +0530
 categories: ruby gem
 comments: true
+author: Prasun Anand
+banner: /images/banner.png
 ---
 ### Introduction
 NMatrix for MRI has become a fairly well-established project. NMatrix is SciRuby’s numerical matrix core, implementing dense matrices as well as two types of sparse (linked-list-based and Yale/CSR). The backend has been written in C/C++ and relies on ATLAS/ CBLAS / CLAPACK and standard LAPACK for several of its linear algebra operations. 

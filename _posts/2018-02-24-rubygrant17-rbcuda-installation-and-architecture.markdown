@@ -4,9 +4,17 @@ title:  "RbCUDA: Installation and Architecture"
 date:   2018-02-24 12:10:41 +0530
 categories: cuda opencl ruby rbcuda
 comments: true
+author: Prasun Anand
+banner: /images/banner.png
 ---
 
 This post explains the architecture of `RbCUDA` and how you can install it on your machine.
+
+todo:
+I have been working on "Port NMatrix to JRuby" as my GSoC project. I am pleased to announce that **JRuby is ready for Nmatrix users**.
+
+NMatrix, a linear algebra library wraps Apache Commons Maths for its core functionalities. By the end of GSoC, I have been able to implement NMatrix for dense matrices with double and object ( ruby objects ) data type. I have also worked on porting mixed-models gem to JRuby which heavily uses NMatrix at its core.
+
 
 # Installation
 

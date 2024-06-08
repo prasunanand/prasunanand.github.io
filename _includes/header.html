@@ -1,27 +1,57 @@
-<header class="site-header">
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <div class="wrapper">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-    <a class="site-title" href="{{ site.baseurl }}/">{{ site.title }}</a>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"/>
 
-    <nav class="site-nav">
-      <a href="#" class="menu-icon">
-        <svg viewBox="0 0 18 15">
-          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
-          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
-          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
-        </svg>
-      </a>
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/animate.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/css/responsive.css">
 
-      <div class="trigger">
-        {% for my_page in site.pages %}
-          {% if my_page.title %}
-          <a class="page-link" href="{{ my_page.url | prepend: site.baseurl }}">{{ my_page.title }}</a>
-          {% endif %}
-        {% endfor %}
-      </div>
-    </nav>
+    <link rel="icon" href="images/zasper_logo.ico" type="image/gif" sizes="32x32">
 
-  </div>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VRJB8WTXR1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
-</header>
+      gtag('config', 'G-VRJB8WTXR1');
+    </script>
+
+    <title>Prasun's Blog</title>
+  </head>
+  <body>
+    <section id="header-home">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <a class="navbar-brand" href="/">
+            <!-- <img src="images/logo.svg" alt="#"> -->
+            Prasun's blog
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu">
+            <i class="fa fa-bars"></i>
+          </button>
+          <div class="navbar-collapse justify-content-center offcanvas offcanvas-top offcanvas-body" id="offcanvasMenu">
+            <button type="button" class="colse-btn" data-bs-dismiss="offcanvas">
+              <i class="fa fa-times"></i>
+            </button>
+            <div class="menu-right-btn mobile-menu-login-signup">
+              <a href="/about" class="custom-btn btn-bg hover-bg">About</a>
+            </div>
+          </div>
+          <div class="menu-right-btn justify-content-end">
+            <a href="/about" class="custom-btn btn-bg hover-bg">About</a>
+          </div>
+        </div>
+      </nav>
+    </section>

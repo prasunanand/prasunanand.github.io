@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"/>
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/animate.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/css/responsive.css">
+
+    <link rel="icon" href="images/zasper_logo.ico" type="image/gif" sizes="32x32">
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VRJB8WTXR1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-VRJB8WTXR1');
+    </script>
+
+    <title>Prasun's Blog</title>
+  </head>
+  <body>
+    <section id="header-home">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <a class="navbar-brand" href="/">
+            <!-- <img src="images/logo.svg" alt="#"> -->
+            Prasun's blog
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu">
+            <i class="fa fa-bars"></i>
+          </button>
+          <div class="navbar-collapse justify-content-center offcanvas offcanvas-top offcanvas-body" id="offcanvasMenu">
+            <button type="button" class="colse-btn" data-bs-dismiss="offcanvas">
+              <i class="fa fa-times"></i>
+            </button>
+            <div class="menu-right-btn mobile-menu-login-signup">
+              <a href="/about" class="custom-btn btn-bg hover-bg">About</a>
+            </div>
+          </div>
+          <div class="menu-right-btn justify-content-end">
+            <a href="/about" class="custom-btn btn-bg hover-bg">About</a>
+          </div>
+        </div>
+      </nav>
+    </section>
+
+
+
+    <section id="blog-sec">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-12 col-lg-9">
+            <div class="blog-details-wraper">
+              <div class="blog-main-image wow fadeInUp">
+                <img src="/images/banner.png" alt="#">
+              </div>
+
+              <div class="blog-title wow fadeInUp">
+                <h2>ArrayFire Ruby Bindings<br>(Part VI : Device and Util)</h2>
+              </div>
+
+              <div class="blog-published-info wow fadeInUp">
+                <span class="blog-post-date">22 August 2017 by</span>
+                <span class="blog-post-author">Prasun Anand</span>
+              </div>
+
+              <div class="blog-description wow fadeInUp">
+              	<p><p>ArrayFire has Device and Util class that contains of methods which can be used to manage the CPU and GPU
+devices and various utility functions like printing and storing the arrays.
+This blog will explain my work regarding the bindings I have created and how to use them.</p>
+
+<h1 id="device">Device</h1>
+
+<p><code class="language-plaintext highlighter-rouge">Device</code> class contains of singleton methods like <code class="language-plaintext highlighter-rouge">info</code>, <code class="language-plaintext highlighter-rouge">device_gc</code>, <code class="language-plaintext highlighter-rouge">lock_device_ptr</code> that can
+be used to get info about the GPU devices used for calculation, explicitly call the garbage collector
+and locking the pointers on GPU device.</p>
+
+<p>The implementation is as follows:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">Init_arrayfire</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">ArrayFire</span> <span class="o">=</span> <span class="n">rb_define_module</span><span class="p">(</span><span class="s">"ArrayFire"</span><span class="p">);</span>
+
+  <span class="n">Device</span> <span class="o">=</span> <span class="n">rb_define_class_under</span><span class="p">(</span><span class="n">ArrayFire</span><span class="p">,</span> <span class="s">"Device"</span><span class="p">,</span> <span class="n">rb_cObject</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"info"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_info</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"init"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_init2</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"info_string"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_info_string</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"device_info"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_device_info</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"get_device_count"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_get_device_count</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"get_dbl_support"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_get_dbl_support</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"set_device"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_set_device</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"get_device"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_get_device</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"sync"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_sync</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"device_mem_info"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_device_mem_info</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"print_mem_info"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_print_mem_info</span><span class="p">,</span> <span class="mi">2</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"device_gc"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_device_gc</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"set_mem_step_size"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_set_mem_step_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"get_mem_step_size"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_get_mem_step_size</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"lock_device_ptr"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_lock_device_ptr</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"unlock_device_ptr"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_unlock_device_ptr</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"lock_array"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_lock_array</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"unlock_array"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_unlock_array</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"is_locked_array"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_is_locked_array</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Device</span><span class="p">,</span> <span class="s">"get_device_ptr"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_get_device_ptr</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>The implementation of device_info is interesting as it has 4 return values in the form of strings.
+<code class="language-plaintext highlighter-rouge">ArrayFire::Device.device_info</code> passes the variables to be returned to  <code class="language-plaintext highlighter-rouge">ArrayFire::Device.device_info_func</code>
+which modifies the contents of the variables passed.</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">module</span> <span class="nn">ArrayFire</span>
+  <span class="k">class</span> <span class="nc">Device</span>
+    <span class="k">def</span> <span class="nc">self</span><span class="o">.</span><span class="nf">device_info</span>
+      <span class="n">d_name</span>     <span class="o">=</span> <span class="s2">""</span>
+      <span class="n">d_platform</span> <span class="o">=</span> <span class="s2">""</span>
+      <span class="n">d_toolkit</span>  <span class="o">=</span> <span class="s2">""</span>
+      <span class="n">d_compute</span>  <span class="o">=</span> <span class="s2">""</span>
+      <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Device</span><span class="p">.</span><span class="nf">device_info_func</span><span class="p">(</span><span class="n">d_name</span><span class="p">,</span> <span class="n">d_platform</span><span class="p">,</span> <span class="n">d_toolkit</span><span class="p">,</span> <span class="n">d_compute</span><span class="p">);</span>
+      <span class="k">return</span> <span class="n">d_name</span><span class="p">,</span> <span class="n">d_platform</span><span class="p">,</span> <span class="n">d_toolkit</span><span class="p">,</span> <span class="n">d_compute</span>
+    <span class="k">end</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>The point to note here is that <code class="language-plaintext highlighter-rouge">ArrayFire::Device.device_info</code> uses <code class="language-plaintext highlighter-rouge">rb_str_cat2()</code> to concatenate the <code class="language-plaintext highlighter-rouge">char*</code>
+to the <code class="language-plaintext highlighter-rouge">VALUE</code> containing empty string.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_device_info</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">name_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">platform_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">toolkit_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">compute_val</span><span class="p">){</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">d_name</span>     <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">)</span> <span class="o">*</span> <span class="mi">64</span><span class="p">);</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">d_platform</span> <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">);</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">d_toolkit</span>  <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">)</span> <span class="o">*</span> <span class="mi">64</span><span class="p">);</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">d_compute</span>  <span class="o">=</span> <span class="p">(</span><span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">malloc</span><span class="p">(</span><span class="k">sizeof</span><span class="p">(</span><span class="kt">char</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">);</span>
+
+  <span class="n">af_device_info</span><span class="p">(</span><span class="n">d_name</span><span class="p">,</span> <span class="n">d_platform</span><span class="p">,</span> <span class="n">d_toolkit</span><span class="p">,</span> <span class="n">d_compute</span><span class="p">);</span>
+
+  <span class="n">rb_str_cat2</span><span class="p">(</span><span class="n">name_val</span><span class="p">,</span>     <span class="n">d_name</span><span class="p">);</span>
+  <span class="n">rb_str_cat2</span><span class="p">(</span><span class="n">platform_val</span><span class="p">,</span> <span class="n">d_platform</span><span class="p">);</span>
+  <span class="n">rb_str_cat2</span><span class="p">(</span><span class="n">toolkit_val</span><span class="p">,</span>  <span class="n">d_toolkit</span><span class="p">);</span>
+  <span class="n">rb_str_cat2</span><span class="p">(</span><span class="n">compute_val</span><span class="p">,</span>  <span class="n">d_compute</span><span class="p">);</span>
+
+  <span class="k">return</span> <span class="n">Qnil</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_device_mem_info</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">){</span>
+  <span class="kt">size_t</span> <span class="n">alloc_bytes</span><span class="p">,</span> <span class="n">alloc_buffers</span><span class="p">,</span> <span class="n">lock_bytes</span><span class="p">,</span> <span class="n">lock_buffers</span><span class="p">;</span>
+  <span class="n">af_device_mem_info</span><span class="p">(</span> <span class="o">&amp;</span><span class="n">alloc_bytes</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">alloc_buffers</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lock_bytes</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">lock_buffers</span><span class="p">);</span>
+  <span class="n">printf</span><span class="p">(</span><span class="s">"Allocated Bytes: %d</span><span class="se">\n</span><span class="s">Allocated buffers: %d</span><span class="se">\n</span><span class="s">Lock Bytes: %d</span><span class="se">\n</span><span class="s">Lock Buffers: %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+          <span class="n">alloc_bytes</span><span class="p">,</span> <span class="n">alloc_buffers</span><span class="p">,</span> <span class="n">lock_bytes</span><span class="p">,</span> <span class="n">lock_buffers</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">Qnil</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p>Running <code class="language-plaintext highlighter-rouge">pry</code> to check the bindings:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">rake</span> <span class="n">pry</span>
+<span class="n">pry</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'./lib/arrayfire.rb'</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Device</span><span class="p">.</span><span class="nf">info</span>
+<span class="no">ArrayFire</span> <span class="n">v3</span><span class="o">.</span><span class="mf">4.0</span> <span class="p">(</span><span class="no">CUDA</span><span class="p">,</span> <span class="mi">64</span><span class="o">-</span><span class="n">bit</span> <span class="no">Linux</span><span class="p">,</span> <span class="n">build</span> <span class="mi">75</span><span class="n">cad40</span><span class="p">)</span>
+<span class="no">Platform</span><span class="p">:</span> <span class="no">CUDA</span> <span class="no">Toolkit</span> <span class="mf">7.5</span><span class="p">,</span> <span class="no">Driver</span><span class="p">:</span> <span class="mf">375.66</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="no">GeForce</span> <span class="no">GTX</span> <span class="mi">750</span> <span class="no">Ti</span><span class="p">,</span> <span class="mi">4042</span> <span class="no">MB</span><span class="p">,</span> <span class="no">CUDA</span> <span class="no">Compute</span> <span class="mf">5.0</span>
+<span class="o">=&gt;</span> <span class="kp">nil</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Device</span><span class="p">.</span><span class="nf">device_info</span>
+<span class="o">=&gt;</span> <span class="p">[</span><span class="s2">"GeForce_GTX_750_Ti"</span><span class="p">,</span> <span class="s2">"CUDA"</span><span class="p">,</span> <span class="s2">"v7.5"</span><span class="p">,</span> <span class="s2">"5.0"</span><span class="p">]</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Device</span><span class="p">.</span><span class="nf">get_device_count</span>
+<span class="o">=&gt;</span> <span class="mi">1</span>
+<span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Device</span><span class="p">.</span><span class="nf">get_dbl_support</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="kp">true</span>
+<span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Device</span><span class="p">.</span><span class="nf">device_mem_info</span>
+<span class="no">Allocated</span> <span class="no">Bytes</span><span class="p">:</span> <span class="mi">0</span>
+<span class="no">Allocated</span> <span class="ss">buffers: </span><span class="mi">0</span>
+<span class="no">Lock</span> <span class="no">Bytes</span><span class="p">:</span> <span class="mi">0</span>
+<span class="no">Lock</span> <span class="no">Buffers</span><span class="p">:</span> <span class="mi">0</span>
+<span class="o">=&gt;</span> <span class="kp">nil</span>
+<span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">arr</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span> <span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">4</span> <span class="mi">4</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">1.0000</span>    <span class="o">-</span><span class="mf">2.0000</span>     <span class="mf">1.0000</span>     <span class="mf">0.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">2.0000</span>     <span class="mf">4.0000</span>    <span class="o">-</span><span class="mf">3.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">1.0000</span>     <span class="mf">3.0000</span>     <span class="mf">2.0000</span>
+    <span class="mf">0.0000</span>     <span class="mf">3.0000</span>     <span class="mf">1.0000</span>     <span class="mf">9.0000</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x000000023800c0&gt;</span>
+<span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Device</span><span class="p">.</span><span class="nf">print_mem_info</span><span class="p">(</span><span class="s2">"mem info"</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">mem</span> <span class="n">info</span>
+<span class="o">---------------------------------------------------------</span>
+<span class="o">|</span>     <span class="no">POINTER</span>      <span class="o">|</span>    <span class="no">SIZE</span>    <span class="o">|</span>  <span class="no">AF</span> <span class="no">LOCK</span>  <span class="o">|</span> <span class="no">USER</span> <span class="no">LOCK</span> <span class="o">|</span>
+<span class="o">---------------------------------------------------------</span>
+<span class="o">|</span>     <span class="mh">0x702f80000</span>  <span class="o">|</span>       <span class="mi">1</span> <span class="no">KB</span> <span class="o">|</span>       <span class="no">Yes</span> <span class="o">|</span>        <span class="no">No</span> <span class="o">|</span>
+<span class="o">|</span>     <span class="mh">0x702f80400</span>  <span class="o">|</span>       <span class="mi">1</span> <span class="no">KB</span> <span class="o">|</span>        <span class="no">No</span> <span class="o">|</span>        <span class="no">No</span> <span class="o">|</span>
+<span class="o">---------------------------------------------------------</span>
+<span class="o">=&gt;</span> <span class="kp">nil</span>
+<span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Device</span><span class="p">.</span><span class="nf">device_mem_info</span>
+<span class="no">Allocated</span> <span class="no">Bytes</span><span class="p">:</span> <span class="mi">2048</span>
+<span class="no">Allocated</span> <span class="ss">buffers: </span><span class="mi">2</span>
+<span class="no">Lock</span> <span class="no">Bytes</span><span class="p">:</span> <span class="mi">1024</span>
+<span class="no">Lock</span> <span class="no">Buffers</span><span class="p">:</span> <span class="mi">1</span>
+<span class="o">=&gt;</span> <span class="kp">nil</span>
+<span class="p">[</span><span class="mi">9</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Device</span><span class="p">.</span><span class="nf">get_mem_step_size</span>
+<span class="o">=&gt;</span> <span class="mi">1024</span>
+<span class="p">[</span><span class="mi">10</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Device</span><span class="p">.</span><span class="nf">is_locked_array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="kp">false</span>
+<span class="p">[</span><span class="mi">11</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Device</span><span class="p">.</span><span class="nf">lock_array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="kp">true</span>
+<span class="p">[</span><span class="mi">12</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Device</span><span class="p">.</span><span class="nf">is_locked_array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="kp">true</span>
+</code></pre></div></div>
+
+<h1 id="util">Util</h1>
+
+<p>Util class contains of methods responsible for printing an Af_Array, saving it in a file
+or converting it to string and other utility methods.</p>
+
+<p>The implementation is as follows:</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">Init_arrayfire</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">ArrayFire</span> <span class="o">=</span> <span class="n">rb_define_module</span><span class="p">(</span><span class="s">"ArrayFire"</span><span class="p">);</span>
+
+  <span class="n">Util</span> <span class="o">=</span> <span class="n">rb_define_class_under</span><span class="p">(</span><span class="n">ArrayFire</span><span class="p">,</span> <span class="s">"Util"</span><span class="p">,</span> <span class="n">rb_cObject</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Util</span><span class="p">,</span> <span class="s">"print_array"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_print_array</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Util</span><span class="p">,</span> <span class="s">"print_array_gen"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_print_array_gen</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Util</span><span class="p">,</span> <span class="s">"save_array"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_save_array</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Util</span><span class="p">,</span> <span class="s">"read_array_index"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_read_array_index</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Util</span><span class="p">,</span> <span class="s">"read_array_key"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_read_array_key</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Util</span><span class="p">,</span> <span class="s">"read_array_key_check"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_read_array_key_check</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Util</span><span class="p">,</span> <span class="s">"array_to_string"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_array_to_string</span><span class="p">,</span> <span class="mi">4</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Util</span><span class="p">,</span> <span class="s">"get_version"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_get_version</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Util</span><span class="p">,</span> <span class="s">"get_revision"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_get_revision</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+  <span class="n">rb_define_singleton_method</span><span class="p">(</span><span class="n">Util</span><span class="p">,</span> <span class="s">"get_size_of"</span><span class="p">,</span> <span class="p">(</span><span class="n">METHOD</span><span class="p">)</span><span class="n">arf_get_size_of</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+<p><code class="language-plaintext highlighter-rouge">af_array_to_string</code> API has also been used to implement <code class="language-plaintext highlighter-rouge">ArrayFire::Af_Array#to_s</code>.</p>
+
+<p>The implementation of <code class="language-plaintext highlighter-rouge">arf_get_version</code> is interesting as it returns a hash value that represents
+the version of <code class="language-plaintext highlighter-rouge">ArrayFire</code> C library installed using the keys as <code class="language-plaintext highlighter-rouge">major</code>, <code class="language-plaintext highlighter-rouge">minor</code> and <code class="language-plaintext highlighter-rouge">patch</code>.</p>
+
+<p><code class="language-plaintext highlighter-rouge">rb_hash_new</code> and <code class="language-plaintext highlighter-rouge">rb_hash_aset</code> has been used to create a hash.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_print_array</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">input_val</span><span class="p">){</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">input</span><span class="p">;</span>
+
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">input_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
+
+  <span class="n">af_print_array</span><span class="p">(</span><span class="n">input</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">);</span>
+  <span class="k">return</span> <span class="n">Qtrue</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_save_array</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">key_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">array_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">fn_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">append</span><span class="p">){</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">input</span><span class="p">;</span>
+
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">array_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
+  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">key</span> <span class="o">=</span> <span class="n">StringValueCStr</span><span class="p">(</span><span class="n">key_val</span><span class="p">);</span>
+  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">filename</span> <span class="o">=</span> <span class="n">StringValueCStr</span><span class="p">(</span><span class="n">fn_val</span><span class="p">);</span>
+  <span class="kt">int</span> <span class="n">index</span><span class="p">;</span>
+  <span class="n">af_save_array</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">index</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">input</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">RTEST</span><span class="p">(</span><span class="n">append</span><span class="p">));</span>
+  <span class="k">return</span> <span class="n">INT2NUM</span><span class="p">(</span><span class="n">index</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_array_to_string</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">exp_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">array_val</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">precision</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">transpose</span><span class="p">){</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">output</span><span class="p">;</span>
+  <span class="n">afstruct</span><span class="o">*</span> <span class="n">input</span><span class="p">;</span>
+
+  <span class="n">Data_Get_Struct</span><span class="p">(</span><span class="n">array_val</span><span class="p">,</span> <span class="n">afstruct</span><span class="p">,</span> <span class="n">input</span><span class="p">);</span>
+  <span class="k">const</span> <span class="kt">char</span><span class="o">*</span> <span class="n">exp</span> <span class="o">=</span> <span class="n">StringValueCStr</span><span class="p">(</span><span class="n">exp_val</span><span class="p">);</span>
+  <span class="n">af_array_to_string</span><span class="p">(</span><span class="o">&amp;</span><span class="n">output</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">input</span><span class="o">-&gt;</span><span class="n">carray</span><span class="p">,</span> <span class="n">NUM2INT</span><span class="p">(</span><span class="n">precision</span><span class="p">),</span> <span class="n">RTEST</span><span class="p">(</span><span class="n">transpose</span><span class="p">));</span>
+
+  <span class="k">return</span> <span class="n">rb_str_new_cstr</span><span class="p">(</span><span class="n">output</span><span class="p">);</span>
+<span class="p">}</span>
+
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">arf_get_version</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">){</span>
+  <span class="kt">int</span> <span class="n">major</span><span class="p">,</span> <span class="n">minor</span><span class="p">,</span> <span class="n">patch</span><span class="p">;</span>
+  <span class="n">af_get_version</span><span class="p">(</span><span class="o">&amp;</span><span class="n">major</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">minor</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">patch</span><span class="p">);</span>
+
+  <span class="n">VALUE</span> <span class="n">hash</span> <span class="o">=</span> <span class="n">rb_hash_new</span><span class="p">();</span>
+  <span class="n">rb_hash_aset</span><span class="p">(</span><span class="n">hash</span><span class="p">,</span> <span class="n">rb_str_new_cstr</span><span class="p">(</span><span class="s">"major"</span><span class="p">),</span> <span class="n">INT2NUM</span><span class="p">(</span><span class="n">major</span><span class="p">));</span>
+  <span class="n">rb_hash_aset</span><span class="p">(</span><span class="n">hash</span><span class="p">,</span> <span class="n">rb_str_new_cstr</span><span class="p">(</span><span class="s">"minor"</span><span class="p">),</span> <span class="n">INT2NUM</span><span class="p">(</span><span class="n">minor</span><span class="p">));</span>
+  <span class="n">rb_hash_aset</span><span class="p">(</span><span class="n">hash</span><span class="p">,</span> <span class="n">rb_str_new_cstr</span><span class="p">(</span><span class="s">"patch"</span><span class="p">),</span> <span class="n">INT2NUM</span><span class="p">(</span><span class="n">patch</span><span class="p">));</span>
+  <span class="k">return</span> <span class="n">hash</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>Lets use pry to check the bindings:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">rake</span> <span class="n">pry</span>
+<span class="n">pry</span> <span class="o">-</span><span class="n">r</span> <span class="s1">'./lib/arrayfire.rb'</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">arr</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Af_Array</span><span class="p">.</span><span class="nf">new</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span> <span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">4</span> <span class="mi">4</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">1.0000</span>    <span class="o">-</span><span class="mf">2.0000</span>     <span class="mf">1.0000</span>     <span class="mf">0.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">2.0000</span>     <span class="mf">4.0000</span>    <span class="o">-</span><span class="mf">3.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">1.0000</span>     <span class="mf">3.0000</span>     <span class="mf">2.0000</span>
+    <span class="mf">0.0000</span>     <span class="mf">3.0000</span>     <span class="mf">1.0000</span>     <span class="mf">9.0000</span>
+
+<span class="o">=&gt;</span> <span class="c1">#&lt;ArrayFire::Af_Array:0x000000026bde18&gt;</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Util</span><span class="p">.</span><span class="nf">print_array</span><span class="p">(</span><span class="n">arr</span><span class="p">)</span>
+<span class="no">No</span> <span class="no">Name</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">4</span> <span class="mi">4</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">1.0000</span>    <span class="o">-</span><span class="mf">2.0000</span>     <span class="mf">1.0000</span>     <span class="mf">0.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">2.0000</span>     <span class="mf">4.0000</span>    <span class="o">-</span><span class="mf">3.0000</span>
+    <span class="mf">2.0000</span>     <span class="mf">1.0000</span>     <span class="mf">3.0000</span>     <span class="mf">2.0000</span>
+    <span class="mf">0.0000</span>     <span class="mf">3.0000</span>     <span class="mf">1.0000</span>     <span class="mf">9.0000</span>
+
+<span class="o">=&gt;</span> <span class="kp">true</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Util</span><span class="p">.</span><span class="nf">array_to_string</span><span class="p">(</span><span class="s2">"GPU Array"</span><span class="p">,</span> <span class="n">arr</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="kp">false</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="s2">"GPU Array</span><span class="se">\n</span><span class="s2">[4 4 1 1]</span><span class="se">\n</span><span class="s2">    1.00000     2.00000     2.00000     0.00000 </span><span class="se">\n</span><span class="s2">   -2.00000     2.00000     1.00000     3.00000 </span><span class="se">\n</span><span class="s2">    1.00000     4.00000     3.00000     1.00000 </span><span class="se">\n</span><span class="s2">    0.00000    -3.00000     2.00000     9.00000 </span><span class="se">\n\n</span><span class="s2">"</span>
+<span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="nb">puts</span> <span class="n">x</span>
+<span class="no">GPU</span> <span class="no">Array</span>
+<span class="p">[</span><span class="mi">4</span> <span class="mi">4</span> <span class="mi">1</span> <span class="mi">1</span><span class="p">]</span>
+    <span class="mf">1.00000</span>     <span class="mf">2.00000</span>     <span class="mf">2.00000</span>     <span class="mf">0.00000</span>
+   <span class="o">-</span><span class="mf">2.00000</span>     <span class="mf">2.00000</span>     <span class="mf">1.00000</span>     <span class="mf">3.00000</span>
+    <span class="mf">1.00000</span>     <span class="mf">4.00000</span>     <span class="mf">3.00000</span>     <span class="mf">1.00000</span>
+    <span class="mf">0.00000</span>    <span class="o">-</span><span class="mf">3.00000</span>     <span class="mf">2.00000</span>     <span class="mf">9.00000</span>
+
+<span class="o">=&gt;</span> <span class="kp">nil</span>
+<span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Util</span><span class="p">.</span><span class="nf">get_version</span>
+<span class="o">=&gt;</span> <span class="p">{</span><span class="s2">"major"</span><span class="o">=&gt;</span><span class="mi">3</span><span class="p">,</span> <span class="s2">"minor"</span><span class="o">=&gt;</span><span class="mi">4</span><span class="p">,</span> <span class="s2">"patch"</span><span class="o">=&gt;</span><span class="mi">0</span><span class="p">}</span>
+<span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Util</span><span class="p">.</span><span class="nf">get_revision</span>
+<span class="o">=&gt;</span> <span class="s2">"75cad40"</span>
+<span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="n">pry</span><span class="p">(</span><span class="n">main</span><span class="p">)</span><span class="o">&gt;</span> <span class="no">ArrayFire</span><span class="o">::</span><span class="no">Util</span><span class="p">.</span><span class="nf">get_size_of</span><span class="p">(</span><span class="ss">:f64</span><span class="p">)</span>
+<span class="o">=&gt;</span> <span class="mi">8</span>
+</code></pre></div></div>
+
+<p>The bindings work!.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>We can easily manage the available GPU devices and manage the memory. Also, we can save the <code class="language-plaintext highlighter-rouge">Af_Array</code>
+output to a file among other utilities.</p>
+
+<p>In the next blog post, I will explain about using multiple backends using <code class="language-plaintext highlighter-rouge">ArrayFire</code> , i.e. OpenCL, CUDA
+and even use CPUs.</p>
+
+<div id="disqus_thread"></div>
+<script>
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//prasunanandblog.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+</p>
+              </div>
+            </div>
+
+            <div class="related-blog-wraper wow fadeInUp">
+              <h6>Related Blog</h6>
+
+              
+
+              <div class="related-blog-item latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                <a href="/cuda/opencl/ruby/rbcuda/2018/02/24/rubygrant17-rbcuda-installation-and-architecture.html.html">
+                  <div class="latest-post-item-image">
+                    <img src="/images/banner.png" alt="#">
+                  </div>
+                  <div class="latest-post-item-content">
+                    <h2>RbCUDA: Installation and Architecture</h2>
+                    <span>24 February 2018</span>
+                  </div>
+                </a>
+              </div>
+              
+
+              <div class="related-blog-item latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                <a href="/cuda/opencl/ruby/rbcuda/2017/12/30/rubygrant17-rbcuda-introduction.html.html">
+                  <div class="latest-post-item-image">
+                    <img src="/images/banner.png" alt="#">
+                  </div>
+                  <div class="latest-post-item-content">
+                    <h2>RbCUDA: CUDA bindings for Ruby</h2>
+                    <span>30 December 2017</span>
+                  </div>
+                </a>
+              </div>
+              
+
+            </div>
+          </div>
+          
+
+          <div class="col-12 col-md-12 col-lg-3">
+            <div class="blog-page-right-wraper">
+              <div class="search-wraper wow fadeInUp" data-wow-delay="0.2s">
+                <h6>Search</h6>
+                <div class="search-form-wraper">
+                  <form action="/search.html" method="GET">
+                    <input type="text" name="query" id="search-box" placeholder="Search">
+                    <button class="btn-bg"><img src="/images/icons/search.svg" alt="#"></button>
+                  </form>
+                </div>
+              </div>
+
+              <div class="latest-post-wraper wow fadeInUp" data-wow-delay="0.3s">
+                <h6>Latest Post</h6>
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/cuda/opencl/ruby/rbcuda/2018/02/24/rubygrant17-rbcuda-installation-and-architecture.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>RbCUDA: Installation and Architecture</h2>
+                      <span>24 February 2018</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/cuda/opencl/ruby/rbcuda/2017/12/30/rubygrant17-rbcuda-introduction.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>RbCUDA: CUDA bindings for Ruby</h2>
+                      <span>30 December 2017</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/arrayfire/cuda/opencl/ruby/2017/08/28/gsoc17-project-report.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>GSoC 2017: Creating the fastest math libraries for Ruby by using the GPU through OpenCL and ArrayFire.</h2>
+                      <span>28 August 2017</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+              </div>
+
+              <div class="tags-wraper wow fadeInUp" data-wow-delay="0.4s">
+                <h6>Tag Clouds</h6>
+                <div class="tag-clouds">
+                  <a href="#">Engineering</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Future</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Future</a>
+                  <a href="#">Engineering</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Engineering</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Future</a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+
+
+        </div>
+      </div>
+    </section>
+
+    <section id="updates">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="updates-wraper">
+              <div class="updates-image wow fadeInUp" data-wow-delay="0.2s">
+                <img src="/images/image2.svg" alt="#">
+              </div>
+              <div class="updates-form header-form wow fadeInUp" data-wow-delay="0.2s">
+                <h5 class="font-h5">Subscribe for exclusive</h5>
+                <h3 class="font-h3">news and updates!</h3>
+                <form action="https://zasper.io/newsletter" method="POST">
+                  <div class="form-group">
+                    <input type="email" name="email" placeholder="Enter your email">
+                    <button type="submit" class="btn-bg hover-bg">Subscribe</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-4">
+            <div class="footer-info wow fadeInUp" data-wow-delay="0.2s">
+              <div class="footer-image wow fadeInUp" data-wow-delay="0.1s">
+                <img src="/images/logo.svg" alt="#">
+              </div>
+              <div class="footer-content wow fadeInUp" data-wow-delay="0.2s">
+                <p>Zasper strives to be at the forefront of the AI Revolution that is taking place around the world. We want to ease the pain of Data teams by enabling them to develop and deploy their AI solutions right from rapid prototyping to shipping into production.</p>
+              </div>
+              <div class="footer-social wow fadeInUp" data-wow-delay="0.3s">
+                <a href="https://www.linkedin.com/company/zasper"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+                <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+                <a href="https://github.com/zasperio"><i class="fa fa-github" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-8">
+            <div class="footer-menu-wraper wow fadeInUp" data-wow-delay="0.4s">
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.1s">
+                  <h6>Company</h6>
+                  <a href="https://zasper.io/product">Product</a>
+                  <a href="https://zasper.io/pricing">Pricing</a>
+                  <a href="https://zasper.io/partners">Partners</a>
+                  <a href="https://zasper.io/careers">Careers</a>
+                  <a href="https://zasper.io/support">Support</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.3s">
+                  <h6>Solutions</h6>
+                  <a href="https://zasper.io/solutions/banking">Banking</a>
+                  <a href="https://zasper.io/solutions/telecom">Telecom</a>
+                  <a href="https://zasper.io/solutions/oil-and-gas">Oil and Gas</a>
+                  <a href="https://zasper.io/solutions/healthcare">Healthcare</a>
+                  <a href="https://zasper.io/solutions/">View More</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.5s">
+                  <h6>Community</h6>
+                  <a href="/">Blog</a>
+                  <a href="https://docs.zasper.io">Docs</a>
+                  <a href="https://zasper.io/contact-us">Contact Us</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.6s">
+                  <h6>Legal</h6>
+                  <a href="https://zasper.io/terms-and-conditions">Terms and Conditions</a>
+                  <a href="https://zasper.io/privacy">Privacy Policy</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="copyright">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="copyright-text wow fadeInUp" data-wow-delay="0.2s">
+              <p>©2021 zasper ai labs pvt ltd | All rights reserved.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JavaScripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/wow.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/main.js"></script>
+
+  </body>
+</html>
+

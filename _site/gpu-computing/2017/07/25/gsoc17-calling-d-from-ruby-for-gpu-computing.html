@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"/>
+
+    <!-- CSS -->
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="/css/animate.css">
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+    <link rel="stylesheet" type="text/css" href="/css/responsive.css">
+
+    <link rel="icon" href="images/zasper_logo.ico" type="image/gif" sizes="32x32">
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-VRJB8WTXR1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-VRJB8WTXR1');
+    </script>
+
+    <title>Prasun's Blog</title>
+  </head>
+  <body>
+    <section id="header-home">
+      <nav class="navbar navbar-expand-lg">
+        <div class="container">
+          <a class="navbar-brand" href="/">
+            <!-- <img src="images/logo.svg" alt="#"> -->
+            Prasun's blog
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu">
+            <i class="fa fa-bars"></i>
+          </button>
+          <div class="navbar-collapse justify-content-center offcanvas offcanvas-top offcanvas-body" id="offcanvasMenu">
+            <button type="button" class="colse-btn" data-bs-dismiss="offcanvas">
+              <i class="fa fa-times"></i>
+            </button>
+            <div class="menu-right-btn mobile-menu-login-signup">
+              <a href="/about" class="custom-btn btn-bg hover-bg">About</a>
+            </div>
+          </div>
+          <div class="menu-right-btn justify-content-end">
+            <a href="/about" class="custom-btn btn-bg hover-bg">About</a>
+          </div>
+        </div>
+      </nav>
+    </section>
+
+
+
+    <section id="blog-sec">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-12 col-lg-9">
+            <div class="blog-details-wraper">
+              <div class="blog-main-image wow fadeInUp">
+                <img src="/images/banner.png" alt="#">
+              </div>
+
+              <div class="blog-title wow fadeInUp">
+                <h2>Calling D from Ruby for GPU computing</h2>
+              </div>
+
+              <div class="blog-published-info wow fadeInUp">
+                <span class="blog-post-date">25 July 2017 by</span>
+                <span class="blog-post-author">Prasun Anand</span>
+              </div>
+
+              <div class="blog-description wow fadeInUp">
+              	<p><p>todo:
+I have been working on “Port NMatrix to JRuby” as my GSoC project. I am pleased to announce that <strong>JRuby is ready for Nmatrix users</strong>.</p>
+
+<p>NMatrix, a linear algebra library wraps Apache Commons Maths for its core functionalities. By the end of GSoC, I have been able to implement NMatrix for dense matrices with double and object ( ruby objects ) data type. I have also worked on porting mixed-models gem to JRuby which heavily uses NMatrix at its core.</p>
+
+<p>As <a href="https://github.com/prasunanand/arrayfire-rb"><code class="language-plaintext highlighter-rouge">ArrayFire-rb</code></a>, a GPGPU libray has started taking shape,
+the next goal is to interface it with <a href="https://github.com/sciruby/nmatrix"><code class="language-plaintext highlighter-rouge">NMatrix</code></a> library, so we can
+run Linear Mixed Models(<a href="https://github.com/agisga/mixed_models/"><code class="language-plaintext highlighter-rouge">mixed_models</code></a>).</p>
+
+<p>I have also written an LMM(Linear Mixed Models) solver in D for Genome Wide Association studies
+called <a href="https://github.com/prasunanand/faster_lmm_d">faster_lmm_d</a> which has two GPU backends:</p>
+<ol>
+  <li>
+    <p>CUDA backend which helps it directly interact with CUBLAS libraries and runs only on Nvidia Hardware.
+For CUDA backend, <code class="language-plaintext highlighter-rouge">Faster_LMM_D</code> uses <a href="https://github.com/prasunanand/cuda_d"><code class="language-plaintext highlighter-rouge">cuda_d</code></a>(The D bindings I wrote for CUDA libraries).</p>
+  </li>
+  <li>
+    <p>ArrayFire backend which helps it run on all major GPU vendors(Nvidia, Intel, AMD) by calling CUDA, CuBLAS,
+OpenCL, clBLAS libraries using the ArrayFire library. For ArrayFire backend, <code class="language-plaintext highlighter-rouge">Faster_LMM_D</code> uses
+<a href="https://github.com/arrayfire/arrayfire-d"><code class="language-plaintext highlighter-rouge">arrayfire-d</code></a>(The D bindings I wrote for ArrayFire library).</p>
+  </li>
+</ol>
+
+<p>So, I found that it would be really great if we could port <code class="language-plaintext highlighter-rouge">faster_lmm_d</code> to Ruby by calling D from Ruby. <code class="language-plaintext highlighter-rouge">faster_lmm_d</code>
+uses some cool tricks to efficiently use GPUs for computing like minimizing the warmup time, minimal copying
+of CPU memory to GPU memory. It logs CPU memory and GPU memory before and after every significant computation.
+So, it would be an ideal exercise for GPU computing on Ruby by calling D functions under the hood.</p>
+
+<p>Although, this is still a work in progress, I would like to share about my experiences.</p>
+
+<h1 id="previous-attempts">Previous Attempts</h1>
+
+<p>There has been previous attempts at Calling D from Ruby. In my search for the existing attempts at
+“Calling D from Ruby”, I stumbled upon these resources.</p>
+
+<ol>
+  <li><a href="https://wiki.dlang.org/Call_D_from_Ruby_using_FFI">FFI</a>: Use the Ruby-FFI gem to call a D function from C.</li>
+  <li><a href="https://github.com/tomash/rudy">RuDy</a>: An effort / library / gem to enable
+and ease writing Ruby native extensions in D programming language. It depends on creatind D bindings for the API calls in <code class="language-plaintext highlighter-rouge">ruby.h</code> header
+file.</li>
+  <li><a href="https://github.com/llaine/ruby-dlang">Ruby-Dlang</a>: Similar approach as Rudy.</li>
+  <li><a href="https://github.com/jacob-carlborg/orbit">Orbit</a>: Similar approach as Rudy.</li>
+</ol>
+
+<p>I have been intereseted in the first two methods, i.e. FFI and Rudy.</p>
+
+<h1 id="exploring-ffi">Exploring FFI</h1>
+
+<p>The idea here is to create a shared object <code class="language-plaintext highlighter-rouge">.so</code> and call it with Ruby by loading the shared object using FFI gem.</p>
+
+<p>Dlang has three compilers namely <code class="language-plaintext highlighter-rouge">DMD</code>, <code class="language-plaintext highlighter-rouge">GDC</code> and <code class="language-plaintext highlighter-rouge">LDC</code>. The post on Dlang wiki makes use of <code class="language-plaintext highlighter-rouge">DMD</code>, I could easily
+run the example on my machine using <code class="language-plaintext highlighter-rouge">DMD</code>, however I could not run it with <code class="language-plaintext highlighter-rouge">LDC</code>. I need to compile the d files
+with LDC because <code class="language-plaintext highlighter-rouge">faster_lmm_d</code> makes use of <code class="language-plaintext highlighter-rouge">LDC</code> compiler switches and it would take a lot of effort to be able to
+run it with <code class="language-plaintext highlighter-rouge">DMD</code>.</p>
+
+<p>The error I encountered is:</p>
+
+<ol>
+  <li>Error with ld :
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ldc2 <span class="nt">-shared</span> <span class="nt">-m64</span> <span class="nt">-relocation-model</span><span class="o">=</span>pic i.d
+/usr/bin/ld: /home/prasun/ldclatest/ldc-1.1.0-pk9rkm4zvdp6pglam7s2/lib/libdruntime-ldc.a<span class="o">(</span>errno.c.o<span class="o">)</span>: relocation R_X86_64_PC32 against undefined symbol <span class="sb">`</span>__errno_location@@GLIBC_2.2.5<span class="s1">' can not be used when making a shared object; recompile with -fPIC
+/usr/bin/ld: final link failed: Bad value
+collect2: error: ld returned 1 exit status
+Error: /usr/lib/nvidia-cuda-toolkit/bin/gcc failed with status: 1
+</span></code></pre></div>    </div>
+  </li>
+</ol>
+
+<p>I have also tried some hit and trial and yet I was unable to properly compile the file.</p>
+
+<h1 id="exploring-rudy">Exploring RuDy</h1>
+
+<p>I find Rudy as a more suitable way to create Ruby native extensions.</p>
+
+<p>When creating a Ruby native extension in C, we have a set of APIs provided by <code class="language-plaintext highlighter-rouge">ruby.h</code> that helps in creating a
+<code class="language-plaintext highlighter-rouge">Module</code> or a <code class="language-plaintext highlighter-rouge">Class</code> and the <code class="language-plaintext highlighter-rouge">methods</code> are nested to it.</p>
+
+<p>For example, <code class="language-plaintext highlighter-rouge">rb_define_module</code> helps in creating a module and <code class="language-plaintext highlighter-rouge">rb_define_class_under</code> is used to create a class
+nested in a module. <code class="language-plaintext highlighter-rouge">rb_define_method</code> and <code class="language-plaintext highlighter-rouge">rb_define_singleton_method</code> are used to create methods. The variables
+are used as <code class="language-plaintext highlighter-rouge">VALUE</code> which are passed around between Ruby frontend and C backend.</p>
+
+<p>A simple code snippet.</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// calculater.c</span>
+<span class="kt">void</span> <span class="nf">Init_extension</span><span class="p">()</span> <span class="p">{</span>
+  <span class="n">Calculator</span> <span class="o">=</span> <span class="n">rb_define_module</span><span class="p">(</span><span class="s">"Calculator"</span><span class="p">);</span>              <span class="c1">// Calculator module</span>
+  <span class="n">IO</span> <span class="o">=</span> <span class="n">rb_define_class_under</span><span class="p">(</span><span class="n">Calculator</span><span class="p">,</span> <span class="s">"IO"</span><span class="p">,</span> <span class="n">rb_cObject</span><span class="p">);</span> <span class="c1">// Calculator::IO class</span>
+  <span class="n">rb_define_alloc_func</span><span class="p">(</span><span class="n">IO</span><span class="p">,</span> <span class="n">io_alloc</span><span class="p">);</span>                       <span class="c1">// memory allocator for C structs</span>
+  <span class="n">rb_define_method</span><span class="p">(</span><span class="n">IO</span><span class="p">,</span> <span class="s">"initialize"</span><span class="p">,</span> <span class="n">io_init</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">);</span>          <span class="c1">// Calculator::IO#new constructor</span>
+  <span class="n">rb_define_method</span><span class="p">(</span><span class="n">IO</span><span class="p">,</span> <span class="s">"get_stream"</span><span class="p">,</span><span class="n">io_get_stream</span><span class="p">,</span><span class="mi">1</span> <span class="p">);</span>      <span class="c1">// Calculator::IO#get_stream method</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">io_init</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="n">VALUE</span><span class="o">*</span> <span class="n">argv</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">self</span><span class="p">){</span>
+  <span class="c1">// code...</span>
+  <span class="k">return</span> <span class="n">self</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">VALUE</span> <span class="nf">io_get_stream</span><span class="p">(</span><span class="n">VALUE</span> <span class="n">self</span><span class="p">,</span> <span class="n">VALUE</span> <span class="n">some_val</span><span class="p">){</span>
+  <span class="k">return</span> <span class="n">Qtrue</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p>After the C code with the module, classes and methods are in place, we compile it to get a shared object <code class="language-plaintext highlighter-rouge">extension.so</code>. Then a Ruby
+file <code class="language-plaintext highlighter-rouge">calculater.rb</code> can just load that <code class="language-plaintext highlighter-rouge">extension.so</code> as:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># calculater.rb</span>
+<span class="nb">require</span> <span class="s1">'calculater.so'</span>
+
+</code></pre></div></div>
+
+<p>This seems simple but as the size of application grows, the extension becomes tough to manage.</p>
+
+<p>I believe D to be a superior C and provides modern programming paradigm and the LDC compiler is very promising. So, it would be great if we could write the
+native extension in D and get a shared library. Also, LDC has an incredible garbage collecter that would be very helpful for scientific computing Ruby libraries.</p>
+
+<p>To write the extension in D, the <code class="language-plaintext highlighter-rouge">ruby.h</code> bindings could be created in D using <a href="http://www.dsource.org/projects/dstep"><code class="language-plaintext highlighter-rouge">dstep</code></a> or <a href="http://www.dsource.org/projects/bcd"><code class="language-plaintext highlighter-rouge">bcd</code></a>.</p>
+
+<p>RuDy <a href="https://github.com/tomash/rudy#limitations-and-areas-for-development">doesn’t have complete support</a>
+for <code class="language-plaintext highlighter-rouge">LDC</code> and I am still getting my head around using RuDy to create Ruby native extensions. <a href="http://tomash.wrug.eu/blog/2009/03/03/rudy-ruby-native-extensions-in-d-programming-language/">Here</a> is a nice blog post about RuDy project.</p>
+
+<h1 id="conclusion">Conclusion</h1>
+
+<p>Calling D from Ruby would for sure prove to be an efficient way of writing Ruby native extensions and use D as a
+better choice over C. In the meanwhile, porting faster-lmm-d is a work in progress and I will share further updates
+when it is ready.</p>
+
+<p>The progress of Ruby port of <code class="language-plaintext highlighter-rouge">faster-lmm-d</code> can be tracked at <a href="https://github.com/prasunanand/bio-faster_lmm_d"><code class="language-plaintext highlighter-rouge">Bio-faster_lmm_d</code></a>
+and would become a part of <a href="http://bioruby.org/">BioRuby</a> project. The latest progress can be tracked here.</p>
+
+<div id="disqus_thread"></div>
+<script>
+/**
+* RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+* LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+*/
+/*
+var disqus_config = function () {
+this.page.url = PAGE_URL; // Replace PAGE_URL with your page's canonical URL variable
+this.page.identifier = PAGE_IDENTIFIER; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+};
+*/
+(function() { // DON'T EDIT BELOW THIS LINE
+var d = document, s = d.createElement('script');
+
+s.src = '//prasunanandblog.disqus.com/embed.js';
+
+s.setAttribute('data-timestamp', +new Date());
+(d.head || d.body).appendChild(s);
+})();
+</script>
+
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+</p>
+              </div>
+            </div>
+
+            <div class="related-blog-wraper wow fadeInUp">
+              <h6>Related Blog</h6>
+
+              
+
+              <div class="related-blog-item latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                <a href="/cuda/opencl/ruby/rbcuda/2018/02/24/rubygrant17-rbcuda-installation-and-architecture.html.html">
+                  <div class="latest-post-item-image">
+                    <img src="/images/banner.png" alt="#">
+                  </div>
+                  <div class="latest-post-item-content">
+                    <h2>RbCUDA: Installation and Architecture</h2>
+                    <span>24 February 2018</span>
+                  </div>
+                </a>
+              </div>
+              
+
+              <div class="related-blog-item latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                <a href="/cuda/opencl/ruby/rbcuda/2017/12/30/rubygrant17-rbcuda-introduction.html.html">
+                  <div class="latest-post-item-image">
+                    <img src="/images/banner.png" alt="#">
+                  </div>
+                  <div class="latest-post-item-content">
+                    <h2>RbCUDA: CUDA bindings for Ruby</h2>
+                    <span>30 December 2017</span>
+                  </div>
+                </a>
+              </div>
+              
+
+            </div>
+          </div>
+          
+
+          <div class="col-12 col-md-12 col-lg-3">
+            <div class="blog-page-right-wraper">
+              <div class="search-wraper wow fadeInUp" data-wow-delay="0.2s">
+                <h6>Search</h6>
+                <div class="search-form-wraper">
+                  <form action="/search.html" method="GET">
+                    <input type="text" name="query" id="search-box" placeholder="Search">
+                    <button class="btn-bg"><img src="/images/icons/search.svg" alt="#"></button>
+                  </form>
+                </div>
+              </div>
+
+              <div class="latest-post-wraper wow fadeInUp" data-wow-delay="0.3s">
+                <h6>Latest Post</h6>
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/cuda/opencl/ruby/rbcuda/2018/02/24/rubygrant17-rbcuda-installation-and-architecture.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>RbCUDA: Installation and Architecture</h2>
+                      <span>24 February 2018</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/cuda/opencl/ruby/rbcuda/2017/12/30/rubygrant17-rbcuda-introduction.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>RbCUDA: CUDA bindings for Ruby</h2>
+                      <span>30 December 2017</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+                <div class="latest-post-item wow fadeInUp" data-wow-delay="0.1s">
+                  <a href="/arrayfire/cuda/opencl/ruby/2017/08/28/gsoc17-project-report.html">
+                    <div class="latest-post-item-image">
+                      <img src="/images/banner.png" alt="#">
+                    </div>
+                    <div class="latest-post-item-content">
+                      <h2>GSoC 2017: Creating the fastest math libraries for Ruby by using the GPU through OpenCL and ArrayFire.</h2>
+                      <span>28 August 2017</span>
+                    </div>
+                  </a>
+                </div>
+
+                
+              </div>
+
+              <div class="tags-wraper wow fadeInUp" data-wow-delay="0.4s">
+                <h6>Tag Clouds</h6>
+                <div class="tag-clouds">
+                  <a href="#">Engineering</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Future</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Future</a>
+                  <a href="#">Engineering</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Engineering</a>
+                  <a href="#">Infrastructure</a>
+                  <a href="#">Technology</a>
+                  <a href="#">Future</a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+
+
+        </div>
+      </div>
+    </section>
+
+    <section id="updates">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="updates-wraper">
+              <div class="updates-image wow fadeInUp" data-wow-delay="0.2s">
+                <img src="/images/image2.svg" alt="#">
+              </div>
+              <div class="updates-form header-form wow fadeInUp" data-wow-delay="0.2s">
+                <h5 class="font-h5">Subscribe for exclusive</h5>
+                <h3 class="font-h3">news and updates!</h3>
+                <form action="https://zasper.io/newsletter" method="POST">
+                  <div class="form-group">
+                    <input type="email" name="email" placeholder="Enter your email">
+                    <button type="submit" class="btn-bg hover-bg">Subscribe</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="footer">
+      <div class="container">
+        <div class="row">
+          <div class="col-12 col-md-4">
+            <div class="footer-info wow fadeInUp" data-wow-delay="0.2s">
+              <div class="footer-image wow fadeInUp" data-wow-delay="0.1s">
+                <img src="/images/logo.svg" alt="#">
+              </div>
+              <div class="footer-content wow fadeInUp" data-wow-delay="0.2s">
+                <p>Zasper strives to be at the forefront of the AI Revolution that is taking place around the world. We want to ease the pain of Data teams by enabling them to develop and deploy their AI solutions right from rapid prototyping to shipping into production.</p>
+              </div>
+              <div class="footer-social wow fadeInUp" data-wow-delay="0.3s">
+                <a href="https://www.linkedin.com/company/zasper"><i class="fa fa-linkedin" aria-hidden="true"></i></a>
+                <a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a>
+                <a href="https://github.com/zasperio"><i class="fa fa-github" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-12 col-md-8">
+            <div class="footer-menu-wraper wow fadeInUp" data-wow-delay="0.4s">
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.1s">
+                  <h6>Company</h6>
+                  <a href="https://zasper.io/product">Product</a>
+                  <a href="https://zasper.io/pricing">Pricing</a>
+                  <a href="https://zasper.io/partners">Partners</a>
+                  <a href="https://zasper.io/careers">Careers</a>
+                  <a href="https://zasper.io/support">Support</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.3s">
+                  <h6>Solutions</h6>
+                  <a href="https://zasper.io/solutions/banking">Banking</a>
+                  <a href="https://zasper.io/solutions/telecom">Telecom</a>
+                  <a href="https://zasper.io/solutions/oil-and-gas">Oil and Gas</a>
+                  <a href="https://zasper.io/solutions/healthcare">Healthcare</a>
+                  <a href="https://zasper.io/solutions/">View More</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.5s">
+                  <h6>Community</h6>
+                  <a href="/">Blog</a>
+                  <a href="https://docs.zasper.io">Docs</a>
+                  <a href="https://zasper.io/contact-us">Contact Us</a>
+                </div>
+              </div>
+              <div>
+                <div class="footer-menu wow fadeInUp" data-wow-delay="0.6s">
+                  <h6>Legal</h6>
+                  <a href="https://zasper.io/terms-and-conditions">Terms and Conditions</a>
+                  <a href="https://zasper.io/privacy">Privacy Policy</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="copyright">
+      <div class="container">
+        <div class="row">
+          <div class="col-12">
+            <div class="copyright-text wow fadeInUp" data-wow-delay="0.2s">
+              <p>©2021 zasper ai labs pvt ltd | All rights reserved.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JavaScripts -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <script src="/js/wow.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/main.js"></script>
+
+  </body>
+</html>
+

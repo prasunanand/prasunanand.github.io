@@ -4,6 +4,8 @@ title:  "ArrayFire Ruby Bindings<br>(Part VI : Device and Util)"
 date:   2017-08-22 14:00:00 +0530
 categories: arrayfire
 comments: true
+author: Prasun Anand
+banner: /images/banner.png
 ---
 
 ArrayFire has Device and Util class that contains of methods which can be used to manage the CPU and GPU
