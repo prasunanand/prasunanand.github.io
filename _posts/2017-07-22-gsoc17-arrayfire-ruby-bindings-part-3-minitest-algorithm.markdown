@@ -5,7 +5,7 @@ date:   2017-07-22 10:01:00 +0530
 categories: arrayfire
 comments: true
 author: Prasun Anand
-banner: /images/banner.png
+banner: /images/gsoc2017.png
 ---
 
 This post covers how I implemented the test-suite and `Algorithm` class for `ArrayFire-rb` using  ArrayFire C API, and

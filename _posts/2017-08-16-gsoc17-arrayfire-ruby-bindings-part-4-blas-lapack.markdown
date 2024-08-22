@@ -5,7 +5,7 @@ date:   2017-08-16 16:01:00 +0530
 categories: arrayfire
 comments: true
 author: Prasun Anand
-banner: /images/banner.png
+banner: /images/gsoc2017.png
 ---
 
 This post covers how to use `BLAS` and `LAPACK` routines with `ArrayFire-rb`, and how these functions

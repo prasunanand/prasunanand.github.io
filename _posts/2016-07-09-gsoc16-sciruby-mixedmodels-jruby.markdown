@@ -5,7 +5,7 @@ date:   2016-07-09 16:10:41 +0530
 categories: jruby ruby gem
 comments: true
 author: Prasun Anand
-banner: /images/banner.png
+banner: /images/gsoc2016.jpeg
 ---
 
 For my GSoC 2016 project of JRuby port of NMatrix, we worked on testing NMatrix-JRuby with real-life data. We started with **mixed-models** gem. 

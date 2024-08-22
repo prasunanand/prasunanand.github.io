@@ -5,7 +5,7 @@ date:   2017-08-17 14:00:00 +0530
 categories: arrayfire
 comments: true
 author: Prasun Anand
-banner: /images/banner.png
+banner: /images/gsoc2017.png
 ---
 
 This post explains about the `Statistics` and `Random` class of `arrayfire` gem.

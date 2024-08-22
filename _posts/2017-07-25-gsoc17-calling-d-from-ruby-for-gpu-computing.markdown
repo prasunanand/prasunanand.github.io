@@ -5,7 +5,7 @@ date:   2017-07-25 10:01:00 +0530
 categories: gpu-computing
 comments: true
 author: Prasun Anand
-banner: /images/banner.png
+banner: /images/gsoc2017.png
 ---
 
 Language bindings are interfaces that allow code written in one programming language to interact with or use functionalities provided by libraries or code written in another programming language. They serve as a bridge between different programming environments, making it possible for developers to leverage existing libraries or systems without needing to rewrite them in the language they are working in.

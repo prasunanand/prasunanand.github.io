@@ -5,7 +5,7 @@ date:   2017-08-24 14:00:00 +0530
 categories: arrayfire
 comments: true
 author: Prasun Anand
-banner: /images/banner.png
+banner: /images/gsoc2017.png
 ---
 
 ArrayFire-rb has been interfaced to NMatrix so that they can work together. Sometimes, copying data

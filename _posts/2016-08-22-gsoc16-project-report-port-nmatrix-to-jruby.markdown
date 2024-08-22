@@ -5,7 +5,7 @@ date:   2016-08-22 20:10:41 +0530
 categories: jruby
 comments: true
 author: Prasun Anand
-banner: /images/banner.png
+banner: /images/gsoc2016.jpeg
 ---
 
 I have been working on "Port NMatrix to JRuby" as my GSoC project. I am pleased to announce that **JRuby is ready for Nmatrix users**.

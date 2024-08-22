@@ -5,7 +5,7 @@ date:   2017-08-28 08:10:41 +0530
 categories: arrayfire cuda opencl ruby
 comments: true
 author: Prasun Anand
-banner: /images/banner.png
+banner: /images/gsoc2017.png
 ---
 
 GSoC 2017 is about to end. This post summarises my work during the course of summer.
