@@ -8,12 +8,20 @@ author: Prasun Anand
 banner: /images/banner.png
 ---
 
+
+RBCuda is a software library designed to integrate with Ruby. It provides an interface for leveraging NVIDIA CUDA technology to accelerate computations on GPUs (Graphics Processing Units). This can significantly speed up tasks like matrix operations, simulations, and data processing by harnessing the parallel processing power of modern GPUs. Essentially, RBCuda helps Ruby users perform complex calculations more efficiently by offloading them to a GPU.
+
+The main objectives of RbCUDA are:
+
+* Map all of CUDA into Ruby
+* Ready-made on-GPU linear algebra, reduction, scan using cuBLAS, cuMath, cuSolver libraries.
+* Random Numer generator using cuRand
+* Near-zero wrapping overhead.
+* CUDA profiler for Ruby.
+
 This post explains the architecture of `RbCUDA` and how you can install it on your machine.
 
-todo:
-I have been working on "Port NMatrix to JRuby" as my GSoC project. I am pleased to announce that **JRuby is ready for Nmatrix users**.
 
-NMatrix, a linear algebra library wraps Apache Commons Maths for its core functionalities. By the end of GSoC, I have been able to implement NMatrix for dense matrices with double and object ( ruby objects ) data type. I have also worked on porting mixed-models gem to JRuby which heavily uses NMatrix at its core.
 
 
 # Installation

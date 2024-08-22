@@ -8,10 +8,7 @@ author: Prasun Anand
 banner: /images/banner.png
 ---
 
-todo:
-I have been working on "Port NMatrix to JRuby" as my GSoC project. I am pleased to announce that **JRuby is ready for Nmatrix users**.
-
-NMatrix, a linear algebra library wraps Apache Commons Maths for its core functionalities. By the end of GSoC, I have been able to implement NMatrix for dense matrices with double and object ( ruby objects ) data type. I have also worked on porting mixed-models gem to JRuby which heavily uses NMatrix at its core.
+Language bindings are interfaces that allow code written in one programming language to interact with or use functionalities provided by libraries or code written in another programming language. They serve as a bridge between different programming environments, making it possible for developers to leverage existing libraries or systems without needing to rewrite them in the language they are working in.
 
 
 As [`ArrayFire-rb`](https://github.com/prasunanand/arrayfire-rb), a GPGPU libray has started taking shape,

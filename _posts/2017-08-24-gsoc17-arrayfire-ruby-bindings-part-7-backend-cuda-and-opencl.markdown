@@ -7,14 +7,11 @@ comments: true
 author: Prasun Anand
 banner: /images/banner.png
 ---
-todo:
-I have been working on "Port NMatrix to JRuby" as my GSoC project. I am pleased to announce that **JRuby is ready for Nmatrix users**.
 
-NMatrix, a linear algebra library wraps Apache Commons Maths for its core functionalities. By the end of GSoC, I have been able to implement NMatrix for dense matrices with double and object ( ruby objects ) data type. I have also worked on porting mixed-models gem to JRuby which heavily uses NMatrix at its core.
 
 
 ArrayFire can run not just on GPU devices but also on CPU devices, which is one of its really cool features.
-With version `3.2` the `unified-backend` helps in changing the ArrayFire backend on the fly.
+With version **3.2** the **unified-backend** helps in changing the ArrayFire backend on the fly.
 When using the unified-backend, the preference order for the default backend is CUDA > OpenCL > CPU.
 
 The CPU backend requires `Intel MKL libraries` be installed. To install Intel MKL library, go to the official

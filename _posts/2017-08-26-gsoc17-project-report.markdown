@@ -9,11 +9,10 @@ banner: /images/banner.png
 ---
 
 GSoC 2017 is about to end. This post summarises my work during the course of summer.
-todo:
-I have been working on "Port NMatrix to JRuby" as my GSoC project. I am pleased to announce that **JRuby is ready for Nmatrix users**.
 
-NMatrix, a linear algebra library wraps Apache Commons Maths for its core functionalities. By the end of GSoC, I have been able to implement NMatrix for dense matrices with double and object ( ruby objects ) data type. I have also worked on porting mixed-models gem to JRuby which heavily uses NMatrix at its core.
+Few people realise it, but even modest computers today, including mobile phones, have powerful GPUs. And these GPUs can be used serially and in parallel to CPUs, potentially delivering awesome performance.
 
+In this project I wanted to make it possible to combine the beauty of Ruby with transparent GPU processing so that software developers can easily use that power when available, and farm out computations transparently to GPU and CPU. This will work both on client computers and on servers that make use of TESLA's and Intel Xeon Phi solutions.
 
 # Application
 

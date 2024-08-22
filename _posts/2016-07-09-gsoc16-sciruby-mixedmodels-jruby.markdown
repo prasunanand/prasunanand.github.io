@@ -8,7 +8,6 @@ author: Prasun Anand
 banner: /images/banner.png
 ---
 
-## **Introduction**
 For my GSoC 2016 project of JRuby port of NMatrix, we worked on testing NMatrix-JRuby with real-life data. We started with **mixed-models** gem. 
 
 Mixed models are statistical models which predict the value of a response variable as a result of fixed and random effects. All matrix calculations are performed using the gem **nmatrix**, which has a quite intuitive syntax and contributes to the overall code readability as well.
