@@ -4,9 +4,10 @@ title: About
 permalink: /about/
 ---
 
-Hi, I am Prasun. I work as a software engineer at [Quansight](https://www.quansight.com/). Currently I am working on the [Pytorch](https://pytorch.org/) library. I am contributing to [Uarray](https://github.com/Quansight-Labs/uarray) and [Unumpy](https://github.com/Quansight-Labs/unumpy) development.
+Hi, I am Prasun. I love building software. I am the creator of [Zasper](https://github.com/zasper-io/zasper): Supercharged IDE for Data Science.
 
-I am a huge supporter of Open-source software and love Bioinformatics. I am involved with different open-source projects aimed at super fast Scientific Computing on Python, Ruby and D.
+
+Previously I worked as a software engineer at [Quansight](https://www.quansight.com/).Here I was contributing  on the [Pytorch](https://pytorch.org/) library and [Nebari](https://github.com/nebari-dev/nebari) project.
 
 I briefly worked as a Software Architect at Modak Analytics Software where I was leading the Genomics team. Here, I was responsible for building Genome scan tools optimized for GPU clusters, to aid pharmaceutical companies study large-scale genomics data. I built a strong team from the ground up and set up collaborations with some of the top research organisations in India and around the world.
 
@@ -33,7 +34,7 @@ for Ruby/JRuby by using the GPU through OpenCL and ArrayFire"](https://summerofc
 
 # Programming
 
-I like to program in C++, C, Python, Java, D and Ruby.
+I like to program in Go, C++, C, Python, Java, D and Ruby.
 
 I love GPU programming and have built opensource libraries in D and Ruby that help in GPU acceleration. I am
 the creator and maintainer of `ArrayFire-rb`, `ArrayFire-D`, `cuda_d` and `RbCUDA`.
