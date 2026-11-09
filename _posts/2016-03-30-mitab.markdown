@@ -39,7 +39,7 @@ Check out the [Mitab Gem][mitab-gem]. File all bugs/feature requests at [Mitabâ€
 
 [mitab-gem]: https://rubygems.org/gems/mitab
 [mitab-gh]: https://github.com/prasunanand/mitab
-[prasun-mail]: mail-to:prasunanand.bitsp@gmail.com
+[prasun-mail]: mailto:prasunanand.bitsp@gmail.com
 
 {% if page.comments %}
 <div id="disqus_thread"></div>

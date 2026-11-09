@@ -7,11 +7,15 @@
 
       for (var i = 0; i < results.length; i++) {  // Iterate over the results
         var item = store[results[i].ref];
-        appendString += '<div class="blog-list-item wow fadeInUp"><a href="'
+        appendString += '<div class="blog-list-item"><a href="'
         appendString += item.url
-        appendString += '.html"><div class="blog-list-item-image"><img src="images/blog.jpg" alt="#"><span class="blog-list-item-badge new-blog">New</span></div><div class="blog-list-item-content"><h2>'
+        appendString += '"><div class="blog-list-item-image"><img src="'
+        appendString += item.banner
+        appendString += '" alt=""></div><div class="blog-list-item-content"><h2>'
         appendString += item.title
-        appendString += '</h2><div class="blog-published-info"><span class="blog-post-date">September 17, 2021 by</span><span class="blog-post-author">';
+        appendString += '</h2><div class="blog-published-info"><span class="blog-post-date">'
+        appendString += item.date
+        appendString += ' by</span><span class="blog-post-author">';
         appendString += item.author;
         appendString += '</span></div><p>'
         appendString += item.content.substring(0, 150)
@@ -21,7 +25,7 @@
 
       searchResults.innerHTML = appendString;
     } else {
-      searchResults.innerHTML = '<li>No results found</li>';
+      searchResults.innerHTML = '<p>No results found.</p>';
     }
   }
 
@@ -61,9 +65,9 @@
         'category': window.store[key].category,
         'content': window.store[key].content
       });
-
-      var results = idx.search(searchTerm); // Get lunr to perform a search
-      displaySearchResults(results, window.store); // We'll write this in the next section
     }
+
+    var results = idx.search(searchTerm);
+    displaySearchResults(results, window.store);
   }
 })();

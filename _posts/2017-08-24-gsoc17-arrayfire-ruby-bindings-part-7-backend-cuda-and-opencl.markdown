@@ -38,7 +38,7 @@ Next, run
 $ sudo ldconfig
 ```
 
-Now download arrayfire-rb from [link]("https://github.com/prasunanand/arrayfire-rb")
+Now download arrayfire-rb from [link](https://github.com/prasunanand/arrayfire-rb)
 
 ```ruby
 $ git clone https://github.com/prasunanand/arrayfire-rb

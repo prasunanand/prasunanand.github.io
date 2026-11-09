@@ -7,7 +7,7 @@
           <div class="col-12 col-md-12 col-lg-9">
             <div class="blog-details-wraper">
               <div class="blog-main-image wow fadeInUp">
-                <img src="{{ page.banner }}" alt="#">
+                <img src="{{ page.banner }}" alt="">
               </div>
 
               <div class="blog-title wow fadeInUp">
@@ -20,29 +20,33 @@
               </div>
 
               <div class="blog-description wow fadeInUp">
-              	<p>{{ page.content }}</p>
+                {{ content }}
               </div>
             </div>
 
+            {% if page.previous or page.next %}
             <div class="related-blog-wraper wow fadeInUp">
-              <h6>Related Blog</h6>
+              <h6>More posts</h6>
 
-              {% for post in site.posts limit:2 %}
-
+              {% assign neighbours = "" | split: "" %}
+              {% if page.next %}{% assign neighbours = neighbours | push: page.next %}{% endif %}
+              {% if page.previous %}{% assign neighbours = neighbours | push: page.previous %}{% endif %}
+              {% for post in neighbours %}
               <div class="related-blog-item latest-post-item wow fadeInUp" data-wow-delay="0.1s">
-                <a href="{{ post.url }}.html">
+                <a href="{{ post.url }}">
                   <div class="latest-post-item-image">
-                    <img src="{{ post.banner }}" alt="#">
+                    <img src="{{ post.banner }}" alt="">
                   </div>
                   <div class="latest-post-item-content">
                     <h2>{{ post.title }}</h2>
-                    <span>{{ post.date | date: "%-d %B %Y"}}</span>
+                    <span>{{ post.date | date: "%-d %B %Y" }}</span>
                   </div>
                 </a>
               </div>
               {% endfor %}
 
             </div>
+            {% endif %}
           </div>
           {% include search.html %}
 

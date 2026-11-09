@@ -10,8 +10,7 @@
             <div class="blog-list-item wow fadeInUp">
               <a href="{{ post.url }}">
                 <div class="blog-list-item-image">
-                  <img src="{{ post.banner }}" alt="#">
-                  <span class="blog-list-item-badge new-blog">New</span>
+                  <img src="{{ post.banner }}" alt="">
                 </div>
                 <div class="blog-list-item-content">
                   <h2>{{ post.title }}</h2>
@@ -19,7 +18,7 @@
                     <span class="blog-post-date">{{ post.date | date: "%-d %B %Y"}} by</span>
                     <span class="blog-post-author">{{ post.author }}</span>
                   </div>
-                  <p>{{ post.content | truncate:250 }}</p>
+                  <p>{{ post.excerpt | strip_html | normalize_whitespace | truncate: 250 }}</p>
                 </div>
               </a>
             </div>
