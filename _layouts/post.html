@@ -1,58 +1,47 @@
-{% include header.html %}
+{% include head.html %}
+{% include nav.html %}
 
+<div class="mk-band mk-band-dark mk-band-hero">
+  <div class="mk-wrap mk-hero">
+    <a class="mk-back" href="/">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5" /><path d="m12 19-7-7 7-7" /></svg>
+      All posts
+    </a>
+    {% if page.categories.size > 0 %}
+    <div class="mk-hero-tags">
+      {% for category in page.categories %}
+      <a class="mk-eyebrow" href="/search.html?query={{ category | url_encode }}">{{ category }}</a>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <h1 class="mk-section-title">{{ page.title }}</h1>
+    <p class="mk-post-meta">{{ page.date | date: "%-d %B %Y" }} · {{ page.author }}</p>
+  </div>
+</div>
 
-    <section id="blog-sec">
-      <div class="container">
-        <div class="row">
-          <div class="col-12 col-md-12 col-lg-9">
-            <div class="blog-details-wraper">
-              <div class="blog-main-image wow fadeInUp">
-                <img src="{{ page.banner }}" alt="">
-              </div>
+<main class="mk-main">
+  {% if page.banner %}<img class="mk-banner" src="{{ page.banner }}" alt="">{% endif %}
 
-              <div class="blog-title wow fadeInUp">
-                <h2>{{ page.title }}</h2>
-              </div>
+  <article class="mk-body">
+    {{ content }}
+  </article>
 
-              <div class="blog-published-info wow fadeInUp">
-                <span class="blog-post-date">{{ page.date | date: "%-d %B %Y" }} by</span>
-                <span class="blog-post-author">{{ page.author }}</span>
-              </div>
-
-              <div class="blog-description wow fadeInUp">
-                {{ content }}
-              </div>
-            </div>
-
-            {% if page.previous or page.next %}
-            <div class="related-blog-wraper wow fadeInUp">
-              <h6>More posts</h6>
-
-              {% assign neighbours = "" | split: "" %}
-              {% if page.next %}{% assign neighbours = neighbours | push: page.next %}{% endif %}
-              {% if page.previous %}{% assign neighbours = neighbours | push: page.previous %}{% endif %}
-              {% for post in neighbours %}
-              <div class="related-blog-item latest-post-item wow fadeInUp" data-wow-delay="0.1s">
-                <a href="{{ post.url }}">
-                  <div class="latest-post-item-image">
-                    <img src="{{ post.banner }}" alt="">
-                  </div>
-                  <div class="latest-post-item-content">
-                    <h2>{{ post.title }}</h2>
-                    <span>{{ post.date | date: "%-d %B %Y" }}</span>
-                  </div>
-                </a>
-              </div>
-              {% endfor %}
-
-            </div>
-            {% endif %}
-          </div>
-          {% include search.html %}
-
-
-        </div>
-      </div>
-    </section>
+  {% if page.previous or page.next %}
+  <nav class="mk-pager" aria-label="More posts">
+    {% if page.previous %}
+    <a href="{{ page.previous.url }}">
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5" /><path d="m12 19-7-7 7-7" /></svg>
+      <span><em>Older</em>{{ page.previous.title }}</span>
+    </a>
+    {% endif %}
+    {% if page.next %}
+    <a class="mk-pager-next" href="{{ page.next.url }}">
+      <span><em>Newer</em>{{ page.next.title }}</span>
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
+    </a>
+    {% endif %}
+  </nav>
+  {% endif %}
+</main>
 
 {% include footer.html %}

@@ -1,31 +1,30 @@
 (function() {
-  function displaySearchResults(results, store) {
+  function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.textContent = text == null ? '' : String(text);
+    return div.innerHTML;
+  }
+
+  // Same markup as a card on the home page (_layouts/home.html).
+  function renderCard(item) {
+    return '<article class="mk-card"><a class="mk-card-link" href="' + escapeHtml(item.url) + '">' +
+      (item.banner ? '<img class="mk-card-thumb" src="' + escapeHtml(item.banner) + '" alt="" loading="lazy">' : '') +
+      '<span><span class="mk-card-meta">' +
+      (item.kind ? '<span class="mk-card-kind">' + escapeHtml(item.kind) + '</span>' : '') +
+      escapeHtml(item.date) +
+      '</span><h2>' + item.title + '</h2>' +
+      '<p>' + escapeHtml(item.excerpt) + '</p></span></a></article>';
+  }
+
+  function displaySearchResults(results, store, searchTerm) {
     var searchResults = document.getElementById('search-results');
 
-    if (results.length) { // Are there any results?
-      var appendString = '';
-
-      for (var i = 0; i < results.length; i++) {  // Iterate over the results
-        var item = store[results[i].ref];
-        appendString += '<div class="blog-list-item"><a href="'
-        appendString += item.url
-        appendString += '"><div class="blog-list-item-image"><img src="'
-        appendString += item.banner
-        appendString += '" alt=""></div><div class="blog-list-item-content"><h2>'
-        appendString += item.title
-        appendString += '</h2><div class="blog-published-info"><span class="blog-post-date">'
-        appendString += item.date
-        appendString += ' by</span><span class="blog-post-author">';
-        appendString += item.author;
-        appendString += '</span></div><p>'
-        appendString += item.content.substring(0, 150)
-        appendString += '</p></div></a></div>'
-
-      }
-
-      searchResults.innerHTML = appendString;
+    if (results.length) {
+      searchResults.innerHTML = results.map(function(result) {
+        return renderCard(store[result.ref]);
+      }).join('');
     } else {
-      searchResults.innerHTML = '<p>No results found.</p>';
+      searchResults.innerHTML = '<p class="mk-empty">No posts match “' + escapeHtml(searchTerm) + '”.</p>';
     }
   }
 
@@ -36,7 +35,7 @@
     for (var i = 0; i < vars.length; i++) {
       var pair = vars[i].split('=');
 
-      if (pair[0] === variable) {
+      if (pair[0] === variable && pair[1] !== undefined) {
         return decodeURIComponent(pair[1].replace(/\+/g, '%20'));
       }
     }
@@ -45,10 +44,9 @@
   var searchTerm = getQueryVariable('query');
 
   if (searchTerm) {
-    document.getElementById('search-box').setAttribute("value", searchTerm);
+    document.getElementById('search-box').setAttribute('value', searchTerm);
 
-    // Initalize lunr with the fields it will be searching on. I've given title
-    // a boost of 10 to indicate matches on this field are more important.
+    // Title matches are boosted so they rank above passing mentions in a post body.
     var idx = lunr(function () {
       this.field('id');
       this.field('title', { boost: 10 });
@@ -57,7 +55,7 @@
       this.field('content');
     });
 
-    for (var key in window.store) { // Add the data to lunr
+    for (var key in window.store) {
       idx.add({
         'id': key,
         'title': window.store[key].title,
@@ -67,7 +65,8 @@
       });
     }
 
-    var results = idx.search(searchTerm);
-    displaySearchResults(results, window.store);
+    displaySearchResults(idx.search(searchTerm), window.store, searchTerm);
+  } else {
+    document.getElementById('search-box').focus();
   }
 })();

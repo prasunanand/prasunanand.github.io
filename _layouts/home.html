@@ -1,37 +1,30 @@
-{% include header.html %}
+{% include head.html %}
+{% include nav.html %}
 
-    <section id="blog-sec">
-      <div class="container">
-        <div class="row">
+<div class="mk-band mk-band-dark mk-band-hero">
+  <div class="mk-wrap mk-hero">
+    <p class="mk-eyebrow">Blog</p>
+    <h1 class="mk-section-title">Notes on <span class="mk-accent">GPU computing</span> and scientific Ruby</h1>
+    <p class="mk-section-sub">From Google Summer of Code and the Ruby Grant: NMatrix on JRuby, ArrayFire and CUDA bindings for Ruby, and calling D from Ruby.</p>
+  </div>
+</div>
 
-          <div class="col-12 col-md-12 col-lg-9">
-
-            {% for post in site.posts %}
-            <div class="blog-list-item wow fadeInUp">
-              <a href="{{ post.url }}">
-                <div class="blog-list-item-image">
-                  <img src="{{ post.banner }}" alt="">
-                </div>
-                <div class="blog-list-item-content">
-                  <h2>{{ post.title }}</h2>
-                  <div class="blog-published-info">
-                    <span class="blog-post-date">{{ post.date | date: "%-d %B %Y"}} by</span>
-                    <span class="blog-post-author">{{ post.author }}</span>
-                  </div>
-                  <p>{{ post.excerpt | strip_html | normalize_whitespace | truncate: 250 }}</p>
-                </div>
-              </a>
-            </div>
-            {% endfor %}
-
-          </div>
-
-          {% include search.html %}
-
-
-        </div>
-      </div>
-    </section>
-
+<main class="mk-main">
+  {% for post in site.posts %}
+  <article class="mk-card">
+    <a class="mk-card-link" href="{{ post.url }}">
+      {% if post.banner %}<img class="mk-card-thumb" src="{{ post.banner }}" alt="" loading="lazy">{% endif %}
+      <span>
+        <span class="mk-card-meta">
+          {% if post.categories.size > 0 %}<span class="mk-card-kind">{{ post.categories | first }}</span>{% endif %}
+          {{ post.date | date: "%-d %B %Y" }}
+        </span>
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.excerpt | strip_html | normalize_whitespace | truncate: 300 }}</p>
+      </span>
+    </a>
+  </article>
+  {% endfor %}
+</main>
 
 {% include footer.html %}

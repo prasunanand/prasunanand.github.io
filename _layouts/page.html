@@ -1,27 +1,17 @@
-{% include header.html %}
+{% include head.html %}
+{% include nav.html %}
 
+<div class="mk-band mk-band-dark mk-band-hero">
+  <div class="mk-wrap mk-hero">
+    <h1 class="mk-section-title">{{ page.title }}</h1>
+    {% if page.subtitle %}<p class="mk-section-sub">{{ page.subtitle }}</p>{% endif %}
+  </div>
+</div>
 
-    <section id="blog-sec">
-      <div class="container">
-        <div class="row">
-          <div class="col-12 col-md-12 col-lg-9">
-            <div class="blog-details-wraper">
-
-              <div class="blog-title wow fadeInUp">
-                <h2>{{ page.title }}</h2>
-              </div>
-
-              <div class="blog-description wow fadeInUp">
-                {{ content }}
-              </div>
-            </div>
-
-          </div>
-          {% include search.html %}
-
-
-        </div>
-      </div>
-    </section>
+<main class="mk-main">
+  <article class="mk-body">
+    {{ content }}
+  </article>
+</main>
 
 {% include footer.html %}
