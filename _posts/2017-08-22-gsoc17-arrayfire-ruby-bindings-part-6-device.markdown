@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "ArrayFire Ruby Bindings<br>(Part VI : Device and Util)"
+title:  "ArrayFire Ruby Bindings <br>(Part VI : Device and Util)"
 date:   2017-08-22 14:00:00 +0530
 categories: arrayfire
 comments: true

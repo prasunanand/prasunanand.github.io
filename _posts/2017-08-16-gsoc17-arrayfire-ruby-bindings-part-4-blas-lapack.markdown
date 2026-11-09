@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "ArrayFire Ruby Bindings<br>(Part IV : BLAS and LAPACK routines)"
+title:  "ArrayFire Ruby Bindings <br>(Part IV : BLAS and LAPACK routines)"
 date:   2017-08-16 16:01:00 +0530
 categories: arrayfire
 comments: true

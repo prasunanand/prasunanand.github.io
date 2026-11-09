@@ -117,6 +117,7 @@ DEPENDENCIES
   jekyll (~> 4.3.3)
   jekyll-feed (~> 0.12)
   jekyll-minifier (= 0.1.10)
+  jekyll-seo-tag (~> 2.8)
   logger
   minima (~> 2.5)
   s3_website (= 2.8.6)

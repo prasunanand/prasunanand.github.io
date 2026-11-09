@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "ArrayFire Ruby Bindings<br>(Part I : Installation)"
+title:  "ArrayFire Ruby Bindings <br>(Part I : Installation)"
 date:   2017-06-23 14:15:00 +0530
 categories: arrayfire
 comments: true
