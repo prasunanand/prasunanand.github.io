@@ -29,12 +29,7 @@ end
 # Performance-booster for watching directories on Windows
 gem "wdm", "~> 0.1.1", :platforms => [:mingw, :x64_mingw, :mswin]
 
-
 gem "webrick", "~> 1.7"
-
-gem "s3_website", "= 2.8.6"
-
-gem "jekyll-minifier", "= 0.1.10"
 
 # Removed from Ruby's default gems in 3.4+/3.5+; required by Jekyll
 gem "csv"
