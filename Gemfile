@@ -34,3 +34,9 @@ gem "webrick", "~> 1.7"
 gem "s3_website", "= 2.8.6"
 
 gem "jekyll-minifier", "= 0.1.10"
+
+# Removed from Ruby's default gems in 3.4+/3.5+; required by Jekyll
+gem "csv"
+gem "logger"
+gem "base64"
+gem "bigdecimal"
